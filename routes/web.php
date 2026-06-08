@@ -15,11 +15,24 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated routes (harus login)
 Route::middleware('auth')->group(function () {
+    // Route yang bisa diakses semua role (owner + cashier)
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard/Index');
-    })->name('dashboard');
+    // Route khusus owner
+    Route::middleware('role:owner')->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('Dashboard/Index');
+        })->name('dashboard');
+
+        // Route untuk products, categories, reports, settings
+        // akan ditambahkan di task masing-masing
+    });
+
+    // Route yang bisa diakses owner DAN cashier
+    Route::middleware('role:owner,cashier')->group(function () {
+        // Route POS akan ditambahkan di task T027
+        // Route riwayat transaksi akan ditambahkan di task T049
+    });
 });
 
 // Redirect root ke dashboard atau login
