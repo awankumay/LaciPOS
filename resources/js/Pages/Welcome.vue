@@ -1,9 +1,13 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { useFormatCurrency } from '@/composables/useFormatCurrency';
 
 defineProps({
     appName: String,
 });
+
+const { formatRupiah } = useFormatCurrency();
+const testPrice = formatRupiah(28000); // Harus menghasilkan "Rp 28.000"
 </script>
 
 <template>
@@ -13,9 +17,7 @@ defineProps({
         </template>
 
         <div class="rounded-lg border border-slate-200 bg-white p-6">
-            <p class="text-slate-600">
-                Selamat datang di {{ appName }}! Layout dengan sidebar berhasil.
-            </p>
+            <p class="text-slate-600">Test format: {{ testPrice }}</p>
         </div>
     </AppLayout>
 </template>
