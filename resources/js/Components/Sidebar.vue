@@ -1,5 +1,5 @@
 <script setup>
-import { usePage } from '@inertiajs/vue3';
+import { usePage, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import SidebarNavItem from '@/Components/SidebarNavItem.vue';
 import {
@@ -39,6 +39,10 @@ const menuItems = computed(() => isOwner.value ? ownerMenuItems : cashierMenuIte
 const isActive = (href) => {
     return currentUrl.value.startsWith(href);
 };
+
+const logout = () => {
+    router.post('/logout');
+};
 </script>
 
 <template>
@@ -72,12 +76,13 @@ const isActive = (href) => {
                     <p class="text-xs text-slate-500 capitalize">{{ user?.role }}</p>
                 </div>
             </div>
-            <SidebarNavItem
-                href="/logout"
-                :icon="LogOut"
-                label="Keluar"
-                :active="false"
-            />
+            <button
+                @click="logout"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+            >
+                <LogOut class="h-5 w-5" />
+                <span>Keluar</span>
+            </button>
         </div>
     </aside>
 </template>
