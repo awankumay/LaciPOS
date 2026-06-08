@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\OnboardingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,6 +18,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     // Route yang bisa diakses semua role (owner + cashier)
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+    // Route onboarding
+    Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding');
+    Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
 
     // Route khusus owner
     Route::middleware('role:owner')->group(function () {
