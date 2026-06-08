@@ -14,15 +14,17 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store']);
 });
 
-// Authenticated routes (harus login)
+// Auth-only routes (tanpa onboarding guard — bisa diakses sebelum onboarding selesai)
 Route::middleware('auth')->group(function () {
-    // Route yang bisa diakses semua role (owner + cashier)
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    // Route onboarding
+    // Route onboarding TIDAK pakai middleware 'onboarding' (mencegah infinite redirect loop)
     Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding');
     Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
+});
 
+// Protected routes (auth + onboarding harus selesai)
+Route::middleware(['auth', 'onboarding'])->group(function () {
     // Route khusus owner
     Route::middleware('role:owner')->group(function () {
         Route::get('/dashboard', function () {
