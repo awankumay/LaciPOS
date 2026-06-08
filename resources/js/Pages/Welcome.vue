@@ -1,7 +1,5 @@
 <script setup>
-import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { Store } from 'lucide-vue-next';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 defineProps({
     appName: String,
@@ -9,20 +7,15 @@ defineProps({
 </script>
 
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-slate-50">
-        <Card class="w-[400px]">
-            <CardHeader>
-                <CardTitle class="flex items-center gap-2">
-                    <Store class="w-6 h-6" />
-                    {{ appName }}
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p class="text-slate-600 mb-4">
-                    Tailwind CSS, shadcn-vue, dan Lucide berhasil terinstall!
-                </p>
-                <Button>Test Button</Button>
-            </CardContent>
-        </Card>
-    </div>
+    <AppLayout title="Dashboard">
+        <template #header>
+            <h1 class="text-2xl font-semibold text-slate-900">Dashboard</h1>
+        </template>
+
+        <div class="rounded-lg border border-slate-200 bg-white p-6">
+            <p class="text-slate-600">
+                Selamat datang di {{ appName }}! Layout dengan sidebar berhasil.
+            </p>
+        </div>
+    </AppLayout>
 </template>
