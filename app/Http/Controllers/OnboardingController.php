@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OnboardingRequest;
 use App\Models\StoreProfile;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class OnboardingController extends Controller
@@ -16,16 +16,42 @@ class OnboardingController extends Controller
         $profile = StoreProfile::getProfile();
 
         return Inertia::render('Onboarding/Index', [
-            'existingProfile' => $profile,
+            'existingProfile' => $profile ? [
+                'store_name' => $profile->store_name,
+                'address' => $profile->address,
+                'phone' => $profile->phone,
+                'logo_url' => $profile->logo_url,
+                'receipt_footer' => $profile->receipt_footer,
+            ] : null,
         ]);
     }
 
     /**
-     * Simpan data onboarding (dipanggil di step terakhir).
-     * Endpoint ini akan digunakan di T013.
+     * Simpan data onboarding ke database.
+     * Upload logo ke storage jika ada.
      */
-    public function store(Request $request)
+    public function store(OnboardingRequest $request)
     {
-        // Akan diimplementasikan lengkap di T013
+        $data = [
+            'store_name' => $request->validated('store_name'),
+            'address' => $request->validated('address'),
+            'phone' => $request->validated('phone'),
+            'receipt_footer' => $request->validated('receipt_footer'),
+        ];
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('logos', 'public');
+            $data['logo_path'] = $logoPath;
+        }
+
+        // Update or create (hanya 1 record)
+        StoreProfile::updateOrCreate(
+            [], // Tidak ada where condition, selalu row pertama
+            $data
+        );
+
+        return redirect('/dashboard')
+            ->with('success', 'Setup toko berhasil! Selamat berjualan.');
     }
 }
