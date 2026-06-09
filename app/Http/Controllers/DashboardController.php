@@ -28,6 +28,18 @@ class DashboardController extends Controller
             ->limit(10)
             ->get(['id', 'name', 'stock', 'min_stock_alert', 'category_id']);
 
+        $salesData = collect(range(6, 0))->map(function ($daysAgo) {
+            $date = now()->subDays($daysAgo)->startOfDay();
+            $revenue = Order::where('status', 'completed')
+                ->whereDate('created_at', $date)
+                ->sum('total_amount');
+            return [
+                'date' => $date->format('d/m'),
+                'day' => $date->translatedFormat('D'),
+                'revenue' => (float) $revenue,
+            ];
+        });
+
         return Inertia::render('Dashboard/Index', [
             'stats' => [
                 'totalRevenue' => $totalRevenue,
@@ -35,6 +47,7 @@ class DashboardController extends Controller
                 'grossProfit' => $grossProfit,
             ],
             'restockProducts' => $restockProducts,
+            'salesData' => $salesData,
         ]);
     }
 }

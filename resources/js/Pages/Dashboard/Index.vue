@@ -15,10 +15,15 @@ import {
 } from 'lucide-vue-next';
 
 import StatCard from '@/Components/StatCard.vue';
+import SalesChart from '@/Components/SalesChart.vue';
 
 const props = defineProps({
     stats: Object,
     restockProducts: {
+        type: Array,
+        default: () => [],
+    },
+    salesData: {
         type: Array,
         default: () => [],
     },
@@ -200,6 +205,18 @@ const quickActions = [
                                 Buka Kasir
                             </a>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Chart -->
+            <div>
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-xs font-semibold uppercase tracking-widest text-[#7c8c9a]">Grafik Pendapatan 7 Hari Terakhir</h3>
+                </div>
+                <div class="rounded-2xl border border-[#e1e5e8] bg-white px-6 pb-6 shadow-[0_1px_2px_rgba(0,30,43,0.04)] overflow-x-auto">
+                    <div class="min-w-[500px]">
+                        <SalesChart :data="salesData" />
                     </div>
                 </div>
             </div>
