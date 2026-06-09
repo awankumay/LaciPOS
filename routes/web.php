@@ -41,7 +41,8 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
     Route::resource('products', ProductController::class)->except(['show']);
 
         // Route untuk reports, settings
-        // akan ditambahkan di task masing-masing
+        Route::get('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'index'])->name('settings.printer.index');
+        Route::post('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'store'])->name('settings.printer.store');
     });
 
     // Route yang bisa diakses owner DAN cashier

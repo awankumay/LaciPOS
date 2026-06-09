@@ -15,6 +15,9 @@ class StoreProfile extends Model
         'phone',
         'logo_path',
         'receipt_footer',
+        'printer_name',
+        'paper_size',
+        'auto_print',
     ];
 
     /**
