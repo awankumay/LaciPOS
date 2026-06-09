@@ -63,4 +63,29 @@ class ReportController extends Controller
             'filters' => ['start_date' => $startDate, 'end_date' => $endDate],
         ]);
     }
+
+    public function bestSellers(Request $request)
+    {
+        $startDate = $request->input('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->format('Y-m-d'));
+
+        $products = \App\Models\OrderItem::whereHas('order', fn ($q) =>
+            $q->where('status', 'completed')
+                ->whereDate('created_at', '>=', $startDate)
+                ->whereDate('created_at', '<=', $endDate)
+        )->select(
+            'product_id',
+            DB::raw("MAX(product_name_snapshot) as product_name"),
+            DB::raw("SUM(quantity) as total_qty"),
+            DB::raw("SUM(subtotal) as total_revenue")
+        )->groupBy('product_id')
+        ->orderByDesc('total_qty')
+        ->limit(50)
+        ->get();
+
+        return Inertia::render('Reports/BestSellers', [
+            'products' => $products,
+            'filters' => ['start_date' => $startDate, 'end_date' => $endDate],
+        ]);
+    }
 }
