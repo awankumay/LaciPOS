@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ReportTabs from '@/Components/ReportTabs.vue';
 import { Download, FileText, Calendar, Filter } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -56,6 +57,8 @@ const formatDate = (dateString) => {
         </template>
 
         <div class="space-y-6">
+            <ReportTabs />
+
             <!-- Filters -->
             <div class="rounded-2xl border border-[#e1e5e8] bg-white p-5 shadow-[0_1px_2px_rgba(0,30,43,0.04)]">
                 <div class="flex flex-col sm:flex-row items-end gap-4">

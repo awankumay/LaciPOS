@@ -35,6 +35,7 @@ class DashboardController extends Controller
                 ->sum('total_amount');
             return [
                 'date' => $date->format('d/m'),
+                'full_date' => $date->toDateString(),
                 'day' => $date->translatedFormat('D'),
                 'revenue' => (float) $revenue,
             ];

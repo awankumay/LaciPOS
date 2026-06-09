@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ReportTabs from '@/Components/ReportTabs.vue';
 import { Calendar, Filter, Wallet, ArrowDownCircle, ArrowUpCircle, Info, Download, FileText } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -53,6 +54,8 @@ const formatRupiah = (value) => {
         </template>
 
         <div class="space-y-6">
+            <ReportTabs />
+
             <!-- Disclaimer -->
             <div class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800 flex items-start gap-3">
                 <Info class="h-5 w-5 shrink-0 text-blue-500 mt-0.5" />

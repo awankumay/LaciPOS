@@ -36,9 +36,10 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
     // Product & Stock Routes
     Route::get('/products/{product}/stock', [App\Http\Controllers\StockController::class, 'index'])->name('stock.index');
     Route::post('/products/{product}/stock', [App\Http\Controllers\StockController::class, 'store'])->name('stock.store');
-    Route::resource('products', ProductController::class)->except(['show']);
+        Route::resource('products', ProductController::class)->except(['show']);
 
         // Route untuk reports, settings
+        Route::get('/reports', fn () => redirect()->route('reports.revenue'))->name('reports.index');
         Route::get('/reports/revenue', [\App\Http\Controllers\ReportController::class, 'revenue'])->name('reports.revenue');
         Route::get('/reports/revenue/export-pdf', [\App\Http\Controllers\ExportController::class, 'exportRevenue'])->name('reports.revenue.export-pdf');
         Route::get('/reports/revenue/export-csv', [\App\Http\Controllers\ExportController::class, 'exportRevenueCsv'])->name('reports.revenue.export-csv');
