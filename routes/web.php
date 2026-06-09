@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OnboardingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,7 +32,9 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
             return Inertia::render('Dashboard/Index');
         })->name('dashboard');
 
-        // Route untuk products, categories, reports, settings
+        Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
+
+        // Route untuk products, reports, settings
         // akan ditambahkan di task masing-masing
     });
 
