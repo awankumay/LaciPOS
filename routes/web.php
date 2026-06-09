@@ -41,9 +41,12 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         // Route untuk reports, settings
         Route::get('/reports/revenue', [\App\Http\Controllers\ReportController::class, 'revenue'])->name('reports.revenue');
         Route::get('/reports/revenue/export-pdf', [\App\Http\Controllers\ExportController::class, 'exportRevenue'])->name('reports.revenue.export-pdf');
+        Route::get('/reports/revenue/export-csv', [\App\Http\Controllers\ExportController::class, 'exportRevenueCsv'])->name('reports.revenue.export-csv');
         Route::get('/reports/profit-loss', [\App\Http\Controllers\ReportController::class, 'profitLoss'])->name('reports.profit-loss');
         Route::get('/reports/profit-loss/export-pdf', [\App\Http\Controllers\ExportController::class, 'exportProfitLoss'])->name('reports.profit-loss.export-pdf');
+        Route::get('/reports/profit-loss/export-csv', [\App\Http\Controllers\ExportController::class, 'exportProfitLossCsv'])->name('reports.profit-loss.export-csv');
         Route::get('/reports/best-sellers', [\App\Http\Controllers\ReportController::class, 'bestSellers'])->name('reports.best-sellers');
+        Route::get('/reports/best-sellers/export-csv', [\App\Http\Controllers\ExportController::class, 'exportBestSellersCsv'])->name('reports.best-sellers.export-csv');
         Route::get('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'index'])->name('settings.printer.index');
         Route::post('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'store'])->name('settings.printer.store');
         Route::post('/settings/printer/test', [App\Http\Controllers\PrinterSettingController::class, 'testPrint'])->name('settings.printer.test');
