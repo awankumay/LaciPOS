@@ -57,7 +57,10 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::get('/orders/{order}/success', [App\Http\Controllers\OrderController::class, 'success'])->name('order.success');
         Route::post('/orders/{order}/print', [App\Http\Controllers\PrintController::class, 'print'])->name('order.print');
         
-        // Route riwayat transaksi akan ditambahkan di task T049
+        // Riwayat transaksi
+        Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');
     });
 });
 

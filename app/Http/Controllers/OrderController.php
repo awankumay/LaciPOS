@@ -98,4 +98,55 @@ class OrderController extends Controller
             ],
         ]);
     }
+
+    public function index(\Illuminate\Http\Request $request)
+    {
+        $query = Order::with('user')->orderByDesc('created_at');
+
+        if ($request->input('start_date')) {
+            $query->whereDate('created_at', '>=', $request->input('start_date'));
+        }
+        if ($request->input('end_date')) {
+            $query->whereDate('created_at', '<=', $request->input('end_date'));
+        }
+
+        if ($request->input('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->input('payment_method')) {
+            $query->where('payment_method', $request->input('payment_method'));
+        }
+
+        if ($request->user()->isCashier()) {
+            $query->where('user_id', $request->user()->id);
+        }
+
+        $orders = $query->paginate(20)->withQueryString();
+
+        return Inertia::render('Orders/Index', [
+            'orders' => $orders,
+            'filters' => $request->only(['start_date', 'end_date', 'status', 'payment_method']),
+        ]);
+    }
+
+    public function show(Order $order)
+    {
+        $order->load(['items', 'user']);
+
+        return Inertia::render('Orders/Show', [
+            'order' => $order,
+        ]);
+    }
+
+    public function cancel(Order $order)
+    {
+        if ($order->status !== 'completed') {
+            return back()->with('error', 'Hanya transaksi completed yang bisa dibatalkan.');
+        }
+
+        $order->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Transaksi berhasil dibatalkan. Stok telah dikembalikan.');
+    }
 }
