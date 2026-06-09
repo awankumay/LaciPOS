@@ -11,7 +11,7 @@ const props = defineProps({
     categories: Array,
 });
 
-const { items: cartItems, addItem } = useCart();
+const { addItem } = useCart();
 
 const showVariantModal = ref(false);
 const selectedProduct = ref(null);
@@ -47,6 +47,11 @@ const addToCartFromModal = (data) => {
         photoUrl: data.product.photo_url,
     });
 };
+
+const handleCheckout = () => {
+    // Akan diimplementasikan di T033 (Payment Modal)
+    console.log('Open payment modal');
+};
 </script>
 
 <template>
@@ -63,7 +68,7 @@ const addToCartFromModal = (data) => {
 
             <!-- Panel Kanan: Keranjang (40%) -->
             <div class="w-[380px] flex-shrink-0">
-                <CartPanel :items="cartItems" />
+                <CartPanel @checkout="handleCheckout" />
             </div>
         </div>
 
