@@ -21,12 +21,20 @@ class DashboardController extends Controller
             $q->where('status', 'completed')->where('created_at', '>=', $today);
         })->sum(\Illuminate\Support\Facades\DB::raw('(snapshot_price - snapshot_cogs) * quantity'));
 
+        $restockProducts = \App\Models\Product::active()
+            ->lowStock()
+            ->with('category')
+            ->orderBy('stock')
+            ->limit(10)
+            ->get(['id', 'name', 'stock', 'min_stock_alert', 'category_id']);
+
         return Inertia::render('Dashboard/Index', [
             'stats' => [
                 'totalRevenue' => $totalRevenue,
                 'totalTransactions' => $totalTransactions,
                 'grossProfit' => $grossProfit,
             ],
+            'restockProducts' => $restockProducts,
         ]);
     }
 }

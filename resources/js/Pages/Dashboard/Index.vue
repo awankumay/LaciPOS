@@ -11,12 +11,17 @@ import {
     Clock,
     Sparkles,
     Wallet,
+    AlertTriangle,
 } from 'lucide-vue-next';
 
 import StatCard from '@/Components/StatCard.vue';
 
 const props = defineProps({
     stats: Object,
+    restockProducts: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const page = usePage();
@@ -117,27 +122,62 @@ const quickActions = [
                 </div>
             </div>
 
-            <!-- Quick Actions + Coming Soon -->
+            <!-- Quick Actions & Restock Alert -->
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <!-- Quick Actions -->
-                <div class="lg:col-span-1">
-                    <h3 class="mb-4 text-xs font-semibold uppercase tracking-widest text-[#7c8c9a]">Aksi Cepat</h3>
-                    <div class="space-y-3">
-                        <a
-                            v-for="action in quickActions"
-                            :key="action.label"
-                            :href="action.href"
-                            :class="[
-                                'flex items-center justify-between rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-150',
-                                action.color,
-                            ]"
-                        >
-                            <div class="flex items-center gap-3">
-                                <component :is="action.icon" class="h-4 w-4" />
-                                {{ action.label }}
+                <div class="lg:col-span-1 flex flex-col gap-6">
+                    <!-- Quick Actions -->
+                    <div>
+                        <h3 class="mb-4 text-xs font-semibold uppercase tracking-widest text-[#7c8c9a]">Aksi Cepat</h3>
+                        <div class="space-y-3">
+                            <a
+                                v-for="action in quickActions"
+                                :key="action.label"
+                                :href="action.href"
+                                :class="[
+                                    'flex items-center justify-between rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-150',
+                                    action.color,
+                                ]"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <component :is="action.icon" class="h-4 w-4" />
+                                    {{ action.label }}
+                                </div>
+                                <ArrowUpRight class="h-4 w-4 opacity-60" />
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Restock Alert -->
+                    <div>
+                        <div class="mb-4 flex items-center justify-between">
+                            <h3 class="text-xs font-semibold uppercase tracking-widest text-[#7c8c9a]">Perlu Restock</h3>
+                            <span v-if="restockProducts.length > 0" class="inline-flex items-center rounded-full bg-[#fde8e8] px-2 py-0.5 text-[10px] font-bold text-[#9b1c1c]">
+                                {{ restockProducts.length }} Produk
+                            </span>
+                        </div>
+                        <div class="rounded-2xl border border-[#e1e5e8] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,30,43,0.04)]">
+                            <ul v-if="restockProducts.length > 0" class="divide-y divide-[#e1e5e8]">
+                                <li v-for="product in restockProducts" :key="product.id" class="px-4 py-3 hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <div class="min-w-0 pr-3">
+                                            <p class="text-sm font-medium text-[#001e2b] truncate" :title="product.name">{{ product.name }}</p>
+                                            <p class="text-xs text-[#5c6c7a] truncate">{{ product.category?.name || 'Tanpa Kategori' }}</p>
+                                        </div>
+                                        <div class="text-right shrink-0">
+                                            <p class="text-sm font-bold text-[#e02424]">{{ product.stock }}</p>
+                                            <p class="text-[10px] text-[#7c8c9a]">Min: {{ product.min_stock_alert }}</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div v-else class="flex flex-col items-center justify-center py-8 text-center px-4">
+                                <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#def7ec]">
+                                    <Package class="h-5 w-5 text-[#03543f]" />
+                                </div>
+                                <p class="text-sm font-medium text-[#001e2b]">Stok Aman</p>
+                                <p class="mt-1 text-xs text-[#7c8c9a]">Tidak ada produk yang kurang.</p>
                             </div>
-                            <ArrowUpRight class="h-4 w-4 opacity-60" />
-                        </a>
+                        </div>
                     </div>
                 </div>
 
