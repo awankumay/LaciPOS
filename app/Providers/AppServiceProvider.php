@@ -24,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
         if (config('database.default') === 'sqlite') {
             DB::statement('PRAGMA journal_mode=WAL;');
         }
+
+        if (class_exists(\App\Models\Order::class)) {
+            \App\Models\Order::observe(\App\Observers\OrderObserver::class);
+        }
     }
 }
