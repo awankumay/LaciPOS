@@ -10,6 +10,7 @@ import {
     ArrowUpRight,
     Clock,
     Sparkles,
+    Wallet,
 } from 'lucide-vue-next';
 
 import StatCard from '@/Components/StatCard.vue';
@@ -38,14 +39,14 @@ const dashboardStats = computed(() => [
         icon: TrendingUp,
     },
     {
+        title: 'Laba Kotor Hari Ini',
+        value: formatRupiah(props.stats?.grossProfit),
+        icon: Wallet,
+    },
+    {
         title: 'Transaksi Hari Ini',
         value: props.stats?.totalTransactions || 0,
         icon: ShoppingCart,
-    },
-    {
-        title: 'Total Produk',
-        value: '—',
-        icon: Package,
     },
     {
         title: 'Kasir Aktif',
