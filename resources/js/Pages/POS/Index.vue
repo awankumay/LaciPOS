@@ -4,15 +4,14 @@ import ProductGrid from '@/Components/ProductGrid.vue';
 import CartPanel from '@/Components/CartPanel.vue';
 import VariantPickerModal from '@/Components/VariantPickerModal.vue';
 import { ref } from 'vue';
+import { useCart } from '@/composables/useCart';
 
 const props = defineProps({
     products: Array,
     categories: Array,
 });
 
-// Cart state akan dikelola oleh useCart composable (T031)
-// Untuk saat ini, placeholder
-const cartItems = ref([]);
+const { items: cartItems, addItem } = useCart();
 
 const showVariantModal = ref(false);
 const selectedProduct = ref(null);
@@ -28,13 +27,25 @@ const handleProductClick = (product) => {
 };
 
 const addToCartDirect = (product) => {
-    // Akan diimplementasikan di T031
-    console.log('Add direct to cart:', product);
+    addItem({
+        productId: product.id,
+        productName: product.name,
+        variantLabel: null,
+        price: Number(product.price),
+        cogs: Number(product.cogs),
+        photoUrl: product.photo_url,
+    });
 };
 
-const addToCartFromModal = (payload) => {
-    // Akan diimplementasikan di T031
-    console.log('Add to cart from modal:', payload);
+const addToCartFromModal = (data) => {
+    addItem({
+        productId: data.product.id,
+        productName: data.product.name,
+        variantLabel: data.variantLabel,
+        price: data.finalPrice,
+        cogs: data.finalCogs,
+        photoUrl: data.product.photo_url,
+    });
 };
 </script>
 
