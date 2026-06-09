@@ -95,7 +95,7 @@ const paymentMethodLabels = {
             <!-- Actions -->
             <div class="p-6 bg-slate-50 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <Button variant="outline" class="w-full h-12 bg-white" as-child>
-                    <Link :href="route('pos.index')">
+                    <Link href="/pos">
                         <ArrowLeft class="mr-2 h-4 w-4" />
                         Transaksi Baru
                     </Link>
