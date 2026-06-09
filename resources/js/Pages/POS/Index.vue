@@ -6,13 +6,14 @@ import VariantPickerModal from '@/Components/VariantPickerModal.vue';
 import PaymentModal from '@/Components/PaymentModal.vue';
 import { ref } from 'vue';
 import { useCart } from '@/composables/useCart';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     products: Array,
     categories: Array,
 });
 
-const { addItem, total } = useCart();
+const { items, addItem, total, clearCart } = useCart();
 
 const showVariantModal = ref(false);
 const selectedProduct = ref(null);
@@ -56,9 +57,23 @@ const handleCheckout = () => {
 };
 
 const handleConfirmPayment = (paymentData) => {
-    // Akan diimplementasikan di T036 (Submit Order)
-    console.log('Payment confirmed:', paymentData);
-    // TODO: submit order to backend
+    router.post('/orders', {
+        ...paymentData,
+        items: items.value.map(item => ({
+            productId: item.productId,
+            productName: item.productName,
+            price: item.price,
+            cogs: item.cogs,
+            quantity: item.quantity,
+            variantLabel: item.variantLabel,
+            notes: item.notes,
+        })),
+    }, {
+        onSuccess: () => {
+            clearCart();
+            showPaymentModal.value = false;
+        },
+    });
 };
 </script>
 

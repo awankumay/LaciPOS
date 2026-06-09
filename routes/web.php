@@ -49,6 +49,10 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         // Route POS akan ditambahkan di task T027
         Route::get('/pos', [App\Http\Controllers\POSController::class, 'index'])->name('pos.index');
         
+        // Orders
+        Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+        Route::get('/orders/{order}/success', [App\Http\Controllers\OrderController::class, 'success'])->name('order.success');
+        
         // Route riwayat transaksi akan ditambahkan di task T049
     });
 });
