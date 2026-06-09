@@ -63,8 +63,29 @@ class OrderController extends Controller
 
     public function success(Order $order)
     {
-        // Akan diimplementasikan di T037
-        // Untuk sementara redirect ke POS dengan pesan sukses
-        return redirect()->route('pos.index')->with('success', 'Transaksi berhasil (T037 belum diimplementasi)');
+        $order->load(['items', 'user']);
+
+        return Inertia::render('POS/Success', [
+            'order' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'payment_method' => $order->payment_method,
+                'payment_provider' => $order->payment_provider,
+                'total_amount' => $order->total_amount,
+                'cash_received' => $order->cash_received,
+                'change_amount' => $order->change_amount,
+                'created_at' => $order->created_at->format('d M Y, H:i'),
+                'cashier_name' => $order->user->name,
+                'items' => $order->items->map(fn ($item) => [
+                    'product_name' => $item->product_name_snapshot,
+                    'variant_label' => $item->variant_label,
+                    'quantity' => $item->quantity,
+                    'price' => $item->snapshot_price,
+                    'subtotal' => $item->subtotal,
+                    'notes' => $item->notes,
+                ]),
+            ],
+        ]);
     }
 }
