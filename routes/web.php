@@ -47,6 +47,8 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
     // Route yang bisa diakses owner DAN cashier
     Route::middleware('role:owner,cashier')->group(function () {
         // Route POS akan ditambahkan di task T027
+        Route::get('/pos', [App\Http\Controllers\POSController::class, 'index'])->name('pos.index');
+        
         // Route riwayat transaksi akan ditambahkan di task T049
     });
 });
