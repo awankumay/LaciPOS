@@ -25,7 +25,6 @@ const handleProductClick = (product) => {
         selectedProduct.value = product;
         showVariantModal.value = true;
     } else {
-        // Langsung tambah ke cart tanpa modal
         addToCartDirect(product);
     }
 };
@@ -78,35 +77,64 @@ const handleConfirmPayment = (paymentData) => {
 </script>
 
 <template>
+    <!-- POS uses full-height layout without extra padding from AppLayout -->
     <AppLayout title="Kasir (POS)">
-        <div class="flex gap-4 h-[calc(100vh-80px)]">
-            <!-- Panel Kiri: Grid Produk (60%) -->
-            <div class="flex-1 flex flex-col overflow-hidden">
-                <ProductGrid
-                    :products="products"
-                    :categories="categories"
-                    @add-to-cart="handleProductClick"
-                />
+        <template #default>
+            <div class="pos-wrapper">
+                <!-- Left Panel: Product Grid -->
+                <div class="pos-products-panel">
+                    <ProductGrid
+                        :products="products"
+                        :categories="categories"
+                        @add-to-cart="handleProductClick"
+                    />
+                </div>
+
+                <!-- Right Panel: Cart -->
+                <div class="pos-cart-panel">
+                    <CartPanel @checkout="handleCheckout" />
+                </div>
             </div>
 
-            <!-- Panel Kanan: Keranjang (40%) -->
-            <div class="w-[380px] flex-shrink-0">
-                <CartPanel @checkout="handleCheckout" />
-            </div>
-        </div>
+            <VariantPickerModal
+                :open="showVariantModal"
+                :product="selectedProduct"
+                @close="showVariantModal = false"
+                @add-to-cart="addToCartFromModal"
+            />
 
-        <VariantPickerModal
-            :open="showVariantModal"
-            :product="selectedProduct"
-            @close="showVariantModal = false"
-            @add-to-cart="addToCartFromModal"
-        />
-
-        <PaymentModal
-            :open="showPaymentModal"
-            :total="total"
-            @close="showPaymentModal = false"
-            @confirm-payment="handleConfirmPayment"
-        />
+            <PaymentModal
+                :open="showPaymentModal"
+                :total="total"
+                @close="showPaymentModal = false"
+                @confirm-payment="handleConfirmPayment"
+            />
+        </template>
     </AppLayout>
 </template>
+
+<style scoped>
+.pos-wrapper {
+    display: flex;
+    gap: 20px;
+    /* Subtract: py-8 (top 32px + bot 32px) = 64px + sidebar header if any */
+    height: calc(100vh - 64px - 64px);
+    min-height: 0;
+}
+
+.pos-products-panel {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pos-cart-panel {
+    width: 360px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+</style>
