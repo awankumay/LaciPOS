@@ -59,7 +59,23 @@ class ProductController extends Controller
         }
         unset($data['photo']);
 
-        Product::create($data);
+        $product = Product::create($data);
+
+        // Handle variants
+        if ($request->has('variants')) {
+            foreach ($request->input('variants', []) as $variantData) {
+                if (empty($variantData['name'])) continue;
+                $variant = $product->variants()->create(['name' => $variantData['name']]);
+                foreach ($variantData['options'] ?? [] as $optionData) {
+                    if (empty($optionData['label'])) continue;
+                    $variant->options()->create([
+                        'label' => $optionData['label'],
+                        'price_modifier' => $optionData['price_modifier'] ?? 0,
+                        'cogs_modifier' => $optionData['cogs_modifier'] ?? 0,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil ditambahkan.');
@@ -68,7 +84,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         return Inertia::render('Products/Edit', [
-            'product' => array_merge($product->toArray(), [
+            'product' => array_merge($product->load('variants.options')->toArray(), [
                 'photo_url' => $product->photo_url,
             ]),
             'categories' => Category::orderBy('name')->get(),
@@ -93,6 +109,23 @@ class ProductController extends Controller
         unset($data['photo'], $data['remove_photo']);
 
         $product->update($data);
+
+        // Handle variants (purge and re-create)
+        if ($request->has('variants')) {
+            $product->variants()->delete();
+            foreach ($request->input('variants', []) as $variantData) {
+                if (empty($variantData['name'])) continue;
+                $variant = $product->variants()->create(['name' => $variantData['name']]);
+                foreach ($variantData['options'] ?? [] as $optionData) {
+                    if (empty($optionData['label'])) continue;
+                    $variant->options()->create([
+                        'label' => $optionData['label'],
+                        'price_modifier' => $optionData['price_modifier'] ?? 0,
+                        'cogs_modifier' => $optionData['cogs_modifier'] ?? 0,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil diperbarui.');

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Separator } from '@/Components/ui/separator';
 import { ArrowLeft, Upload, X } from 'lucide-vue-next';
 import { ref } from 'vue';
+import VariantEditor from '@/Components/VariantEditor.vue';
 
 const props = defineProps({
     categories: Array,
@@ -22,6 +23,7 @@ const form = useForm({
     stock: 0,
     min_stock_alert: 5,
     is_active: true,
+    variants: [],
 });
 
 const photoPreview = ref(null);
@@ -144,6 +146,14 @@ const submit = () => {
                             <p class="text-xs text-slate-400">Notifikasi muncul saat stok ≤ nilai ini</p>
                         </div>
                     </div>
+                </CardContent>
+            </Card>
+
+            <!-- Variants -->
+            <Card>
+                <CardHeader><CardTitle>Varian Produk (Opsional)</CardTitle></CardHeader>
+                <CardContent>
+                    <VariantEditor v-model="form.variants" />
                 </CardContent>
             </Card>
 

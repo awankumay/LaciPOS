@@ -7,6 +7,7 @@ import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { ArrowLeft, Upload, X } from 'lucide-vue-next';
 import { ref } from 'vue';
+import VariantEditor from '@/Components/VariantEditor.vue';
 
 const props = defineProps({
     product: Object,
@@ -24,6 +25,7 @@ const form = useForm({
     stock: props.product.stock,
     min_stock_alert: props.product.min_stock_alert,
     is_active: props.product.is_active,
+    variants: props.product.variants || [],
 });
 
 const photoPreview = ref(props.product.photo_url);
@@ -133,6 +135,13 @@ const submit = () => {
                         <input id="is_active" type="checkbox" v-model="form.is_active" class="rounded" />
                         <Label for="is_active">Produk aktif (tampil di kasir)</Label>
                     </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader><CardTitle>Varian Produk (Opsional)</CardTitle></CardHeader>
+                <CardContent>
+                    <VariantEditor v-model="form.variants" />
                 </CardContent>
             </Card>
 
