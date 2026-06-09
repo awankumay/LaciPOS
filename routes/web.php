@@ -51,6 +51,11 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::get('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'index'])->name('settings.printer.index');
         Route::post('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'store'])->name('settings.printer.store');
         Route::post('/settings/printer/test', [App\Http\Controllers\PrinterSettingController::class, 'testPrint'])->name('settings.printer.test');
+
+        // Store Settings
+        Route::get('/settings', [App\Http\Controllers\SettingsController::class, 'store'])->name('settings');
+        Route::get('/settings/store', [App\Http\Controllers\SettingsController::class, 'store'])->name('settings.store');
+        Route::post('/settings/store', [App\Http\Controllers\SettingsController::class, 'updateStore'])->name('settings.store.update');
     });
 
     // Route yang bisa diakses owner DAN cashier
