@@ -13,7 +13,6 @@ defineProps({
 const page = usePage();
 const toast = useToast();
 
-// Trigger toast dari flash message Inertia
 const handleFlash = () => {
     const flash = page.props.flash;
     if (flash?.success) toast.success(flash.success, 'Berhasil');
@@ -27,24 +26,27 @@ watch(() => page.props.flash, handleFlash, { deep: true });
 <template>
     <Head :title="title" />
 
-    <div class="min-h-screen bg-slate-50">
+    <div class="min-h-screen bg-[#f4f7f6]">
         <!-- Sidebar -->
         <Sidebar />
 
         <!-- Main Content -->
-        <main class="pl-64">
-            <!-- Page Header (opsional, diisi via slot) -->
-            <div v-if="$slots.header" class="border-b border-slate-200 bg-white px-8 py-5">
+        <main class="pl-64 min-h-screen">
+            <!-- Page Header slot -->
+            <div
+                v-if="$slots.header"
+                class="sticky top-0 z-30 flex h-16 items-center border-b border-[#e1e5e8] bg-white/90 px-8 backdrop-blur-sm"
+            >
                 <slot name="header" />
             </div>
 
             <!-- Page Content -->
-            <div class="p-8">
+            <div class="px-8 py-8">
                 <slot />
             </div>
         </main>
 
-        <!-- Flash Messages (legacy, tetap dipertahankan) -->
+        <!-- Flash Messages (legacy) -->
         <FlashMessage />
 
         <!-- Toast Notification -->
