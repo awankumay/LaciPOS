@@ -56,6 +56,12 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::get('/settings', [App\Http\Controllers\SettingsController::class, 'store'])->name('settings');
         Route::get('/settings/store', [App\Http\Controllers\SettingsController::class, 'store'])->name('settings.store');
         Route::post('/settings/store', [App\Http\Controllers\SettingsController::class, 'updateStore'])->name('settings.store.update');
+
+        // Cashiers Settings
+        Route::get('/settings/cashiers', [App\Http\Controllers\CashierController::class, 'index'])->name('settings.cashiers');
+        Route::post('/settings/cashiers', [App\Http\Controllers\CashierController::class, 'store']);
+        Route::put('/settings/cashiers/{cashier}', [App\Http\Controllers\CashierController::class, 'update']);
+        Route::patch('/settings/cashiers/{cashier}/toggle', [App\Http\Controllers\CashierController::class, 'toggleActive']);
     });
 
     // Route yang bisa diakses owner DAN cashier
