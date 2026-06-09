@@ -51,4 +51,26 @@ class SettingsController extends Controller
 
         return back()->with('success', 'Informasi toko berhasil diperbarui.');
     }
+    public function inventory()
+    {
+        $profile = StoreProfile::getProfile();
+        return Inertia::render('Settings/Inventory', [
+            'defaultMinStock' => $profile?->default_min_stock ?? 5,
+        ]);
+    }
+
+    public function updateInventory(\Illuminate\Http\Request $request)
+    {
+        $validated = $request->validate([
+            'default_min_stock' => ['required', 'integer', 'min:0'],
+        ]);
+
+        StoreProfile::updateOrCreate([], $validated);
+
+        if ($request->boolean('apply_to_all')) {
+            \App\Models\Product::query()->update(['min_stock_alert' => $validated['default_min_stock']]);
+        }
+
+        return back()->with('success', 'Pengaturan stok berhasil disimpan.');
+    }
 }

@@ -44,8 +44,10 @@ class ProductController extends Controller
 
     public function create()
     {
+        $profile = \App\Models\StoreProfile::getProfile();
         return Inertia::render('Products/Create', [
             'categories' => Category::orderBy('name')->get(),
+            'defaultMinStock' => $profile ? $profile->default_min_stock : 5,
         ]);
     }
 

@@ -18,6 +18,7 @@ class StoreProfile extends Model
         'printer_name',
         'paper_size',
         'auto_print',
+        'default_min_stock',
     ];
 
     /**

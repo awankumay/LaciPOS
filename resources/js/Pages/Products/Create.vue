@@ -12,6 +12,7 @@ import VariantEditor from '@/Components/VariantEditor.vue';
 
 const props = defineProps({
     categories: Array,
+    defaultMinStock: { type: Number, default: 5 },
 });
 
 const form = useForm({
@@ -21,7 +22,7 @@ const form = useForm({
     cogs: '',
     price: '',
     stock: 0,
-    min_stock_alert: 5,
+    min_stock_alert: props.defaultMinStock,
     is_active: true,
     variants: [],
 });

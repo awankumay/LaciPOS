@@ -1,0 +1,75 @@
+<script setup>
+import AppLayout from '@/Layouts/AppLayout.vue';
+import { Head, useForm } from '@inertiajs/vue3';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Switch } from '@/Components/ui/switch';
+
+const props = defineProps({
+    defaultMinStock: { type: Number, default: 5 },
+});
+
+const form = useForm({
+    default_min_stock: props.defaultMinStock,
+    apply_to_all: false,
+});
+
+const submit = () => {
+    form.post('/settings/inventory', {
+        preserveScroll: true,
+        onSuccess: () => {
+            form.apply_to_all = false;
+        }
+    });
+};
+</script>
+
+<template>
+    <AppLayout title="Pengaturan Stok">
+        <template #header>
+            <h1 class="text-2xl font-semibold text-slate-900">Pengaturan Stok</h1>
+        </template>
+
+        <div class="max-w-2xl mt-4">
+            <Card>
+                <form @submit.prevent="submit">
+                    <CardHeader>
+                        <CardTitle>Stok Minimum Global</CardTitle>
+                        <CardDescription>
+                            Atur nilai default untuk peringatan stok menipis. Nilai ini akan otomatis digunakan saat Anda menambahkan produk baru.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent class="space-y-6">
+                        <div class="space-y-2">
+                            <Label for="default_min_stock">Minimum Stok Alert</Label>
+                            <Input
+                                id="default_min_stock"
+                                type="number"
+                                v-model="form.default_min_stock"
+                                min="0"
+                                required
+                            />
+                            <p class="text-sm text-slate-500">Nilai ini digunakan sebagai default saat menambah produk baru.</p>
+                            <p v-if="form.errors.default_min_stock" class="text-sm text-red-500">{{ form.errors.default_min_stock }}</p>
+                        </div>
+
+                        <div class="flex items-center justify-between rounded-lg border p-4">
+                            <div class="space-y-0.5">
+                                <Label class="text-base">Terapkan ke Semua Produk</Label>
+                                <p class="text-sm text-slate-500">
+                                    Update minimum stok alert untuk semua produk yang sudah ada di database saat ini.
+                                </p>
+                            </div>
+                            <Switch v-model:checked="form.apply_to_all" />
+                        </div>
+                    </CardContent>
+                    <CardFooter class="flex justify-end">
+                        <Button type="submit" :disabled="form.processing">Simpan Pengaturan</Button>
+                    </CardFooter>
+                </form>
+            </Card>
+        </div>
+    </AppLayout>
+</template>
