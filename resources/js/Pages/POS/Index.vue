@@ -3,6 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import ProductGrid from '@/Components/ProductGrid.vue';
 import CartPanel from '@/Components/CartPanel.vue';
 import VariantPickerModal from '@/Components/VariantPickerModal.vue';
+import PaymentModal from '@/Components/PaymentModal.vue';
 import { ref } from 'vue';
 import { useCart } from '@/composables/useCart';
 
@@ -11,10 +12,12 @@ const props = defineProps({
     categories: Array,
 });
 
-const { addItem } = useCart();
+const { addItem, total } = useCart();
 
 const showVariantModal = ref(false);
 const selectedProduct = ref(null);
+
+const showPaymentModal = ref(false);
 
 const handleProductClick = (product) => {
     if (product.has_variants) {
@@ -49,8 +52,13 @@ const addToCartFromModal = (data) => {
 };
 
 const handleCheckout = () => {
-    // Akan diimplementasikan di T033 (Payment Modal)
-    console.log('Open payment modal');
+    showPaymentModal.value = true;
+};
+
+const handleConfirmPayment = (paymentData) => {
+    // Akan diimplementasikan di T036 (Submit Order)
+    console.log('Payment confirmed:', paymentData);
+    // TODO: submit order to backend
 };
 </script>
 
@@ -77,6 +85,13 @@ const handleCheckout = () => {
             :product="selectedProduct"
             @close="showVariantModal = false"
             @add-to-cart="addToCartFromModal"
+        />
+
+        <PaymentModal
+            :open="showPaymentModal"
+            :total="total"
+            @close="showPaymentModal = false"
+            @confirm-payment="handleConfirmPayment"
         />
     </AppLayout>
 </template>
