@@ -18,6 +18,41 @@ const paymentMethodLabels = {
     bank_transfer: 'Transfer Bank',
     e_wallet: 'E-Wallet'
 };
+
+import { router, usePage } from '@inertiajs/vue3';
+import { useToast } from '@/composables/useToast';
+import ToastNotification from '@/Components/ToastNotification.vue';
+import { onMounted, ref } from 'vue';
+
+const toast = useToast();
+const page = usePage();
+const isPrinting = ref(false);
+
+const printReceipt = () => {
+    isPrinting.value = true;
+    router.post(`/orders/${props.order.id}/print`, {}, {
+        preserveScroll: true,
+        onFinish: () => {
+            isPrinting.value = false;
+        },
+        onSuccess: (response) => {
+            const flash = response.props.flash;
+            if (flash?.success) {
+                toast.success(flash.success, 'Berhasil');
+            } else if (flash?.error) {
+                toast.error(flash.error, 'Gagal');
+            } else if (flash?.warning) {
+                toast.warning(flash.warning, 'Peringatan');
+            }
+        }
+    });
+};
+
+onMounted(() => {
+    if (page.props.flash?.warning) {
+        toast.warning(page.props.flash.warning, 'Peringatan');
+    }
+});
 </script>
 
 <template>
@@ -100,13 +135,19 @@ const paymentMethodLabels = {
                         Transaksi Baru
                     </Link>
                 </Button>
-                <!-- Placeholder untuk Print (T041) -->
-                <Button class="w-full h-12 bg-slate-900 text-white hover:bg-slate-800" @click="() => alert('Fitur cetak struk akan hadir di T041')">
+                <!-- Tombol Print (T041) -->
+                <Button 
+                    class="w-full h-12 bg-slate-900 text-white hover:bg-slate-800" 
+                    @click="printReceipt"
+                    :disabled="isPrinting"
+                >
                     <Receipt class="mr-2 h-4 w-4" />
-                    Cetak Struk
+                    {{ isPrinting ? 'Mencetak...' : 'Cetak Struk' }}
                 </Button>
             </div>
         </div>
+        <!-- Render Toast Notification -->
+        <ToastNotification />
     </div>
 </template>
 

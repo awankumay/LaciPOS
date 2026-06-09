@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class OrderController extends Controller
 {
-    public function store(StoreOrderRequest $request)
+    public function store(StoreOrderRequest $request, \App\Services\PrintService $printService)
     {
         $validated = $request->validated();
         $items = $validated['items'];
@@ -57,8 +57,18 @@ class OrderController extends Controller
             return $order;
         });
 
-        return redirect()->route('order.success', $order->id)
-            ->with('success', 'Transaksi berhasil!');
+        $redirect = redirect()->route('order.success', $order->id)->with('success', 'Transaksi berhasil!');
+
+        // Auto print jika setting aktif
+        $storeProfile = \App\Models\StoreProfile::getProfile();
+        if ($storeProfile && $storeProfile->auto_print) {
+            $printResult = $printService->printReceipt($order);
+            if (!$printResult['success']) {
+                $redirect->with('warning', $printResult['message']);
+            }
+        }
+
+        return $redirect;
     }
 
     public function success(Order $order)

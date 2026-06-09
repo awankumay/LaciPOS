@@ -1,5 +1,6 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
@@ -7,7 +8,7 @@ import { Input } from '@/Components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/Components/ui/radio-group';
 import { Switch } from '@/Components/ui/switch';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
-import { useToast } from '@/Components/ui/toast/use-toast';
+import { useToast } from '@/composables/useToast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 
 const props = defineProps({
@@ -27,24 +28,23 @@ const form = useForm({
     auto_print: props.profile?.auto_print ? true : false,
 });
 
-const { toast } = useToast();
+const toast = useToast();
 
 const submit = () => {
-    form.post(route('settings.printer.store'), {
+    form.post('/settings/printer', {
         preserveScroll: true,
-        onSuccess: () => {
-            toast({
-                title: 'Berhasil',
-                description: 'Pengaturan printer berhasil disimpan.',
-            });
-        },
     });
 };
 
+const isTesting = ref(false);
+
 const testPrint = () => {
-    toast({
-        title: 'Info',
-        description: 'Fungsionalitas test print akan tersedia di task selanjutnya (T040).',
+    isTesting.value = true;
+    router.post('/settings/printer/test', {}, {
+        preserveScroll: true,
+        onFinish: () => {
+            isTesting.value = false;
+        }
     });
 };
 </script>
@@ -132,7 +132,9 @@ const testPrint = () => {
                             </div>
                         </CardContent>
                         <CardFooter class="flex justify-between">
-                            <Button type="button" variant="outline" @click="testPrint">Test Print</Button>
+                            <Button type="button" variant="outline" @click="testPrint" :disabled="isTesting">
+                                {{ isTesting ? 'Mencetak...' : 'Test Print' }}
+                            </Button>
                             <Button type="submit" :disabled="form.processing">Simpan Pengaturan</Button>
                         </CardFooter>
                     </form>

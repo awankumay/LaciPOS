@@ -51,4 +51,37 @@ class PrinterSettingController extends Controller
 
         return redirect()->back()->with('success', 'Pengaturan printer berhasil disimpan.');
     }
+
+    public function testPrint(\App\Services\PrintService $printService)
+    {
+        $dummyOrder = new \App\Models\Order([
+            'order_number' => 'TEST-' . date('Ymd-His'),
+            'payment_method' => 'cash',
+            'payment_provider' => null,
+            'total_amount' => 150000,
+            'cash_received' => 150000,
+            'change_amount' => 0,
+        ]);
+        $dummyOrder->created_at = now();
+
+        $dummyUser = new \App\Models\User(['name' => 'Test Cashier']);
+        $dummyOrder->setRelation('user', $dummyUser);
+
+        $dummyItem = new \App\Models\OrderItem([
+            'product_name_snapshot' => 'Produk Test Printer',
+            'variant_label' => 'Variant 1',
+            'quantity' => 1,
+            'snapshot_price' => 150000,
+            'subtotal' => 150000,
+        ]);
+        $dummyOrder->setRelation('items', collect([$dummyItem]));
+
+        $result = $printService->printReceipt($dummyOrder);
+
+        if ($result['success']) {
+            return redirect()->back()->with('success', 'Test print berhasil dikirim ke printer.');
+        } else {
+            return redirect()->back()->with('error', $result['message']);
+        }
+    }
 }

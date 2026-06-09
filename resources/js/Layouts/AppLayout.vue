@@ -1,6 +1,5 @@
 <script setup>
 import Sidebar from '@/Components/Sidebar.vue';
-import FlashMessage from '@/Components/FlashMessage.vue';
 import ToastNotification from '@/Components/ToastNotification.vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import { onMounted, watch } from 'vue';
@@ -45,9 +44,6 @@ watch(() => page.props.flash, handleFlash, { deep: true });
                 <slot />
             </div>
         </main>
-
-        <!-- Flash Messages (legacy) -->
-        <FlashMessage />
 
         <!-- Toast Notification -->
         <ToastNotification />
