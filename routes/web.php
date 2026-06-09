@@ -33,8 +33,12 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
             return Inertia::render('Dashboard/Index');
         })->name('dashboard');
 
-        Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::resource('products', ProductController::class);
+        Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
+    
+    // Product & Stock Routes
+    Route::get('/products/{product}/stock', [App\Http\Controllers\StockController::class, 'index'])->name('stock.index');
+    Route::post('/products/{product}/stock', [App\Http\Controllers\StockController::class, 'store'])->name('stock.store');
+    Route::resource('products', ProductController::class)->except(['show']);
 
         // Route untuk reports, settings
         // akan ditambahkan di task masing-masing

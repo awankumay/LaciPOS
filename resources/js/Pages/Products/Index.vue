@@ -6,7 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
-import { Plus, Search, Package, Trash2 } from 'lucide-vue-next';
+import { Plus, Search, Package, Trash2, ArrowRightLeft } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
 
@@ -135,6 +135,11 @@ const executeDelete = () => {
                         </TableCell>
                         <TableCell class="text-right">
                             <div class="flex items-center justify-end gap-1">
+                                <Link :href="`/products/${product.id}/stock`" title="Penyesuaian Stok">
+                                    <Button variant="ghost" size="sm" class="text-blue-600">
+                                        <ArrowRightLeft class="h-4 w-4" />
+                                    </Button>
+                                </Link>
                                 <Link :href="`/products/${product.id}/edit`">
                                     <Button variant="ghost" size="sm">Edit</Button>
                                 </Link>
