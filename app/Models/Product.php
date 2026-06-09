@@ -16,6 +16,8 @@ class Product extends Model
         'stock', 'min_stock_alert', 'is_active',
     ];
 
+    protected $appends = ['photo_url'];
+
     protected function casts(): array
     {
         return [

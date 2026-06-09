@@ -111,19 +111,19 @@ class ProductController extends Controller
         $product->update($data);
 
         // Handle variants (purge and re-create)
-        if ($request->has('variants')) {
-            $product->variants()->delete();
-            foreach ($request->input('variants', []) as $variantData) {
-                if (empty($variantData['name'])) continue;
-                $variant = $product->variants()->create(['name' => $variantData['name']]);
-                foreach ($variantData['options'] ?? [] as $optionData) {
-                    if (empty($optionData['label'])) continue;
-                    $variant->options()->create([
-                        'label' => $optionData['label'],
-                        'price_modifier' => $optionData['price_modifier'] ?? 0,
-                        'cogs_modifier' => $optionData['cogs_modifier'] ?? 0,
-                    ]);
-                }
+        // Karena FormData tidak mengirim key array yang kosong, kita selalu menghapus varian lama
+        // dan membuat ulang sesuai isi form (jika kosong, tidak ada yang dibuat)
+        $product->variants()->delete();
+        foreach ($request->input('variants', []) as $variantData) {
+            if (empty($variantData['name'])) continue;
+            $variant = $product->variants()->create(['name' => $variantData['name']]);
+            foreach ($variantData['options'] ?? [] as $optionData) {
+                if (empty($optionData['label'])) continue;
+                $variant->options()->create([
+                    'label' => $optionData['label'],
+                    'price_modifier' => $optionData['price_modifier'] ?? 0,
+                    'cogs_modifier' => $optionData['cogs_modifier'] ?? 0,
+                ]);
             }
         }
 
