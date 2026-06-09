@@ -1,7 +1,5 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Button } from '@/Components/ui/button';
-import { Label } from '@/Components/ui/label';
 import { ImagePlus, ArrowRight, ArrowLeft, X, Upload } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -23,21 +21,18 @@ const handleFileSelect = (event) => {
 
     if (!file) return;
 
-    // Validasi tipe file
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
         errorMessage.value = 'Format file harus PNG atau JPG.';
         return;
     }
 
-    // Validasi ukuran file (maks 2MB)
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
         errorMessage.value = 'Ukuran file maksimal 2MB.';
         return;
     }
 
-    // Set preview
     previewUrl.value = URL.createObjectURL(file);
     emit('update:modelValue', file);
 };
@@ -45,60 +40,60 @@ const handleFileSelect = (event) => {
 const removeLogo = () => {
     previewUrl.value = null;
     emit('update:modelValue', null);
-    if (fileInput.value) {
-        fileInput.value.value = '';
-    }
+    if (fileInput.value) fileInput.value.value = '';
 };
 
-const triggerFileInput = () => {
-    fileInput.value?.click();
-};
+const triggerFileInput = () => fileInput.value?.click();
 </script>
 
 <template>
-    <div class="space-y-6">
-        <div class="text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                <ImagePlus class="h-8 w-8 text-slate-700" />
+    <div class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e3fcef]">
+                <ImagePlus class="h-6 w-6 text-[#00684a]" />
             </div>
-            <h2 class="text-xl font-semibold text-slate-900">Upload Logo Toko</h2>
-            <p class="mt-1 text-sm text-slate-500">
-                Logo akan muncul di header struk. Bisa dilewati jika belum ada.
-            </p>
+            <div>
+                <h2 class="text-lg font-semibold text-[#001e2b]">Upload Logo Toko</h2>
+                <p class="mt-1 text-sm text-[#5c6c7a]">
+                    Logo akan muncul di header struk. Bisa dilewati jika belum ada.
+                </p>
+            </div>
         </div>
 
         <!-- Upload Area -->
         <div class="flex flex-col items-center gap-4">
             <!-- Preview -->
-            <div
-                v-if="hasLogo"
-                class="relative group"
-            >
+            <div v-if="hasLogo" class="relative group">
                 <img
                     :src="previewUrl"
                     alt="Logo toko"
-                    class="h-32 w-32 rounded-lg border border-slate-200 object-contain bg-white p-2"
+                    class="h-36 w-36 rounded-2xl border border-[#e1e5e8] object-contain bg-white p-3 shadow-sm"
                 />
                 <button
                     @click="removeLogo"
-                    class="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    class="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                    <X class="h-3 w-3" />
+                    <X class="h-3.5 w-3.5" />
                 </button>
             </div>
 
-            <!-- Upload Button -->
+            <!-- Upload zone -->
             <div
                 v-else
                 @click="triggerFileInput"
-                class="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100 transition-colors"
+                class="flex h-44 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#c1ccd6] bg-[#f9fbfa] transition-colors hover:border-[#00684a] hover:bg-[#e3fcef]"
             >
-                <Upload class="mb-2 h-8 w-8 text-slate-400" />
-                <p class="text-sm font-medium text-slate-600">Klik untuk upload</p>
-                <p class="text-xs text-slate-400 mt-1">PNG atau JPG, maks 2MB</p>
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm">
+                    <Upload class="h-6 w-6 text-[#5c6c7a]" />
+                </div>
+                <div class="text-center">
+                    <p class="text-sm font-medium text-[#1c2d38]">Klik untuk upload logo</p>
+                    <p class="text-xs text-[#7c8c9a] mt-0.5">PNG atau JPG, maks 2MB</p>
+                </div>
             </div>
 
-            <!-- Hidden File Input -->
+            <!-- Hidden input -->
             <input
                 ref="fileInput"
                 type="file"
@@ -107,32 +102,37 @@ const triggerFileInput = () => {
                 @change="handleFileSelect"
             />
 
-            <!-- Ganti Logo Button -->
-            <Button
+            <!-- Ganti logo -->
+            <button
                 v-if="hasLogo"
-                variant="outline"
-                size="sm"
                 @click="triggerFileInput"
+                class="rounded-full border border-[#c1ccd6] px-4 py-1.5 text-xs font-semibold text-[#3d4f5b] transition-colors hover:border-[#001e2b] hover:text-[#001e2b]"
             >
                 Ganti Logo
-            </Button>
+            </button>
 
-            <!-- Error Message -->
-            <p v-if="errorMessage" class="text-sm text-red-500">
+            <!-- Error -->
+            <div v-if="errorMessage" class="flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
                 {{ errorMessage }}
-            </p>
+            </div>
         </div>
 
-        <!-- Navigation Buttons -->
+        <!-- Navigation -->
         <div class="flex gap-3">
-            <Button variant="outline" @click="$emit('back')" class="flex-1">
-                <ArrowLeft class="mr-2 h-4 w-4" />
+            <button
+                @click="$emit('back')"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full border border-[#c1ccd6] py-3 text-sm font-semibold text-[#3d4f5b] transition-colors hover:border-[#001e2b] hover:text-[#001e2b]"
+            >
+                <ArrowLeft class="h-4 w-4" />
                 Kembali
-            </Button>
-            <Button @click="$emit('next')" class="flex-1">
+            </button>
+            <button
+                @click="$emit('next')"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#00ed64] py-3 text-sm font-semibold text-[#001e2b] transition-colors hover:bg-[#00b545] active:bg-[#008c34]"
+            >
                 {{ hasLogo ? 'Lanjutkan' : 'Lewati' }}
-                <ArrowRight class="ml-2 h-4 w-4" />
-            </Button>
+                <ArrowRight class="h-4 w-4" />
+            </button>
         </div>
     </div>
 </template>

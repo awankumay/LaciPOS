@@ -1,7 +1,6 @@
 <script setup>
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Button } from '@/Components/ui/button';
 import { MapPin, ArrowRight, ArrowLeft } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -12,19 +11,26 @@ const emit = defineEmits(['update:modelValue', 'next', 'back']);
 </script>
 
 <template>
-    <div class="space-y-6">
-        <div class="text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                <MapPin class="h-8 w-8 text-slate-700" />
+    <div class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e3fcef]">
+                <MapPin class="h-6 w-6 text-[#00684a]" />
             </div>
-            <h2 class="text-xl font-semibold text-slate-900">Di mana lokasi toko Anda?</h2>
-            <p class="mt-1 text-sm text-slate-500">
-                Alamat ini akan muncul di struk. Bisa dilewati jika belum ada.
-            </p>
+            <div>
+                <h2 class="text-lg font-semibold text-[#001e2b]">Di mana lokasi toko Anda?</h2>
+                <p class="mt-1 text-sm text-[#5c6c7a]">
+                    Alamat ini akan muncul di struk. Bisa dilewati jika belum ada.
+                </p>
+            </div>
         </div>
 
+        <!-- Field -->
         <div class="space-y-2">
-            <Label for="address">Alamat Toko (opsional)</Label>
+            <Label for="address" class="text-sm font-medium text-[#1c2d38]">
+                Alamat Toko
+                <span class="ml-1 text-xs font-normal text-[#7c8c9a]">(opsional)</span>
+            </Label>
             <Input
                 id="address"
                 :model-value="modelValue"
@@ -32,18 +38,26 @@ const emit = defineEmits(['update:modelValue', 'next', 'back']);
                 type="text"
                 placeholder="Contoh: Jl. Merdeka No. 123, Jakarta"
                 autofocus
+                class="h-11"
             />
         </div>
 
+        <!-- Navigation -->
         <div class="flex gap-3">
-            <Button variant="outline" @click="$emit('back')" class="flex-1">
-                <ArrowLeft class="mr-2 h-4 w-4" />
+            <button
+                @click="$emit('back')"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full border border-[#c1ccd6] py-3 text-sm font-semibold text-[#3d4f5b] transition-colors hover:border-[#001e2b] hover:text-[#001e2b]"
+            >
+                <ArrowLeft class="h-4 w-4" />
                 Kembali
-            </Button>
-            <Button @click="$emit('next')" class="flex-1">
+            </button>
+            <button
+                @click="$emit('next')"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#00ed64] py-3 text-sm font-semibold text-[#001e2b] transition-colors hover:bg-[#00b545] active:bg-[#008c34]"
+            >
                 Lanjutkan
-                <ArrowRight class="ml-2 h-4 w-4" />
-            </Button>
+                <ArrowRight class="h-4 w-4" />
+            </button>
         </div>
     </div>
 </template>

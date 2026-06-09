@@ -1,6 +1,5 @@
 <script setup>
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import { Card, CardContent } from '@/Components/ui/card';
 import OnboardingProgress from '@/Components/OnboardingProgress.vue';
 import OnboardingStep1 from '@/Components/OnboardingStep1.vue';
 import OnboardingStep2 from '@/Components/OnboardingStep2.vue';
@@ -44,7 +43,6 @@ const prevStep = () => {
 const submitOnboarding = () => {
     isSubmitting.value = true;
 
-    // Gunakan FormData untuk upload file
     const data = new FormData();
     data.append('store_name', formData.store_name);
     if (formData.address) data.append('address', formData.address);
@@ -63,53 +61,96 @@ const submitOnboarding = () => {
 
 <template>
     <GuestLayout title="Setup Toko">
-        <Card class="w-full max-w-lg mx-auto">
-            <CardContent class="pt-6">
+        <!-- Wizard Card -->
+        <div class="rounded-2xl border border-[#e1e5e8] bg-white shadow-[0_4px_12px_rgba(0,30,43,0.08)]">
+            <!-- Card Header: teal band -->
+            <div class="rounded-t-2xl bg-[#001e2b] px-8 py-6">
+                <p class="text-xs font-semibold uppercase tracking-widest text-[#00ed64] mb-1">Setup Toko</p>
+                <h1 class="text-2xl font-semibold leading-snug text-white">
+                    Ayo setup toko Anda 🚀
+                </h1>
+                <p class="mt-1 text-sm text-[#a8b3bc]">
+                    Selesaikan {{ 5 }} langkah berikut untuk mulai berjualan.
+                </p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="border-b border-[#e1e5e8] px-8 py-5">
                 <OnboardingProgress :current-step="currentStep" />
+            </div>
 
-                <OnboardingStep1
-                    v-if="currentStep === 1"
-                    v-model="formData.store_name"
-                    @next="nextStep"
-                />
+            <!-- Step Content -->
+            <div class="px-8 py-8">
+                <Transition name="step" mode="out-in">
+                    <OnboardingStep1
+                        v-if="currentStep === 1"
+                        key="step1"
+                        v-model="formData.store_name"
+                        @next="nextStep"
+                    />
 
-                <OnboardingStep2
-                    v-if="currentStep === 2"
-                    v-model="formData.address"
-                    @next="nextStep"
-                    @back="prevStep"
-                />
+                    <OnboardingStep2
+                        v-else-if="currentStep === 2"
+                        key="step2"
+                        v-model="formData.address"
+                        @next="nextStep"
+                        @back="prevStep"
+                    />
 
-                <OnboardingStep3
-                    v-if="currentStep === 3"
-                    v-model="formData.logo"
-                    :existing-logo-url="existingProfile?.logo_url"
-                    @next="nextStep"
-                    @back="prevStep"
-                />
+                    <OnboardingStep3
+                        v-else-if="currentStep === 3"
+                        key="step3"
+                        v-model="formData.logo"
+                        :existing-logo-url="existingProfile?.logo_url"
+                        @next="nextStep"
+                        @back="prevStep"
+                    />
 
-                <OnboardingStep4
-                    v-if="currentStep === 4"
-                    :phone="formData.phone"
-                    :receipt-footer="formData.receipt_footer"
-                    @update:phone="formData.phone = $event"
-                    @update:receipt-footer="formData.receipt_footer = $event"
-                    @next="nextStep"
-                    @back="prevStep"
-                />
+                    <OnboardingStep4
+                        v-else-if="currentStep === 4"
+                        key="step4"
+                        :phone="formData.phone"
+                        :receipt-footer="formData.receipt_footer"
+                        @update:phone="formData.phone = $event"
+                        @update:receipt-footer="formData.receipt_footer = $event"
+                        @next="nextStep"
+                        @back="prevStep"
+                    />
 
-                <OnboardingStep5
-                    v-if="currentStep === 5"
-                    :store-name="formData.store_name"
-                    :address="formData.address"
-                    :phone="formData.phone"
-                    :logo-preview-url="logoPreviewUrl"
-                    :receipt-footer="formData.receipt_footer"
-                    :is-submitting="isSubmitting"
-                    @back="prevStep"
-                    @submit="submitOnboarding"
-                />
-            </CardContent>
-        </Card>
+                    <OnboardingStep5
+                        v-else-if="currentStep === 5"
+                        key="step5"
+                        :store-name="formData.store_name"
+                        :address="formData.address"
+                        :phone="formData.phone"
+                        :logo-preview-url="logoPreviewUrl"
+                        :receipt-footer="formData.receipt_footer"
+                        :is-submitting="isSubmitting"
+                        @back="prevStep"
+                        @submit="submitOnboarding"
+                    />
+                </Transition>
+            </div>
+        </div>
+
+        <!-- Footer note -->
+        <p class="mt-5 text-center text-xs text-[#7c8c9a]">
+            Data Anda tersimpan secara lokal dan aman.
+        </p>
     </GuestLayout>
 </template>
+
+<style scoped>
+.step-enter-active,
+.step-leave-active {
+    transition: all 0.2s ease;
+}
+.step-enter-from {
+    opacity: 0;
+    transform: translateX(12px);
+}
+.step-leave-to {
+    opacity: 0;
+    transform: translateX(-12px);
+}
+</style>

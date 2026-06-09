@@ -1,7 +1,6 @@
 <script setup>
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Button } from '@/Components/ui/button';
 import { Phone, ArrowRight, ArrowLeft } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -13,20 +12,27 @@ const emit = defineEmits(['update:phone', 'update:receiptFooter', 'next', 'back'
 </script>
 
 <template>
-    <div class="space-y-6">
-        <div class="text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                <Phone class="h-8 w-8 text-slate-700" />
+    <div class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e3fcef]">
+                <Phone class="h-6 w-6 text-[#00684a]" />
             </div>
-            <h2 class="text-xl font-semibold text-slate-900">Informasi Kontak</h2>
-            <p class="mt-1 text-sm text-slate-500">
-                Nomor telepon akan ditampilkan di struk.
-            </p>
+            <div>
+                <h2 class="text-lg font-semibold text-[#001e2b]">Informasi Kontak</h2>
+                <p class="mt-1 text-sm text-[#5c6c7a]">
+                    Nomor telepon dan teks footer akan ditampilkan di struk.
+                </p>
+            </div>
         </div>
 
-        <div class="space-y-4">
+        <!-- Fields -->
+        <div class="space-y-5">
             <div class="space-y-2">
-                <Label for="phone">Nomor Telepon (opsional)</Label>
+                <Label for="phone" class="text-sm font-medium text-[#1c2d38]">
+                    Nomor Telepon
+                    <span class="ml-1 text-xs font-normal text-[#7c8c9a]">(opsional)</span>
+                </Label>
                 <Input
                     id="phone"
                     :model-value="phone"
@@ -34,31 +40,43 @@ const emit = defineEmits(['update:phone', 'update:receiptFooter', 'next', 'back'
                     type="tel"
                     placeholder="Contoh: 0812-3456-7890"
                     autofocus
+                    class="h-11"
                 />
             </div>
 
             <div class="space-y-2">
-                <Label for="receipt_footer">Teks Footer Struk (opsional)</Label>
+                <Label for="receipt_footer" class="text-sm font-medium text-[#1c2d38]">
+                    Teks Footer Struk
+                    <span class="ml-1 text-xs font-normal text-[#7c8c9a]">(opsional)</span>
+                </Label>
                 <Input
                     id="receipt_footer"
                     :model-value="receiptFooter"
                     @update:model-value="$emit('update:receiptFooter', $event)"
                     type="text"
                     placeholder="Contoh: Terima kasih sudah berkunjung!"
+                    class="h-11"
                 />
-                <p class="text-xs text-slate-400">Teks ini akan muncul di bagian bawah struk.</p>
+                <p class="text-xs text-[#7c8c9a]">Teks ini akan muncul di bagian bawah struk.</p>
             </div>
         </div>
 
+        <!-- Navigation -->
         <div class="flex gap-3">
-            <Button variant="outline" @click="$emit('back')" class="flex-1">
-                <ArrowLeft class="mr-2 h-4 w-4" />
+            <button
+                @click="$emit('back')"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full border border-[#c1ccd6] py-3 text-sm font-semibold text-[#3d4f5b] transition-colors hover:border-[#001e2b] hover:text-[#001e2b]"
+            >
+                <ArrowLeft class="h-4 w-4" />
                 Kembali
-            </Button>
-            <Button @click="$emit('next')" class="flex-1">
+            </button>
+            <button
+                @click="$emit('next')"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#00ed64] py-3 text-sm font-semibold text-[#001e2b] transition-colors hover:bg-[#00b545] active:bg-[#008c34]"
+            >
                 Lihat Preview
-                <ArrowRight class="ml-2 h-4 w-4" />
-            </Button>
+                <ArrowRight class="h-4 w-4" />
+            </button>
         </div>
     </div>
 </template>

@@ -1,7 +1,6 @@
 <script setup>
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Button } from '@/Components/ui/button';
 import { Store, ArrowRight } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -18,19 +17,23 @@ const handleNext = () => {
 </script>
 
 <template>
-    <div class="space-y-6">
-        <div class="text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                <Store class="h-8 w-8 text-slate-700" />
+    <div class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e3fcef]">
+                <Store class="h-6 w-6 text-[#00684a]" />
             </div>
-            <h2 class="text-xl font-semibold text-slate-900">Apa nama toko Anda?</h2>
-            <p class="mt-1 text-sm text-slate-500">
-                Nama ini akan muncul di header struk dan laporan.
-            </p>
+            <div>
+                <h2 class="text-lg font-semibold text-[#001e2b]">Apa nama toko Anda?</h2>
+                <p class="mt-1 text-sm text-[#5c6c7a]">
+                    Nama ini akan muncul di header struk dan laporan.
+                </p>
+            </div>
         </div>
 
+        <!-- Field -->
         <div class="space-y-2">
-            <Label for="store_name">Nama Toko</Label>
+            <Label for="store_name" class="text-sm font-medium text-[#1c2d38]">Nama Toko</Label>
             <Input
                 id="store_name"
                 :model-value="modelValue"
@@ -38,17 +41,23 @@ const handleNext = () => {
                 type="text"
                 placeholder="Contoh: Warung Kopi Budi"
                 autofocus
-                class="text-center text-lg"
+                class="h-11 text-base"
             />
         </div>
 
-        <Button
+        <!-- CTA -->
+        <button
             @click="handleNext"
             :disabled="!modelValue.trim()"
-            class="w-full"
+            :class="[
+                'flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold transition-all duration-150',
+                modelValue.trim()
+                    ? 'bg-[#00ed64] text-[#001e2b] hover:bg-[#00b545] active:bg-[#008c34] cursor-pointer'
+                    : 'bg-[#e1e5e8] text-[#a8b3bc] cursor-not-allowed',
+            ]"
         >
             Lanjutkan
-            <ArrowRight class="ml-2 h-4 w-4" />
-        </Button>
+            <ArrowRight class="h-4 w-4" />
+        </button>
     </div>
 </template>

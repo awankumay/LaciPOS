@@ -1,11 +1,27 @@
 <script setup>
 import Sidebar from '@/Components/Sidebar.vue';
 import FlashMessage from '@/Components/FlashMessage.vue';
-import { Head } from '@inertiajs/vue3';
+import ToastNotification from '@/Components/ToastNotification.vue';
+import { Head, usePage } from '@inertiajs/vue3';
+import { onMounted, watch } from 'vue';
+import { useToast } from '@/composables/useToast';
 
 defineProps({
     title: { type: String, default: '' },
 });
+
+const page = usePage();
+const toast = useToast();
+
+// Trigger toast dari flash message Inertia
+const handleFlash = () => {
+    const flash = page.props.flash;
+    if (flash?.success) toast.success(flash.success, 'Berhasil');
+    if (flash?.error) toast.error(flash.error, 'Terjadi Kesalahan');
+};
+
+onMounted(handleFlash);
+watch(() => page.props.flash, handleFlash, { deep: true });
 </script>
 
 <template>
@@ -28,7 +44,10 @@ defineProps({
             </div>
         </main>
 
-        <!-- Flash Messages -->
+        <!-- Flash Messages (legacy, tetap dipertahankan) -->
         <FlashMessage />
+
+        <!-- Toast Notification -->
+        <ToastNotification />
     </div>
 </template>

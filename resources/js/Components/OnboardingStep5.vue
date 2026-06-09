@@ -1,7 +1,6 @@
 <script setup>
-import { Button } from '@/Components/ui/button';
 import { Separator } from '@/Components/ui/separator';
-import { ArrowLeft, Check, Printer } from 'lucide-vue-next';
+import { ArrowLeft, Check, Printer, Loader2 } from 'lucide-vue-next';
 
 const props = defineProps({
     storeName: { type: String, required: true },
@@ -16,84 +15,93 @@ const emit = defineEmits(['back', 'submit']);
 </script>
 
 <template>
-    <div class="space-y-6">
-        <div class="text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                <Printer class="h-8 w-8 text-slate-700" />
+    <div class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e3fcef]">
+                <Printer class="h-6 w-6 text-[#00684a]" />
             </div>
-            <h2 class="text-xl font-semibold text-slate-900">Preview Struk</h2>
-            <p class="mt-1 text-sm text-slate-500">
-                Ini adalah tampilan struk toko Anda.
-            </p>
+            <div>
+                <h2 class="text-lg font-semibold text-[#001e2b]">Preview Struk</h2>
+                <p class="mt-1 text-sm text-[#5c6c7a]">
+                    Begini tampilan struk toko Anda. Klik "Selesaikan Setup" jika sudah sesuai.
+                </p>
+            </div>
         </div>
 
         <!-- Receipt Preview -->
-        <div class="mx-auto max-w-[280px] rounded-lg border border-slate-200 bg-white p-4 font-mono text-xs leading-relaxed shadow-sm">
-            <!-- Header -->
-            <div class="text-center space-y-1">
-                <div class="text-base font-bold">================================</div>
+        <div class="mx-auto w-64 rounded-2xl border border-[#e1e5e8] bg-white p-5 shadow-[0_4px_12px_rgba(0,30,43,0.08)]">
+            <!-- Struk header -->
+            <div class="text-center font-mono text-xs leading-relaxed">
+                <div class="text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
                 <img
                     v-if="logoPreviewUrl"
                     :src="logoPreviewUrl"
                     alt="Logo"
-                    class="mx-auto h-12 w-12 object-contain"
+                    class="mx-auto my-2 h-12 w-12 object-contain"
                 />
-                <div class="font-bold text-sm">{{ storeName || 'Nama Toko' }}</div>
-                <div v-if="address">{{ address }}</div>
-                <div v-if="phone">Telp: {{ phone }}</div>
-                <div class="text-base font-bold">================================</div>
+                <div class="mt-1 text-sm font-bold text-[#001e2b]">{{ storeName || 'Nama Toko' }}</div>
+                <div v-if="address" class="text-[#5c6c7a]">{{ address }}</div>
+                <div v-if="phone" class="text-[#5c6c7a]">Telp: {{ phone }}</div>
+                <div class="mt-1 text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
             </div>
 
-            <!-- Sample Transaction -->
-            <div class="mt-2 space-y-1">
+            <!-- Sample items -->
+            <div class="mt-3 font-mono text-xs space-y-1 text-[#3d4f5b]">
                 <div>No: TRX-20260610-001</div>
                 <div>Kasir: Sari</div>
                 <div>Tgl: 10 Jun 2026, 14:32</div>
                 <Separator class="my-2" />
                 <div class="flex justify-between">
-                    <span>Kopi Susu (M, Less) x1</span>
+                    <span>Kopi Susu x1</span>
+                    <span>28.000</span>
                 </div>
-                <div class="text-right">Rp 28.000</div>
                 <div class="flex justify-between">
                     <span>Es Teh x2</span>
+                    <span>14.000</span>
                 </div>
-                <div class="text-right">Rp 14.000</div>
                 <Separator class="my-2" />
-                <div class="flex justify-between font-bold">
-                    <span>Subtotal:</span>
+                <div class="flex justify-between font-bold text-[#001e2b]">
+                    <span>Total:</span>
                     <span>Rp 42.000</span>
                 </div>
-                <div class="flex justify-between">
-                    <span>Bayar (Tunai):</span>
-                    <span>Rp 50.000</span>
+                <div class="flex justify-between text-[#5c6c7a]">
+                    <span>Bayar:</span>
+                    <span>50.000</span>
                 </div>
-                <div class="flex justify-between">
-                    <span>Kembalian:</span>
-                    <span>Rp 8.000</span>
+                <div class="flex justify-between text-[#5c6c7a]">
+                    <span>Kembali:</span>
+                    <span>8.000</span>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="mt-2 text-center">
-                <div class="text-base font-bold">================================</div>
-                <div v-if="receiptFooter" class="mt-1">{{ receiptFooter }}</div>
-                <div class="text-base font-bold">================================</div>
+            <!-- Struk footer -->
+            <div class="mt-3 text-center font-mono text-xs">
+                <div class="text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
+                <div v-if="receiptFooter" class="mt-1 text-[#5c6c7a]">{{ receiptFooter }}</div>
+                <div class="mt-0.5 text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
             </div>
         </div>
 
-        <!-- Navigation Buttons -->
+        <!-- Navigation -->
         <div class="flex gap-3">
-            <Button variant="outline" @click="$emit('back')" class="flex-1" :disabled="isSubmitting">
-                <ArrowLeft class="mr-2 h-4 w-4" />
+            <button
+                @click="$emit('back')"
+                :disabled="isSubmitting"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full border border-[#c1ccd6] py-3 text-sm font-semibold text-[#3d4f5b] transition-colors hover:border-[#001e2b] hover:text-[#001e2b] disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+                <ArrowLeft class="h-4 w-4" />
                 Kembali
-            </Button>
-            <Button @click="$emit('submit')" class="flex-1" :disabled="isSubmitting">
-                <span v-if="isSubmitting">Menyimpan...</span>
-                <template v-else>
-                    <Check class="mr-2 h-4 w-4" />
-                    Selesaikan Setup
-                </template>
-            </Button>
+            </button>
+            <button
+                @click="$emit('submit')"
+                :disabled="isSubmitting"
+                class="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#00ed64] py-3 text-sm font-semibold text-[#001e2b] transition-colors hover:bg-[#00b545] active:bg-[#008c34] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+                <Loader2 v-if="isSubmitting" class="h-4 w-4 animate-spin" />
+                <Check v-else class="h-4 w-4 stroke-[2.5]" />
+                {{ isSubmitting ? 'Menyimpan...' : 'Selesaikan Setup' }}
+            </button>
         </div>
     </div>
 </template>
