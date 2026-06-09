@@ -97,4 +97,13 @@ class ProductController extends Controller
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil diperbarui.');
     }
+
+    public function destroy(Product $product)
+    {
+        $product->update(['is_active' => false]);
+        $product->delete(); // Soft delete
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk "' . $product->name . '" berhasil dihapus.');
+    }
 }

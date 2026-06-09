@@ -5,7 +5,8 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
-import { Plus, Search, Package } from 'lucide-vue-next';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Plus, Search, Package, Trash2 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
 
@@ -37,6 +38,24 @@ const applyFilters = () => {
     }, {
         preserveState: true,
         replace: true,
+    });
+};
+
+// Delete
+const showDeleteDialog = ref(false);
+const deletingProduct = ref(null);
+
+const confirmDelete = (product) => {
+    deletingProduct.value = product;
+    showDeleteDialog.value = true;
+};
+
+const executeDelete = () => {
+    router.delete(`/products/${deletingProduct.value.id}`, {
+        onFinish: () => {
+            showDeleteDialog.value = false;
+            deletingProduct.value = null;
+        },
     });
 };
 </script>
@@ -115,9 +134,14 @@ const applyFilters = () => {
                             </Badge>
                         </TableCell>
                         <TableCell class="text-right">
-                            <Link :href="`/products/${product.id}/edit`">
-                                <Button variant="ghost" size="sm">Edit</Button>
-                            </Link>
+                            <div class="flex items-center justify-end gap-1">
+                                <Link :href="`/products/${product.id}/edit`">
+                                    <Button variant="ghost" size="sm">Edit</Button>
+                                </Link>
+                                <Button variant="ghost" size="sm" @click="confirmDelete(product)">
+                                    <Trash2 class="h-4 w-4 text-red-500" />
+                                </Button>
+                            </div>
                         </TableCell>
                     </TableRow>
                     <TableRow v-if="products.data.length === 0">
@@ -143,5 +167,22 @@ const applyFilters = () => {
                 <span v-else class="px-3 py-1 text-sm text-slate-300" v-html="link.label" />
             </template>
         </div>
+
+        <!-- Delete Confirmation Dialog -->
+        <Dialog v-model:open="showDeleteDialog">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Hapus Produk</DialogTitle>
+                    <DialogDescription>
+                        Apakah Anda yakin ingin menghapus produk "{{ deletingProduct?.name }}"?
+                        Data produk ini tidak akan ditampilkan lagi, namun riwayat penjualan tetap tersimpan.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button variant="outline" @click="showDeleteDialog = false">Batal</Button>
+                    <Button variant="destructive" @click="executeDelete">Hapus</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </AppLayout>
 </template>
