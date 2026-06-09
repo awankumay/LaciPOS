@@ -1,0 +1,58 @@
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+class Order extends Model
+{
+    use HasUlids;
+
+    protected $fillable = [
+        'order_number', 'user_id', 'status', 'payment_method',
+        'payment_provider', 'total_amount', 'cash_received',
+        'change_amount', 'notes',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'total_amount' => 'decimal:2',
+            'cash_received' => 'decimal:2',
+            'change_amount' => 'decimal:2',
+        ];
+    }
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Generate order number: TRX-YYYYMMDD-NNN
+     */
+    public static function generateOrderNumber(): string
+    {
+        $today = now()->format('Ymd');
+        $prefix = "TRX-{$today}-";
+
+        $lastOrder = static::where('order_number', 'like', "{$prefix}%")
+            ->orderByDesc('order_number')
+            ->first();
+
+        if ($lastOrder) {
+            $lastNumber = (int) Str::afterLast($lastOrder->order_number, '-');
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    }
+}
