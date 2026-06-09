@@ -26,12 +26,6 @@ const removeVariant = (index) => {
     emit('update:modelValue', updated);
 };
 
-const updateVariantName = (index, name) => {
-    const updated = [...props.modelValue];
-    updated[index] = { ...updated[index], name };
-    emit('update:modelValue', updated);
-};
-
 const addOption = (variantIndex) => {
     const updated = [...props.modelValue];
     updated[variantIndex] = {
@@ -49,17 +43,6 @@ const removeOption = (variantIndex, optionIndex) => {
     };
     emit('update:modelValue', updated);
 };
-
-const updateOption = (variantIndex, optionIndex, field, value) => {
-    const updated = [...props.modelValue];
-    updated[variantIndex] = {
-        ...updated[variantIndex],
-        options: updated[variantIndex].options.map((opt, i) =>
-            i === optionIndex ? { ...opt, [field]: value } : opt
-        ),
-    };
-    emit('update:modelValue', updated);
-};
 </script>
 
 <template>
@@ -69,10 +52,9 @@ const updateOption = (variantIndex, optionIndex, field, value) => {
             <div class="flex items-center justify-between">
                 <div class="flex-1 mr-3">
                     <Label class="text-xs text-slate-500">Nama Varian {{ vIdx + 1 }}</Label>
-                    <Input :value="variant.name" @input="updateVariantName(vIdx, $event.target.value)"
-                        placeholder='Contoh: Ukuran, Level Gula, Suhu' class="mt-1" />
+                    <Input v-model="variant.name" placeholder='Contoh: Ukuran, Level Gula, Suhu' class="mt-1" />
                 </div>
-                <Button variant="ghost" size="sm" @click="removeVariant(vIdx)" class="text-red-500">
+                <Button type="button" variant="ghost" size="sm" @click="removeVariant(vIdx)" class="text-red-500">
                     <Trash2 class="h-4 w-4" />
                 </Button>
             </div>
@@ -80,24 +62,22 @@ const updateOption = (variantIndex, optionIndex, field, value) => {
             <!-- Options -->
             <div class="space-y-2 pl-4 border-l-2 border-slate-100">
                 <div v-for="(option, oIdx) in variant.options" :key="oIdx" class="flex items-center gap-2">
-                    <Input :value="option.label" @input="updateOption(vIdx, oIdx, 'label', $event.target.value)"
-                        placeholder="Label opsi" class="flex-1" />
+                    <Input v-model="option.label" placeholder="Label opsi" class="flex-1" />
                     <div class="w-32">
-                        <Input :value="option.price_modifier" @input="updateOption(vIdx, oIdx, 'price_modifier', Number($event.target.value))"
-                            type="number" step="500" placeholder="± Harga" />
+                        <Input v-model="option.price_modifier" type="number" step="500" placeholder="± Harga" />
                     </div>
-                    <Button v-if="variant.options.length > 1" variant="ghost" size="sm"
+                    <Button type="button" v-if="variant.options.length > 1" variant="ghost" size="sm"
                         @click="removeOption(vIdx, oIdx)">
                         <Trash2 class="h-3 w-3 text-slate-400" />
                     </Button>
                 </div>
-                <Button variant="outline" size="sm" @click="addOption(vIdx)">
+                <Button type="button" variant="outline" size="sm" @click="addOption(vIdx)">
                     <Plus class="mr-1 h-3 w-3" /> Tambah Opsi
                 </Button>
             </div>
         </div>
 
-        <Button v-if="modelValue.length < 3" variant="outline" @click="addVariant" class="w-full" type="button">
+        <Button type="button" v-if="modelValue.length < 3" variant="outline" @click="addVariant" class="w-full">
             <Plus class="mr-2 h-4 w-4" />
             Tambah Varian ({{ modelValue.length }}/3)
         </Button>
