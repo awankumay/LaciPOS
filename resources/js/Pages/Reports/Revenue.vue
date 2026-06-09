@@ -43,11 +43,11 @@ const formatDate = (dateString) => {
                     <p class="text-xs text-[#7c8c9a]">Pantau omzet harian bisnis Anda</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button class="inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] hover:bg-slate-50 transition-colors">
+                    <a :href="`/reports/revenue/export-pdf?start_date=${startDate}&end_date=${endDate}`" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] hover:bg-slate-50 transition-colors">
                         <Download class="h-3.5 w-3.5" />
                         Export PDF
-                    </button>
-                    <button class="inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] hover:bg-slate-50 transition-colors">
+                    </a>
+                    <button disabled class="opacity-50 cursor-not-allowed inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] transition-colors">
                         <FileText class="h-3.5 w-3.5" />
                         Export CSV
                     </button>
