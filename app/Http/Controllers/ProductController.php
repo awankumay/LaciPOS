@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -38,5 +39,28 @@ class ProductController extends Controller
                 'category' => $request->input('category', ''),
             ],
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Products/Create', [
+            'categories' => Category::orderBy('name')->get(),
+        ]);
+    }
+
+    public function store(StoreProductRequest $request)
+    {
+        $data = $request->validated();
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('products', 'public');
+        }
+        unset($data['photo']);
+
+        Product::create($data);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil ditambahkan.');
     }
 }
