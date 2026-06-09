@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -62,5 +63,38 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil ditambahkan.');
+    }
+
+    public function edit(Product $product)
+    {
+        return Inertia::render('Products/Edit', [
+            'product' => array_merge($product->toArray(), [
+                'photo_url' => $product->photo_url,
+            ]),
+            'categories' => Category::orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(UpdateProductRequest $request, Product $product)
+    {
+        $data = $request->validated();
+
+        // Handle photo
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
+            if ($product->photo_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->photo_path);
+            }
+            $data['photo_path'] = $request->file('photo')->store('products', 'public');
+        } elseif ($request->boolean('remove_photo') && $product->photo_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->photo_path);
+            $data['photo_path'] = null;
+        }
+        unset($data['photo'], $data['remove_photo']);
+
+        $product->update($data);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil diperbarui.');
     }
 }
