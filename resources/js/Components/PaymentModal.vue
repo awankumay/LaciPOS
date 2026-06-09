@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
 import { Banknote, CreditCard, Smartphone } from 'lucide-vue-next';
+import CashCalculator from '@/Components/CashCalculator.vue';
 
 const props = defineProps({
     open: { type: Boolean, default: false },
@@ -16,6 +17,7 @@ const { formatRupiah } = useFormatCurrency();
 
 const paymentMethod = ref(null);
 const paymentProvider = ref('');
+const cashReceived = ref(0);
 
 // Constants for providers
 const BANK_PROVIDERS = ['BCA', 'Mandiri', 'BNI', 'BRI', 'BSI', 'Lainnya'];
@@ -26,6 +28,7 @@ watch(() => props.open, (isOpen) => {
     if (isOpen) {
         paymentMethod.value = null;
         paymentProvider.value = '';
+        cashReceived.value = 0;
     }
 });
 
@@ -42,8 +45,11 @@ const canConfirm = computed(() => {
         return paymentProvider.value.length > 0;
     }
     
-    // Untuk tunai selalu true di T033 (T034 akan implement logic cash)
-    return true;
+    if (paymentMethod.value === 'cash') {
+        return cashReceived.value >= props.total;
+    }
+    
+    return false;
 });
 
 const handleConfirm = () => {
@@ -52,8 +58,8 @@ const handleConfirm = () => {
     emit('confirm-payment', {
         payment_method: paymentMethod.value,
         payment_provider: paymentMethod.value === 'cash' ? null : paymentProvider.value,
-        cash_received: paymentMethod.value === 'cash' ? props.total : null, // placeholder until T034
-        change_amount: paymentMethod.value === 'cash' ? 0 : null, // placeholder until T034
+        cash_received: paymentMethod.value === 'cash' ? cashReceived.value : null,
+        change_amount: paymentMethod.value === 'cash' ? (cashReceived.value - props.total) : null,
     });
     
     emit('close');
@@ -115,9 +121,10 @@ const handleConfirm = () => {
 
                 <!-- Method Details -->
                 <div v-if="paymentMethod === 'cash'" class="p-4 border border-slate-200 rounded-lg bg-slate-50/50">
-                    <p class="text-sm text-slate-500 text-center">
-                        Modul kalkulator kembalian tunai akan hadir di T034.
-                    </p>
+                    <CashCalculator 
+                        :total-amount="total" 
+                        @update:cashReceived="val => cashReceived = val"
+                    />
                 </div>
                 
                 <div v-if="paymentMethod === 'bank_transfer'" class="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
