@@ -12,6 +12,12 @@ import {
     Sparkles,
 } from 'lucide-vue-next';
 
+import StatCard from '@/Components/StatCard.vue';
+
+const props = defineProps({
+    stats: Object,
+});
+
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
 const greeting = computed(() => {
@@ -21,41 +27,32 @@ const greeting = computed(() => {
     return 'Selamat malam';
 });
 
-// Stat cards placeholder — akan diisi data nyata di task selanjutnya
-const stats = [
+const formatRupiah = (value) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
+};
+
+const dashboardStats = computed(() => [
     {
-        label: 'Transaksi Hari Ini',
-        value: '—',
-        sub: 'Belum ada data',
-        icon: ShoppingCart,
-        color: 'bg-[#e3fcef] text-[#00684a]',
-        accent: 'text-[#00684a]',
-    },
-    {
-        label: 'Pendapatan Hari Ini',
-        value: '—',
-        sub: 'Belum ada data',
+        title: 'Pendapatan Hari Ini',
+        value: formatRupiah(props.stats?.totalRevenue),
         icon: TrendingUp,
-        color: 'bg-[#e3fcef] text-[#00684a]',
-        accent: 'text-[#00684a]',
     },
     {
-        label: 'Total Produk',
+        title: 'Transaksi Hari Ini',
+        value: props.stats?.totalTransactions || 0,
+        icon: ShoppingCart,
+    },
+    {
+        title: 'Total Produk',
         value: '—',
-        sub: 'Belum ada produk',
         icon: Package,
-        color: 'bg-[#f0ebfe] text-[#7b3ff2]',
-        accent: 'text-[#7b3ff2]',
     },
     {
-        label: 'Kasir Aktif',
+        title: 'Kasir Aktif',
         value: '—',
-        sub: 'Belum ada data',
         icon: Users,
-        color: 'bg-[#fff3ee] text-[#c05621]',
-        accent: 'text-[#fa6e39]',
     },
-];
+]);
 
 // Quick actions
 const quickActions = [
@@ -109,22 +106,13 @@ const quickActions = [
             <div>
                 <h3 class="mb-4 text-xs font-semibold uppercase tracking-widest text-[#7c8c9a]">Ringkasan Hari Ini</h3>
                 <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
-                    <div
-                        v-for="stat in stats"
-                        :key="stat.label"
-                        class="rounded-2xl border border-[#e1e5e8] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(0,30,43,0.04)] transition-shadow hover:shadow-[0_4px_12px_rgba(0,30,43,0.08)]"
-                    >
-                        <!-- Icon -->
-                        <div :class="['mb-4 flex h-10 w-10 items-center justify-center rounded-xl', stat.color]">
-                            <component :is="stat.icon" class="h-5 w-5" />
-                        </div>
-                        <!-- Value -->
-                        <p class="text-2xl font-bold text-[#001e2b]">{{ stat.value }}</p>
-                        <!-- Label -->
-                        <p class="mt-0.5 text-xs font-medium text-[#5c6c7a]">{{ stat.label }}</p>
-                        <!-- Sub -->
-                        <p :class="['mt-2 text-xs', stat.accent]">{{ stat.sub }}</p>
-                    </div>
+                    <StatCard
+                        v-for="stat in dashboardStats"
+                        :key="stat.title"
+                        :title="stat.title"
+                        :value="stat.value"
+                        :icon="stat.icon"
+                    />
                 </div>
             </div>
 

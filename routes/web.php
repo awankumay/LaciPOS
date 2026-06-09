@@ -29,9 +29,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'onboarding'])->group(function () {
     // Route khusus owner
     Route::middleware('role:owner')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('Dashboard/Index');
-        })->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
     
