@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ProductGrid from '@/Components/ProductGrid.vue';
 import CartPanel from '@/Components/CartPanel.vue';
+import VariantPickerModal from '@/Components/VariantPickerModal.vue';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -13,9 +14,27 @@ const props = defineProps({
 // Untuk saat ini, placeholder
 const cartItems = ref([]);
 
-const addToCart = (product, selectedOptions) => {
+const showVariantModal = ref(false);
+const selectedProduct = ref(null);
+
+const handleProductClick = (product) => {
+    if (product.has_variants) {
+        selectedProduct.value = product;
+        showVariantModal.value = true;
+    } else {
+        // Langsung tambah ke cart tanpa modal
+        addToCartDirect(product);
+    }
+};
+
+const addToCartDirect = (product) => {
     // Akan diimplementasikan di T031
-    console.log('Add to cart:', product, selectedOptions);
+    console.log('Add direct to cart:', product);
+};
+
+const addToCartFromModal = (payload) => {
+    // Akan diimplementasikan di T031
+    console.log('Add to cart from modal:', payload);
 };
 </script>
 
@@ -27,7 +46,7 @@ const addToCart = (product, selectedOptions) => {
                 <ProductGrid
                     :products="products"
                     :categories="categories"
-                    @add-to-cart="addToCart"
+                    @add-to-cart="handleProductClick"
                 />
             </div>
 
@@ -36,5 +55,12 @@ const addToCart = (product, selectedOptions) => {
                 <CartPanel :items="cartItems" />
             </div>
         </div>
+
+        <VariantPickerModal
+            :open="showVariantModal"
+            :product="selectedProduct"
+            @close="showVariantModal = false"
+            @add-to-cart="addToCartFromModal"
+        />
     </AppLayout>
 </template>
