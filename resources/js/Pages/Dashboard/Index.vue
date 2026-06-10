@@ -80,11 +80,12 @@ const quickActions = [
 <template>
     <AppLayout title="Dashboard">
         <template #header>
-            <div class="flex items-center justify-between w-full">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
                 <div>
                     <h1 class="text-lg font-semibold text-[#001e2b]">Dashboard</h1>
+                    <p class="text-xs text-[#7c8c9a]">Ringkasan performa bisnis dan operasional kasir</p>
                 </div>
-                <div class="flex items-center gap-2 text-xs text-[#7c8c9a]">
+                <div class="flex items-center gap-2 text-xs text-[#7c8c9a] bg-white border border-[#e1e5e8] px-3 py-1.5 rounded-lg shadow-sm">
                     <Clock class="h-3.5 w-3.5" />
                     {{ new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) }}
                 </div>

@@ -70,14 +70,20 @@ const executeDelete = () => {
 <template>
     <AppLayout title="Kategori">
         <template #header>
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold text-slate-900">Kategori</h1>
-                <Button @click="showAddForm = !showAddForm" size="sm">
-                    <Plus class="mr-2 h-4 w-4" />
-                    Tambah Kategori
-                </Button>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+                <div>
+                    <h1 class="text-lg font-semibold text-[#001e2b]">Kategori</h1>
+                    <p class="text-xs text-[#7c8c9a]">Kelola daftar kategori untuk produk Anda</p>
+                </div>
             </div>
         </template>
+
+        <div class="mb-6 flex justify-end">
+            <Button @click="showAddForm = !showAddForm" size="sm" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">
+                <Plus class="mr-2 h-4 w-4" />
+                Tambah Kategori
+            </Button>
+        </div>
 
         <!-- Add Form -->
         <div v-if="showAddForm" class="mb-6 rounded-lg border border-slate-200 bg-white p-4">

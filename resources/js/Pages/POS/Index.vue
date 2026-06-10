@@ -79,6 +79,15 @@ const handleConfirmPayment = (paymentData) => {
 <template>
     <!-- POS uses full-height layout without extra padding from AppLayout -->
     <AppLayout title="Kasir (POS)">
+        <template #header>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+                <div>
+                    <h1 class="text-lg font-semibold text-[#001e2b]">Kasir (POS)</h1>
+                    <p class="text-xs text-[#7c8c9a]">Kelola transaksi penjualan dengan mudah</p>
+                </div>
+            </div>
+        </template>
+
         <template #default>
             <div class="pos-wrapper">
                 <!-- Left Panel: Product Grid -->
@@ -117,8 +126,8 @@ const handleConfirmPayment = (paymentData) => {
 .pos-wrapper {
     display: flex;
     gap: 20px;
-    /* Subtract: py-8 (top 32px + bot 32px) = 64px + sidebar header if any */
-    height: calc(100vh - 64px - 64px);
+    /* Adjusted for AppLayout padding and the new header height */
+    height: calc(100vh - 180px);
     min-height: 0;
 }
 

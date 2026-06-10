@@ -63,32 +63,37 @@ const executeDelete = () => {
 <template>
     <AppLayout title="Produk">
         <template #header>
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold text-slate-900">Produk</h1>
-                <Link href="/products/create">
-                    <Button size="sm">
-                        <Plus class="mr-2 h-4 w-4" />
-                        Tambah Produk
-                    </Button>
-                </Link>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+                <div>
+                    <h1 class="text-lg font-semibold text-[#001e2b]">Produk</h1>
+                    <p class="text-xs text-[#7c8c9a]">Kelola daftar produk, harga, dan stok</p>
+                </div>
             </div>
         </template>
 
-        <!-- Filters -->
-        <div class="mb-6 flex flex-wrap items-center gap-3">
-            <div class="relative flex-1 max-w-sm">
-                <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input v-model="search" placeholder="Cari produk..." class="pl-10" />
+        <!-- Filters & Actions -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                <div class="relative flex-1 min-w-[200px] max-w-sm">
+                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input v-model="search" placeholder="Cari produk..." class="pl-10" />
+                </div>
+                <select
+                    v-model="selectedCategory"
+                    class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                >
+                    <option value="">Semua Kategori</option>
+                    <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                        {{ cat.name }}
+                    </option>
+                </select>
             </div>
-            <select
-                v-model="selectedCategory"
-                class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400"
-            >
-                <option value="">Semua Kategori</option>
-                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                    {{ cat.name }}
-                </option>
-            </select>
+            <Link href="/products/create" class="shrink-0 w-full sm:w-auto">
+                <Button size="sm" class="w-full sm:w-auto bg-[#001e2b] text-white hover:bg-[#1c2d38]">
+                    <Plus class="mr-2 h-4 w-4" />
+                    Tambah Produk
+                </Button>
+            </Link>
         </div>
 
         <!-- Products Table -->

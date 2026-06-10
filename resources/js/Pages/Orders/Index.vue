@@ -49,7 +49,7 @@ const getStatusColor = (statusText) => {
 <template>
     <AppLayout title="Riwayat Transaksi">
         <template #header>
-            <div class="flex items-center justify-between w-full">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
                 <div>
                     <h1 class="text-lg font-semibold text-[#001e2b]">Riwayat Transaksi</h1>
                     <p class="text-xs text-[#7c8c9a]">Daftar semua transaksi yang pernah dilakukan</p>

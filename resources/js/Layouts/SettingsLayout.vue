@@ -20,7 +20,12 @@ const navItems = [
 <template>
     <AppLayout :title="title">
         <template #header>
-            <h1 class="text-2xl font-semibold text-[#001e2b]">Pengaturan</h1>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+                <div>
+                    <h1 class="text-lg font-semibold text-[#001e2b]">Pengaturan</h1>
+                    <p class="text-xs text-[#7c8c9a]">Kelola konfigurasi sistem dan preferensi aplikasi</p>
+                </div>
+            </div>
         </template>
 
         <div class="flex flex-col md:flex-row gap-8 items-start max-w-6xl mx-auto w-full">
