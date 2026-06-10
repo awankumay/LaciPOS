@@ -17,6 +17,8 @@ class DashboardController extends Controller
         $totalRevenue = (clone $todayOrders)->sum('total_amount');
         $totalTransactions = (clone $todayOrders)->count();
 
+        $activeCashiers = \App\Models\User::where('role', 'cashier')->where('is_active', true)->count();
+
         $grossProfit = \App\Models\OrderItem::whereHas('order', function ($q) use ($today) {
             $q->where('status', 'completed')->where('created_at', '>=', $today);
         })->sum(\Illuminate\Support\Facades\DB::raw('(snapshot_price - snapshot_cogs) * quantity'));
@@ -46,6 +48,7 @@ class DashboardController extends Controller
                 'totalRevenue' => $totalRevenue,
                 'totalTransactions' => $totalTransactions,
                 'grossProfit' => $grossProfit,
+                'activeCashiers' => $activeCashiers,
             ],
             'restockProducts' => $restockProducts,
             'salesData' => $salesData,

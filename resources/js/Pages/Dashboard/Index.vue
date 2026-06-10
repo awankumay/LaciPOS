@@ -60,7 +60,7 @@ const dashboardStats = computed(() => [
     },
     {
         title: 'Kasir Aktif',
-        value: '—',
+        value: props.stats?.activeCashiers || 0,
         icon: Users,
     },
 ]);
