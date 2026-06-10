@@ -1,5 +1,5 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Button } from '@/Components/ui/button';
@@ -73,18 +73,14 @@ const formatDate = (dateString) => {
 </script>
 
 <template>
-    <AppLayout>
-        <Head title="Manajemen Kasir" />
-
-        <template #header>
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold text-slate-900">Manajemen Kasir</h1>
-                <Button @click="showAddDialog = true">
-                    <Plus class="mr-2 h-4 w-4" />
-                    Tambah Kasir
-                </Button>
-            </div>
-        </template>
+    <SettingsLayout title="Manajemen Kasir">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold tracking-tight text-[#001e2b]">Manajemen Kasir</h2>
+            <Button @click="showAddDialog = true">
+                <Plus class="mr-2 h-4 w-4" />
+                Tambah Kasir
+            </Button>
+        </div>
 
         <div class="rounded-lg border border-slate-200 bg-white">
             <Table>
@@ -194,5 +190,5 @@ const formatDate = (dateString) => {
                 </form>
             </DialogContent>
         </Dialog>
-    </AppLayout>
+    </SettingsLayout>
 </template>

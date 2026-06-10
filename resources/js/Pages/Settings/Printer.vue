@@ -1,7 +1,7 @@
 <script setup>
 import { Head, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
@@ -50,13 +50,10 @@ const testPrint = () => {
 </script>
 
 <template>
-    <AppLayout>
-        <Head title="Pengaturan Printer" />
-
-        <div class="flex-1 space-y-4 p-4 md:p-8 pt-6">
-            <div class="flex items-center justify-between space-y-2">
-                <h2 class="text-3xl font-bold tracking-tight">Pengaturan Printer</h2>
-            </div>
+    <SettingsLayout title="Pengaturan Printer">
+        <div class="flex items-center justify-between space-y-2">
+            <h2 class="text-2xl font-bold tracking-tight text-[#001e2b]">Pengaturan Printer</h2>
+        </div>
 
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card class="col-span-2">
@@ -140,6 +137,5 @@ const testPrint = () => {
                     </form>
                 </Card>
             </div>
-        </div>
-    </AppLayout>
+    </SettingsLayout>
 </template>

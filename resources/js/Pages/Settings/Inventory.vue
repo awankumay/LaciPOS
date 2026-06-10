@@ -1,5 +1,5 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -27,10 +27,10 @@ const submit = () => {
 </script>
 
 <template>
-    <AppLayout title="Pengaturan Stok">
-        <template #header>
-            <h1 class="text-2xl font-semibold text-slate-900">Pengaturan Stok</h1>
-        </template>
+    <SettingsLayout title="Pengaturan Stok">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold tracking-tight text-[#001e2b]">Pengaturan Stok</h2>
+        </div>
 
         <div class="max-w-2xl mt-4">
             <Card>
@@ -71,5 +71,5 @@ const submit = () => {
                 </form>
             </Card>
         </div>
-    </AppLayout>
+    </SettingsLayout>
 </template>

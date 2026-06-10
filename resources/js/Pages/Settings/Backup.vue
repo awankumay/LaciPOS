@@ -1,5 +1,5 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -20,14 +20,10 @@ const createBackup = () => {
 </script>
 
 <template>
-    <AppLayout>
-        <Head title="Backup Database" />
-
-        <template #header>
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold text-slate-900">Backup Database</h1>
-            </div>
-        </template>
+    <SettingsLayout title="Backup Database">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold tracking-tight text-[#001e2b]">Backup Database</h2>
+        </div>
 
         <div class="max-w-4xl mt-4 space-y-6">
             <Card>
@@ -86,5 +82,5 @@ const createBackup = () => {
                 </CardContent>
             </Card>
         </div>
-    </AppLayout>
+    </SettingsLayout>
 </template>
