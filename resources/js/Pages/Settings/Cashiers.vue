@@ -8,8 +8,9 @@ import { Label } from '@/Components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
 import Modal from '@/Components/Modal.vue';
-import { Switch } from '@/Components/ui/switch';
-import { Plus, Pencil } from 'lucide-vue-next';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
+import { Plus, Pencil, Check, ChevronsUpDown } from 'lucide-vue-next';
 
 const props = defineProps({
     cashiers: { type: Array, default: () => [] },
@@ -34,10 +35,12 @@ const submitAdd = () => {
 
 // Edit Cashier Form
 const showEditDialog = ref(false);
+const openActiveBox = ref(false);
 const editForm = useForm({
     name: '',
     email: '',
     password: '',
+    is_active: true,
 });
 const editingCashierId = ref(null);
 
@@ -46,6 +49,7 @@ const startEdit = (cashier) => {
     editForm.name = cashier.name;
     editForm.email = cashier.email;
     editForm.password = '';
+    editForm.is_active = Boolean(cashier.is_active);
     showEditDialog.value = true;
 };
 
@@ -56,11 +60,6 @@ const submitEdit = () => {
             editForm.reset();
         },
     });
-};
-
-// Toggle Active
-const toggleActive = (cashier) => {
-    router.patch(`/settings/cashiers/${cashier.id}/toggle`, {}, { preserveScroll: true });
 };
 
 // Format Date
@@ -105,12 +104,6 @@ const formatDate = (dateString) => {
                         <TableCell>{{ formatDate(cashier.created_at) }}</TableCell>
                         <TableCell class="text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <Switch
-                                    :checked="Boolean(cashier.is_active)"
-                                    @update:checked="toggleActive(cashier)"
-                                    title="Toggle Status Aktif"
-                                    class="data-[state=checked]:bg-[#00ED64] data-[state=unchecked]:bg-[#001e2b]"
-                                />
                                 <Button variant="ghost" size="sm" @click="startEdit(cashier)">
                                     <Pencil class="h-4 w-4" />
                                 </Button>
@@ -178,6 +171,57 @@ const formatDate = (dateString) => {
                     <Label for="edit_password">Password Baru (Opsional)</Label>
                     <Input id="edit_password" type="password" v-model="editForm.password" placeholder="Biarkan kosong jika tidak diubah" />
                     <p v-if="editForm.errors.password" class="text-sm text-red-500">{{ editForm.errors.password }}</p>
+                </div>
+                <div class="space-y-2">
+                    <Label>Status Akun</Label>
+                    <Popover v-model:open="openActiveBox">
+                        <PopoverTrigger as-child>
+                            <button
+                                type="button"
+                                role="combobox"
+                                :aria-expanded="openActiveBox"
+                                class="flex items-center justify-between h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                            >
+                                <span class="truncate">{{ editForm.is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                            </button>
+                        </PopoverTrigger>
+                        <PopoverContent class="w-full p-0 bg-white" align="start">
+                            <Command>
+                                <CommandList>
+                                    <CommandGroup>
+                                        <CommandItem
+                                            value="Aktif"
+                                            @select="() => {
+                                                editForm.is_active = true;
+                                                openActiveBox = false;
+                                            }"
+                                            class="text-sm cursor-pointer"
+                                        >
+                                            Aktif
+                                            <Check
+                                                :class="['ml-auto h-4 w-4', editForm.is_active === true ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                            />
+                                        </CommandItem>
+                                        <CommandItem
+                                            value="Nonaktif"
+                                            @select="() => {
+                                                editForm.is_active = false;
+                                                openActiveBox = false;
+                                            }"
+                                            class="text-sm cursor-pointer"
+                                        >
+                                            Nonaktif
+                                            <Check
+                                                :class="['ml-auto h-4 w-4', editForm.is_active === false ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                            />
+                                        </CommandItem>
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <p v-if="editForm.errors.is_active" class="text-sm text-red-500">{{ editForm.errors.is_active }}</p>
                 </div>
             </form>
             <template #footer>

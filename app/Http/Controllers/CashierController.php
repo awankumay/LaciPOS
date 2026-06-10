@@ -40,6 +40,7 @@ class CashierController extends Controller
         $data = [
             'name' => $request->validated('name'),
             'email' => $request->validated('email'),
+            'is_active' => $request->boolean('is_active'),
         ];
 
         if ($request->filled('password')) {
@@ -48,13 +49,5 @@ class CashierController extends Controller
 
         $cashier->update($data);
         return back()->with('success', 'Akun kasir berhasil diperbarui.');
-    }
-
-    public function toggleActive(User $cashier)
-    {
-        $cashier->update(['is_active' => !$cashier->is_active]);
-
-        $status = $cashier->is_active ? 'diaktifkan' : 'dinonaktifkan';
-        return back()->with('success', "Akun kasir berhasil {$status}.");
     }
 }
