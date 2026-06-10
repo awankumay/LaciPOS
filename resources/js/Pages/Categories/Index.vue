@@ -5,7 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import Modal from '@/Components/Modal.vue';
 import { Plus, Pencil, Trash2, Check, X } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -153,20 +153,16 @@ const executeDelete = () => {
         </div>
 
         <!-- Delete Confirmation Dialog -->
-        <Dialog v-model:open="showDeleteDialog">
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Hapus Kategori</DialogTitle>
-                    <DialogDescription>
-                        Apakah Anda yakin ingin menghapus kategori "{{ deletingCategory?.name }}"?
-                        Kategori yang masih memiliki produk tidak bisa dihapus.
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <Button variant="outline" @click="showDeleteDialog = false">Batal</Button>
-                    <Button variant="destructive" @click="executeDelete">Hapus</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <Modal
+            :show="showDeleteDialog"
+            @update:show="showDeleteDialog = $event"
+            title="Hapus Kategori"
+            :description="`Apakah Anda yakin ingin menghapus kategori \u0022${deletingCategory?.name}\u0022? Kategori yang masih memiliki produk tidak bisa dihapus.`"
+        >
+            <template #footer>
+                <Button variant="outline" @click="showDeleteDialog = false">Batal</Button>
+                <Button variant="destructive" @click="executeDelete" class="bg-red-600 text-white">Hapus</Button>
+            </template>
+        </Modal>
     </AppLayout>
 </template>

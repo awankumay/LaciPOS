@@ -5,7 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import Modal from '@/Components/Modal.vue';
 import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/Components/ui/command';
 import { Plus, Search, Package, Trash2, ArrowRightLeft, Check, ChevronsUpDown } from 'lucide-vue-next';
@@ -227,20 +227,16 @@ const executeDelete = () => {
         </div>
 
         <!-- Delete Confirmation Dialog -->
-        <Dialog v-model:open="showDeleteDialog">
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Hapus Produk</DialogTitle>
-                    <DialogDescription>
-                        Apakah Anda yakin ingin menghapus produk "{{ deletingProduct?.name }}"?
-                        Data produk ini tidak akan ditampilkan lagi, namun riwayat penjualan tetap tersimpan.
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <Button variant="outline" @click="showDeleteDialog = false">Batal</Button>
-                    <Button variant="destructive" @click="executeDelete">Hapus</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <Modal
+            :show="showDeleteDialog"
+            @update:show="showDeleteDialog = $event"
+            title="Hapus Produk"
+            :description="`Apakah Anda yakin ingin menghapus produk \u0022${deletingProduct?.name}\u0022? Data produk ini tidak akan ditampilkan lagi, namun riwayat penjualan tetap tersimpan.`"
+        >
+            <template #footer>
+                <Button variant="outline" @click="showDeleteDialog = false">Batal</Button>
+                <Button variant="destructive" @click="executeDelete" class="bg-red-600 text-white">Hapus</Button>
+            </template>
+        </Modal>
     </AppLayout>
 </template>

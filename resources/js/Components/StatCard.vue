@@ -10,7 +10,7 @@ defineProps({
 </script>
 
 <template>
-    <Card>
+    <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
         <CardContent class="flex items-center gap-4 p-6">
             <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
                 <component :is="icon" class="h-6 w-6 text-slate-700" />

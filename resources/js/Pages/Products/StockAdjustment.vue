@@ -50,15 +50,17 @@ const getReasonLabel = (reason) => {
 <template>
     <AppLayout title="Penyesuaian Stok">
         <template #header>
-            <div class="flex items-center gap-4">
-                <Link href="/products">
-                    <Button variant="outline" size="icon">
-                        <ArrowLeft class="h-4 w-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h1 class="text-2xl font-semibold text-slate-900">Penyesuaian Stok</h1>
-                    <p class="text-sm text-slate-500">{{ product.name }}</p>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+                <div class="flex gap-5">
+                    <Link href="/products" class="shrink-0 mt-0.5">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl border-[1.5px] border-slate-200 bg-white text-slate-500 shadow-[0_1px_2px_rgba(0,30,43,0.04)] transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900">
+                            <ArrowLeft class="h-4 w-4" />
+                        </div>
+                    </Link>
+                    <div>
+                        <h1 class="text-lg font-semibold text-[#001e2b]">Penyesuaian Stok</h1>
+                        <p class="text-xs text-[#7c8c9a]">Atur dan pantau stok produk Anda dengan mudah.</p>
+                    </div>
                 </div>
             </div>
         </template>
@@ -66,7 +68,7 @@ const getReasonLabel = (reason) => {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Form Adjustment -->
             <div class="md:col-span-1 space-y-6">
-                <Card>
+                <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
                     <CardHeader>
                         <CardTitle>Stok Saat Ini</CardTitle>
                     </CardHeader>
@@ -80,7 +82,7 @@ const getReasonLabel = (reason) => {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
                     <CardHeader>
                         <CardTitle>Mutasi Stok</CardTitle>
                     </CardHeader>
@@ -129,7 +131,7 @@ const getReasonLabel = (reason) => {
                                 <p v-if="form.errors.notes" class="text-sm text-red-500 mt-1">{{ form.errors.notes }}</p>
                             </div>
 
-                            <Button type="submit" class="w-full" :disabled="form.processing">
+                            <Button type="submit" class="h-11 w-full rounded-xl bg-[#001e2b] text-white hover:bg-[#1c2d38] font-medium shadow-sm transition-colors" :disabled="form.processing">
                                 Simpan Mutasi
                             </Button>
                         </form>
@@ -139,7 +141,7 @@ const getReasonLabel = (reason) => {
 
             <!-- History Log -->
             <div class="md:col-span-2">
-                <Card class="h-full">
+                <Card class="h-full bg-white border-slate-200 shadow-sm rounded-xl">
                     <CardHeader>
                         <CardTitle>Riwayat Stok</CardTitle>
                         <CardDescription>50 catatan terakhir perubahan stok</CardDescription>

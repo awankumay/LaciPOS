@@ -32,7 +32,7 @@ class DashboardController extends Controller
 
         $recentTransactions = Order::with('user:id,name')
             ->orderBy('created_at', 'desc')
-            ->limit(5)
+            ->limit(7)
             ->get();
 
         $salesData = collect(range(6, 0))->map(function ($daysAgo) {

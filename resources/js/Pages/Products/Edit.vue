@@ -5,7 +5,9 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { ArrowLeft, Upload, X } from 'lucide-vue-next';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/Components/ui/command';
+import { ArrowLeft, Upload, X, Check, ChevronsUpDown } from 'lucide-vue-next';
 import { ref } from 'vue';
 import VariantEditor from '@/Components/VariantEditor.vue';
 
@@ -30,6 +32,7 @@ const form = useForm({
 
 const photoPreview = ref(props.product.photo_url);
 const fileInput = ref(null);
+const openCategoryBox = ref(false);
 
 const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -55,103 +58,178 @@ const submit = () => {
 
 <template>
     <AppLayout title="Edit Produk">
+        <!-- <template #header>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+                <div>
+                    <h1 class="text-lg font-semibold text-[#001e2b]">Produk</h1>
+                    <p class="text-xs text-[#7c8c9a]">Kelola daftar produk, harga, dan stok</p>
+                </div>
+            </div>
+        </template> -->
         <template #header>
-            <div class="flex items-center gap-4">
-                <Link href="/products">
-                    <Button variant="ghost" size="sm"><ArrowLeft class="h-4 w-4" /></Button>
-                </Link>
-                <h1 class="text-2xl font-semibold text-slate-900">Edit Produk</h1>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+                <div class="flex gap-5">
+                    <Link href="/products" class="shrink-0 mt-0.5">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl border-[1.5px] border-slate-200 bg-white text-slate-500 shadow-[0_1px_2px_rgba(0,30,43,0.04)] transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900">
+                            <ArrowLeft class="h-4 w-4" />
+                        </div>
+                    </Link>
+                    <div>
+                        <h1 class="text-lg font-semibold text-[#001e2b]">Edit Produk</h1>
+                        <p class="text-xs text-[#7c8c9a]">Perbarui detail produk, harga, maupun stok di sini.</p>
+                    </div>
+                </div>
             </div>
         </template>
 
-        <form @submit.prevent="submit" class="max-w-2xl space-y-6">
-            <Card>
-                <CardHeader><CardTitle>Informasi Produk</CardTitle></CardHeader>
-                <CardContent class="space-y-4">
-                    <div class="space-y-2">
-                        <Label for="name">Nama Produk *</Label>
-                        <Input id="name" v-model="form.name" />
-                        <p v-if="form.errors.name" class="text-sm text-red-500">{{ form.errors.name }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <Label for="category_id">Kategori *</Label>
-                        <select id="category_id" v-model="form.category_id"
-                            class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
-                            <option value="">Pilih kategori</option>
-                            <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-                        </select>
-                        <p v-if="form.errors.category_id" class="text-sm text-red-500">{{ form.errors.category_id }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <Label>Foto Produk</Label>
-                        <div class="flex items-center gap-4">
-                            <div v-if="photoPreview" class="relative">
-                                <img :src="photoPreview" class="h-24 w-24 rounded-lg object-cover border" />
-                                <button @click="removePhoto" type="button"
-                                    class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white">
-                                    <X class="h-3 w-3" />
-                                </button>
-                            </div>
-                            <div @click="fileInput?.click()"
-                                class="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 hover:border-slate-400">
-                                <Upload class="h-5 w-5 text-slate-400" />
-                            </div>
-                            <input ref="fileInput" type="file" accept="image/png,image/jpeg" class="hidden" @change="handlePhotoChange" />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader><CardTitle>Harga</CardTitle></CardHeader>
-                <CardContent class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <Label for="cogs">Harga Modal *</Label>
-                        <Input id="cogs" v-model="form.cogs" type="number" step="100" min="0" />
-                        <p v-if="form.errors.cogs" class="text-sm text-red-500">{{ form.errors.cogs }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <Label for="price">Harga Jual *</Label>
-                        <Input id="price" v-model="form.price" type="number" step="100" min="0" />
-                        <p v-if="form.errors.price" class="text-sm text-red-500">{{ form.errors.price }}</p>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader><CardTitle>Stok & Status</CardTitle></CardHeader>
-                <CardContent class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
+        <form @submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pb-8">
+            <!-- Kolom Kiri: Info & Varian -->
+            <div class="md:col-span-2 space-y-6">
+                <!-- Informasi Produk -->
+                <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
+                    <CardHeader>
+                        <CardTitle class="text-lg font-semibold text-slate-900">Informasi Produk</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-5">
                         <div class="space-y-2">
-                            <Label for="stock">Stok Saat Ini</Label>
-                            <Input id="stock" v-model="form.stock" type="number" min="0" />
+                            <Label for="name" class="text-sm font-medium text-slate-700">Nama Produk <span class="text-red-500">*</span></Label>
+                            <Input id="name" v-model="form.name" class="h-10 rounded-lg" />
+                            <p v-if="form.errors.name" class="text-sm text-red-500">{{ form.errors.name }}</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <Label class="text-sm font-medium text-slate-700">Kategori <span class="text-red-500">*</span></Label>
+                            <Popover v-model:open="openCategoryBox">
+                                <PopoverTrigger as-child>
+                                    <button
+                                        type="button"
+                                        role="combobox"
+                                        :aria-expanded="openCategoryBox"
+                                        class="flex items-center justify-between h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 shadow-sm outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[2px] focus:ring-[#00684a]/10"
+                                    >
+                                        <span class="truncate">{{ form.category_id ? categories.find(cat => cat.id === form.category_id)?.name : 'Pilih kategori...' }}</span>
+                                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-slate-500" />
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent class="w-[300px] sm:w-[400px] p-0 bg-white" align="start">
+                                    <Command>
+                                        <CommandInput class="h-10 text-sm" placeholder="Cari kategori..." />
+                                        <CommandEmpty class="py-3 text-sm text-center text-slate-500">Kategori tidak ditemukan.</CommandEmpty>
+                                        <CommandList>
+                                            <CommandGroup>
+                                                <CommandItem
+                                                    v-for="cat in categories"
+                                                    :key="cat.id"
+                                                    :value="cat.name"
+                                                    @select="() => {
+                                                        form.category_id = cat.id;
+                                                        openCategoryBox = false;
+                                                    }"
+                                                    class="text-sm cursor-pointer"
+                                                >
+                                                    {{ cat.name }}
+                                                    <Check
+                                                        :class="['ml-auto h-4 w-4', form.category_id === cat.id ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                    />
+                                                </CommandItem>
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                            <p v-if="form.errors.category_id" class="text-sm text-red-500">{{ form.errors.category_id }}</p>
+                        </div>
+
+                        <!-- Foto -->
+                        <div class="space-y-2">
+                            <Label class="text-sm font-medium text-slate-700">Foto Produk</Label>
+                            <div class="flex items-center gap-4">
+                                <div v-if="photoPreview" class="relative">
+                                    <img :src="photoPreview" class="h-24 w-24 rounded-lg object-cover border border-slate-200" />
+                                    <button @click="removePhoto" type="button"
+                                        class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm hover:bg-red-600 transition-colors">
+                                        <X class="h-3 w-3" />
+                                    </button>
+                                </div>
+                                <div @click="fileInput?.click()"
+                                    class="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 transition-colors">
+                                    <Upload class="h-5 w-5 text-slate-400" />
+                                </div>
+                                <input ref="fileInput" type="file" accept="image/png,image/jpeg" class="hidden" @change="handlePhotoChange" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Variants -->
+                <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
+                    <CardHeader>
+                        <CardTitle class="text-lg font-semibold text-slate-900">Varian Produk (Opsional)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <VariantEditor v-model="form.variants" />
+                    </CardContent>
+                </Card>
+            </div>
+
+            <!-- Kolom Kanan: Harga, Stok, Submit -->
+            <div class="space-y-6">
+                <!-- Harga -->
+                <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
+                    <CardHeader>
+                        <CardTitle class="text-lg font-semibold text-slate-900">Harga</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div class="space-y-2">
+                            <Label for="cogs" class="text-sm font-medium text-slate-700">Harga Modal <span class="text-red-500">*</span></Label>
+                            <Input id="cogs" v-model="form.cogs" type="number" step="100" min="0" class="h-10 rounded-lg" />
+                            <p v-if="form.errors.cogs" class="text-sm text-red-500">{{ form.errors.cogs }}</p>
                         </div>
                         <div class="space-y-2">
-                            <Label for="min_stock_alert">Minimum Stok Alert</Label>
-                            <Input id="min_stock_alert" v-model="form.min_stock_alert" type="number" min="0" />
+                            <Label for="price" class="text-sm font-medium text-slate-700">Harga Jual <span class="text-red-500">*</span></Label>
+                            <Input id="price" v-model="form.price" type="number" step="100" min="0" class="h-10 rounded-lg" />
+                            <p v-if="form.errors.price" class="text-sm text-red-500">{{ form.errors.price }}</p>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input id="is_active" type="checkbox" v-model="form.is_active" class="rounded" />
-                        <Label for="is_active">Produk aktif (tampil di kasir)</Label>
-                    </div>
-                </CardContent>
-            </Card>
+                        <div v-if="form.cogs && form.price && Number(form.price) > Number(form.cogs)"
+                            class="p-3 bg-green-50 rounded-lg border border-green-100 flex items-center justify-between">
+                            <span class="text-sm text-green-700 font-medium">Estimasi Margin:</span>
+                            <span class="text-sm text-green-700 font-bold">{{ Math.round(((Number(form.price) - Number(form.cogs)) / Number(form.cogs)) * 100) }}%</span>
+                        </div>
+                    </CardContent>
+                </Card>
 
-            <Card>
-                <CardHeader><CardTitle>Varian Produk (Opsional)</CardTitle></CardHeader>
-                <CardContent>
-                    <VariantEditor v-model="form.variants" />
-                </CardContent>
-            </Card>
+                <!-- Stok -->
+                <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
+                    <CardHeader>
+                        <CardTitle class="text-lg font-semibold text-slate-900">Stok & Status</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-5">
+                        <div class="space-y-2">
+                            <Label for="stock" class="text-sm font-medium text-slate-700">Stok Saat Ini</Label>
+                            <Input id="stock" v-model="form.stock" type="number" min="0" class="h-10 rounded-lg" />
+                        </div>
+                        <div class="space-y-2">
+                            <Label for="min_stock_alert" class="text-sm font-medium text-slate-700">Minimum Stok Alert</Label>
+                            <Input id="min_stock_alert" v-model="form.min_stock_alert" type="number" min="0" class="h-10 rounded-lg" />
+                        </div>
+                        <div class="flex items-center gap-3 pt-2">
+                            <input id="is_active" type="checkbox" v-model="form.is_active" class="h-4 w-4 rounded border-slate-300 text-[#00684a] focus:ring-[#00684a]" />
+                            <Label for="is_active" class="text-sm font-medium text-slate-700">Produk aktif (tampil di kasir)</Label>
+                        </div>
+                    </CardContent>
+                </Card>
 
-            <div class="flex items-center gap-3">
-                <Button type="submit" :disabled="form.processing">
-                    {{ form.processing ? 'Menyimpan...' : 'Simpan Perubahan' }}
-                </Button>
-                <Link href="/products">
-                    <Button type="button" variant="outline">Batal</Button>
-                </Link>
+                <!-- Actions -->
+                <div class="flex flex-col gap-3">
+                    <Button type="submit" :disabled="form.processing" class="h-11 w-full rounded-xl bg-[#001e2b] text-white hover:bg-[#1c2d38] font-medium shadow-sm transition-colors">
+                        {{ form.processing ? 'Menyimpan...' : 'Simpan Perubahan' }}
+                    </Button>
+                    <Link href="/products" class="w-full">
+                        <Button type="button" variant="outline" class="h-11 w-full rounded-xl font-medium border-slate-300">
+                            Batal
+                        </Button>
+                    </Link>
+                </div>
             </div>
         </form>
     </AppLayout>

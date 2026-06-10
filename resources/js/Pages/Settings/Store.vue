@@ -100,22 +100,24 @@ const submit = () => {
                                 <Label>Logo Toko</Label>
                                 <div class="mt-2 flex items-center gap-6">
                                     <!-- Preview area -->
-                                    <div
-                                        class="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-[#c1ccd6] bg-[#f8fafc]"
-                                    >
-                                        <img
-                                            v-if="logoPreviewUrl"
-                                            :src="logoPreviewUrl"
-                                            class="h-full w-full object-cover"
-                                            alt="Logo Toko"
-                                        />
-                                        <UploadCloud v-else class="h-8 w-8 text-[#a8b3bc]" />
+                                    <div class="relative shrink-0">
+                                        <div
+                                            class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-[#c1ccd6] bg-[#f8fafc]"
+                                        >
+                                            <img
+                                                v-if="logoPreviewUrl"
+                                                :src="logoPreviewUrl"
+                                                class="h-full w-full object-cover"
+                                                alt="Logo Toko"
+                                            />
+                                            <UploadCloud v-else class="h-8 w-8 text-[#a8b3bc]" />
+                                        </div>
 
                                         <button
                                             v-if="logoPreviewUrl"
                                             type="button"
                                             @click="removeLogo"
-                                            class="absolute right-0 top-0 translate-x-1/3 -translate-y-1/3 rounded-full bg-white p-1 text-[#ff3b3b] shadow-sm hover:bg-[#fff0f0] border border-[#ff3b3b]"
+                                            class="absolute -right-2 -top-2 rounded-full bg-white p-1 text-[#ff3b3b] shadow-sm hover:bg-[#fff0f0] border border-[#ff3b3b] z-10"
                                         >
                                             <X class="h-4 w-4" />
                                         </button>
@@ -154,7 +156,7 @@ const submit = () => {
                             </div>
                         </CardContent>
                         <CardFooter class="flex justify-end">
-                            <Button type="submit" :disabled="form.processing">Simpan Perubahan</Button>
+                            <Button type="submit" :disabled="form.processing" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">Simpan Perubahan</Button>
                         </CardFooter>
                     </form>
                 </Card>

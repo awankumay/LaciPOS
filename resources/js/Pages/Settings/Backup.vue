@@ -35,7 +35,7 @@ const createBackup = () => {
                                 Buat backup database lokal Anda. Sangat disarankan untuk melakukan backup secara rutin untuk menghindari kehilangan data.
                             </CardDescription>
                         </div>
-                        <Button @click="createBackup" :disabled="form.processing">
+                        <Button @click="createBackup" :disabled="form.processing" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">
                             <Database class="mr-2 h-4 w-4" />
                             {{ form.processing ? 'Membuat Backup...' : 'Buat Backup Sekarang' }}
                         </Button>
@@ -65,7 +65,7 @@ const createBackup = () => {
                                 <TableCell>{{ backup.created_at }}</TableCell>
                                 <TableCell class="text-right">
                                     <a :href="`/settings/backup/${backup.filename}/download`" target="_blank">
-                                        <Button variant="outline" size="sm">
+                                        <Button size="sm" class="bg-[#00ED64] text-[#1C2D38] hover:bg-[#00b545] border-none">
                                             <Download class="mr-2 h-4 w-4" />
                                             Download
                                         </Button>

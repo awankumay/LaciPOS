@@ -54,19 +54,9 @@ const submit = () => {
                             <p class="text-sm text-slate-500">Nilai ini digunakan sebagai default saat menambah produk baru.</p>
                             <p v-if="form.errors.default_min_stock" class="text-sm text-red-500">{{ form.errors.default_min_stock }}</p>
                         </div>
-
-                        <div class="flex items-center justify-between rounded-lg border p-4">
-                            <div class="space-y-0.5">
-                                <Label class="text-base">Terapkan ke Semua Produk</Label>
-                                <p class="text-sm text-slate-500">
-                                    Update minimum stok alert untuk semua produk yang sudah ada di database saat ini.
-                                </p>
-                            </div>
-                            <Switch v-model:checked="form.apply_to_all" />
-                        </div>
                     </CardContent>
                     <CardFooter class="flex justify-end">
-                        <Button type="submit" :disabled="form.processing">Simpan Pengaturan</Button>
+                        <Button type="submit" :disabled="form.processing" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">Simpan Pengaturan</Button>
                     </CardFooter>
                 </form>
             </Card>

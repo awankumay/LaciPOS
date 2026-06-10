@@ -132,7 +132,7 @@ const testPrint = () => {
                             <Button type="button" variant="outline" @click="testPrint" :disabled="isTesting">
                                 {{ isTesting ? 'Mencetak...' : 'Test Print' }}
                             </Button>
-                            <Button type="submit" :disabled="form.processing">Simpan Pengaturan</Button>
+                            <Button type="submit" :disabled="form.processing" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">Simpan Pengaturan</Button>
                         </CardFooter>
                     </form>
                 </Card>

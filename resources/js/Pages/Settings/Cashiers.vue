@@ -7,7 +7,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import Modal from '@/Components/Modal.vue';
 import { Switch } from '@/Components/ui/switch';
 import { Plus, Pencil } from 'lucide-vue-next';
 
@@ -76,7 +76,7 @@ const formatDate = (dateString) => {
     <SettingsLayout title="Manajemen Kasir">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-2xl font-bold tracking-tight text-[#001e2b]">Manajemen Kasir</h2>
-            <Button @click="showAddDialog = true">
+            <Button @click="showAddDialog = true" class="bg-[#00ED64] text-[#011E2B] hover:bg-[#00b545]">
                 <Plus class="mr-2 h-4 w-4" />
                 Tambah Kasir
             </Button>
@@ -109,6 +109,7 @@ const formatDate = (dateString) => {
                                     :checked="Boolean(cashier.is_active)"
                                     @update:checked="toggleActive(cashier)"
                                     title="Toggle Status Aktif"
+                                    class="data-[state=checked]:bg-[#00ED64] data-[state=unchecked]:bg-[#001e2b]"
                                 />
                                 <Button variant="ghost" size="sm" @click="startEdit(cashier)">
                                     <Pencil class="h-4 w-4" />
@@ -126,69 +127,63 @@ const formatDate = (dateString) => {
         </div>
 
         <!-- Add Dialog -->
-        <Dialog v-model:open="showAddDialog">
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Tambah Akun Kasir</DialogTitle>
-                    <DialogDescription>
-                        Buat akun baru untuk kasir Anda. Kasir akan menggunakan email dan password ini untuk login.
-                    </DialogDescription>
-                </DialogHeader>
-                <form @submit.prevent="submitAdd" class="space-y-4 py-4">
-                    <div class="space-y-2">
-                        <Label for="name">Nama Lengkap</Label>
-                        <Input id="name" v-model="addForm.name" placeholder="Nama Kasir" autofocus />
-                        <p v-if="addForm.errors.name" class="text-sm text-red-500">{{ addForm.errors.name }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <Label for="email">Email</Label>
-                        <Input id="email" type="email" v-model="addForm.email" placeholder="kasir@contoh.com" />
-                        <p v-if="addForm.errors.email" class="text-sm text-red-500">{{ addForm.errors.email }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <Label for="password">Password</Label>
-                        <Input id="password" type="password" v-model="addForm.password" placeholder="Minimal 8 karakter" />
-                        <p v-if="addForm.errors.password" class="text-sm text-red-500">{{ addForm.errors.password }}</p>
-                    </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" @click="showAddDialog = false">Batal</Button>
-                        <Button type="submit" :disabled="addForm.processing">Simpan</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
+        <Modal
+            :show="showAddDialog"
+            @update:show="showAddDialog = $event"
+            title="Tambah Akun Kasir"
+            description="Buat akun baru untuk kasir Anda. Kasir akan menggunakan email dan password ini untuk login."
+        >
+            <form id="add-cashier-form" @submit.prevent="submitAdd" class="space-y-4 py-2">
+                <div class="space-y-2">
+                    <Label for="name">Nama Lengkap</Label>
+                    <Input id="name" v-model="addForm.name" placeholder="Nama Kasir" autofocus />
+                    <p v-if="addForm.errors.name" class="text-sm text-red-500">{{ addForm.errors.name }}</p>
+                </div>
+                <div class="space-y-2">
+                    <Label for="email">Email</Label>
+                    <Input id="email" type="email" v-model="addForm.email" placeholder="kasir@contoh.com" />
+                    <p v-if="addForm.errors.email" class="text-sm text-red-500">{{ addForm.errors.email }}</p>
+                </div>
+                <div class="space-y-2">
+                    <Label for="password">Password</Label>
+                    <Input id="password" type="password" v-model="addForm.password" placeholder="Minimal 8 karakter" />
+                    <p v-if="addForm.errors.password" class="text-sm text-red-500">{{ addForm.errors.password }}</p>
+                </div>
+            </form>
+            <template #footer>
+                <Button type="button" variant="outline" @click="showAddDialog = false">Batal</Button>
+                <Button type="submit" form="add-cashier-form" :disabled="addForm.processing" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">Simpan</Button>
+            </template>
+        </Modal>
 
         <!-- Edit Dialog -->
-        <Dialog v-model:open="showEditDialog">
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Edit Akun Kasir</DialogTitle>
-                    <DialogDescription>
-                        Ubah informasi kasir. Kosongkan field password jika tidak ingin mengubahnya.
-                    </DialogDescription>
-                </DialogHeader>
-                <form @submit.prevent="submitEdit" class="space-y-4 py-4">
-                    <div class="space-y-2">
-                        <Label for="edit_name">Nama Lengkap</Label>
-                        <Input id="edit_name" v-model="editForm.name" placeholder="Nama Kasir" />
-                        <p v-if="editForm.errors.name" class="text-sm text-red-500">{{ editForm.errors.name }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <Label for="edit_email">Email</Label>
-                        <Input id="edit_email" type="email" v-model="editForm.email" placeholder="kasir@contoh.com" />
-                        <p v-if="editForm.errors.email" class="text-sm text-red-500">{{ editForm.errors.email }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <Label for="edit_password">Password Baru (Opsional)</Label>
-                        <Input id="edit_password" type="password" v-model="editForm.password" placeholder="Biarkan kosong jika tidak diubah" />
-                        <p v-if="editForm.errors.password" class="text-sm text-red-500">{{ editForm.errors.password }}</p>
-                    </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" @click="showEditDialog = false">Batal</Button>
-                        <Button type="submit" :disabled="editForm.processing">Simpan Perubahan</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
+        <Modal
+            :show="showEditDialog"
+            @update:show="showEditDialog = $event"
+            title="Edit Akun Kasir"
+            description="Ubah informasi kasir. Kosongkan field password jika tidak ingin mengubahnya."
+        >
+            <form id="edit-cashier-form" @submit.prevent="submitEdit" class="space-y-4 py-2">
+                <div class="space-y-2">
+                    <Label for="edit_name">Nama Lengkap</Label>
+                    <Input id="edit_name" v-model="editForm.name" placeholder="Nama Kasir" />
+                    <p v-if="editForm.errors.name" class="text-sm text-red-500">{{ editForm.errors.name }}</p>
+                </div>
+                <div class="space-y-2">
+                    <Label for="edit_email">Email</Label>
+                    <Input id="edit_email" type="email" v-model="editForm.email" placeholder="kasir@contoh.com" />
+                    <p v-if="editForm.errors.email" class="text-sm text-red-500">{{ editForm.errors.email }}</p>
+                </div>
+                <div class="space-y-2">
+                    <Label for="edit_password">Password Baru (Opsional)</Label>
+                    <Input id="edit_password" type="password" v-model="editForm.password" placeholder="Biarkan kosong jika tidak diubah" />
+                    <p v-if="editForm.errors.password" class="text-sm text-red-500">{{ editForm.errors.password }}</p>
+                </div>
+            </form>
+            <template #footer>
+                <Button type="button" variant="outline" @click="showEditDialog = false">Batal</Button>
+                <Button type="submit" form="edit-cashier-form" :disabled="editForm.processing" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">Simpan Perubahan</Button>
+            </template>
+        </Modal>
     </SettingsLayout>
 </template>
