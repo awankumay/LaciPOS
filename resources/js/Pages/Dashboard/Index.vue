@@ -27,6 +27,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    recentTransactions: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const page = usePage();
@@ -189,9 +193,45 @@ const quickActions = [
                 <!-- Activity placeholder -->
                 <div class="lg:col-span-2">
                     <h3 class="mb-4 text-xs font-semibold uppercase tracking-widest text-[#7c8c9a]">Transaksi Terbaru</h3>
-                    <div class="rounded-2xl border border-[#e1e5e8] bg-white">
+                    <div class="rounded-2xl border border-[#e1e5e8] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,30,43,0.04)]">
+                        <div v-if="recentTransactions.length > 0" class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-[#f8fafc] text-xs uppercase text-[#7c8c9a] border-b border-[#e1e5e8]">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold whitespace-nowrap">ID Transaksi</th>
+                                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Waktu</th>
+                                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Kasir</th>
+                                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Status</th>
+                                        <th class="px-6 py-4 font-semibold whitespace-nowrap text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#e1e5e8]">
+                                    <tr v-for="trx in recentTransactions" :key="trx.id" class="hover:bg-slate-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-[#001e2b] whitespace-nowrap">{{ trx.order_number }}</td>
+                                        <td class="px-6 py-4 text-[#5c6c7a] whitespace-nowrap">
+                                            {{ new Date(trx.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }}
+                                        </td>
+                                        <td class="px-6 py-4 text-[#001e2b] whitespace-nowrap">{{ trx.user?.name || 'Unknown' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span 
+                                                class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                                                :class="{
+                                                    'bg-[#def7ec] text-[#03543f]': trx.status === 'completed',
+                                                    'bg-[#fde8e8] text-[#9b1c1c]': trx.status === 'cancelled',
+                                                    'bg-[#fdf6b2] text-[#723b13]': trx.status === 'pending'
+                                                }"
+                                            >
+                                                {{ trx.status === 'completed' ? 'Selesai' : (trx.status === 'cancelled' ? 'Batal' : 'Pending') }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-bold text-[#001e2b] whitespace-nowrap">{{ formatRupiah(trx.total_amount) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
                         <!-- Empty state -->
-                        <div class="flex flex-col items-center justify-center py-16 text-center">
+                        <div v-else class="flex flex-col items-center justify-center py-16 text-center">
                             <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f4f7f6]">
                                 <ShoppingCart class="h-7 w-7 text-[#a8b3bc]" />
                             </div>

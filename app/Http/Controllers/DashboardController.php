@@ -30,6 +30,11 @@ class DashboardController extends Controller
             ->limit(10)
             ->get(['id', 'name', 'stock', 'min_stock_alert', 'category_id']);
 
+        $recentTransactions = Order::with('user:id,name')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
         $salesData = collect(range(6, 0))->map(function ($daysAgo) {
             $date = now()->subDays($daysAgo)->startOfDay();
             $revenue = Order::where('status', 'completed')
@@ -52,6 +57,7 @@ class DashboardController extends Controller
             ],
             'restockProducts' => $restockProducts,
             'salesData' => $salesData,
+            'recentTransactions' => $recentTransactions,
         ]);
     }
 }
