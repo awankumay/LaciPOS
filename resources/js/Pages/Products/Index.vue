@@ -6,7 +6,9 @@ import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
-import { Plus, Search, Package, Trash2, ArrowRightLeft } from 'lucide-vue-next';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/Components/ui/command';
+import { Plus, Search, Package, Trash2, ArrowRightLeft, Check, ChevronsUpDown } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
 
@@ -19,6 +21,7 @@ const props = defineProps({
 const { formatRupiah } = useFormatCurrency();
 const search = ref(props.filters.search);
 const selectedCategory = ref(props.filters.category);
+const openCategoryBox = ref(false);
 
 // Debounced search
 let searchTimeout;
@@ -74,22 +77,67 @@ const executeDelete = () => {
         <!-- Filters & Actions -->
         <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                <div class="relative flex-1 min-w-[200px] max-w-sm">
-                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input v-model="search" placeholder="Cari produk..." class="pl-10" />
+                <div class="relative flex-1 min-w-[240px] max-w-sm group">
+                    <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-[#7c8c9a] transition-colors group-focus-within:text-[#00684a]" />
+                    <input 
+                        v-model="search" 
+                        placeholder="Cari produk..." 
+                        class="h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pr-4 pl-11 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all placeholder:text-[#a8b3bc] focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10" 
+                    />
                 </div>
-                <select
-                    v-model="selectedCategory"
-                    class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                >
-                    <option value="">Semua Kategori</option>
-                    <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                        {{ cat.name }}
-                    </option>
-                </select>
+                <Popover v-model:open="openCategoryBox">
+                    <PopoverTrigger as-child>
+                        <button
+                            role="combobox"
+                            :aria-expanded="openCategoryBox"
+                            class="flex items-center justify-between h-10 w-full sm:w-[220px] rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                        >
+                            <span class="truncate">{{ selectedCategory ? categories.find(cat => cat.id === selectedCategory)?.name : 'Semua Kategori' }}</span>
+                            <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent class="w-[220px] p-0 bg-white" align="start">
+                        <Command>
+                            <CommandInput class="h-10 text-sm" placeholder="Cari kategori..." />
+                            <CommandEmpty class="py-3 text-sm text-center text-slate-500">Kategori tidak ditemukan.</CommandEmpty>
+                            <CommandList>
+                                <CommandGroup>
+                                    <CommandItem
+                                        value="Semua Kategori"
+                                        @select="() => {
+                                            selectedCategory = '';
+                                            openCategoryBox = false;
+                                        }"
+                                        class="text-sm cursor-pointer"
+                                    >
+                                        Semua Kategori
+                                        <Check
+                                            :class="['ml-auto h-4 w-4', selectedCategory === '' ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                        />
+                                    </CommandItem>
+                                    <CommandItem
+                                        v-for="cat in categories"
+                                        :key="cat.id"
+                                        :value="cat.name"
+                                        @select="() => {
+                                            selectedCategory = cat.id;
+                                            openCategoryBox = false;
+                                        }"
+                                        class="text-sm cursor-pointer"
+                                    >
+                                        {{ cat.name }}
+                                        <Check
+                                            :class="['ml-auto h-4 w-4', selectedCategory === cat.id ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                        />
+                                    </CommandItem>
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
             </div>
             <Link href="/products/create" class="shrink-0 w-full sm:w-auto">
-                <Button size="sm" class="w-full sm:w-auto bg-[#001e2b] text-white hover:bg-[#1c2d38]">
+                <Button class="h-10 rounded-xl w-full sm:w-auto bg-[#001e2b] text-white hover:bg-[#1c2d38]">
                     <Plus class="mr-2 h-4 w-4" />
                     Tambah Produk
                 </Button>
