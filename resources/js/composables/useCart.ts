@@ -8,6 +8,7 @@ export interface CartItem {
     price: number;          // Harga jual final (termasuk modifier)
     cogs: number;           // Harga modal final (termasuk modifier)
     quantity: number;
+    stock: number;          // Stok produk asli
     notes: string;
     photoUrl: string | null;
 }
@@ -101,6 +102,10 @@ export function useCart() {
      */
     const isEmpty = computed<boolean>(() => items.value.length === 0);
 
+    const getQuantityByProductId = (productId: string): number => {
+        return items.value.filter(i => i.productId === productId).reduce((sum, item) => sum + item.quantity, 0);
+    };
+
     return {
         items,
         addItem,
@@ -112,5 +117,6 @@ export function useCart() {
         total,
         totalItems,
         isEmpty,
+        getQuantityByProductId,
     };
 }

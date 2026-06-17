@@ -16,7 +16,9 @@ const toast = useToast();
 const handleFlash = () => {
     const flash = page.props.flash;
     if (flash?.success) toast.success(flash.success, 'Berhasil');
+    if (flash?.print_success) toast.success(flash.print_success, 'Berhasil');
     if (flash?.error) toast.error(flash.error, 'Terjadi Kesalahan');
+    if (flash?.warning) toast.warning(flash.warning, 'Perhatian');
 };
 
 onMounted(handleFlash);

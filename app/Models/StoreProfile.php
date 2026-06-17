@@ -21,6 +21,13 @@ class StoreProfile extends Model
         'default_min_stock',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'auto_print' => 'boolean',
+        ];
+    }
+
     /**
      * Ambil profil toko (hanya 1 record).
      * Jika belum ada, return null.

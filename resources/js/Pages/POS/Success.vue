@@ -39,10 +39,12 @@ const printReceipt = () => {
             const flash = response.props.flash;
             if (flash?.success) {
                 toast.success(flash.success, 'Berhasil');
+            } else if (flash?.print_success) {
+                toast.success(flash.print_success, 'Berhasil');
             } else if (flash?.error) {
                 toast.error(flash.error, 'Gagal');
             } else if (flash?.warning) {
-                toast.warning(flash.warning, 'Peringatan');
+                toast.warning(flash.warning, 'Perhatian');
             }
         }
     });
@@ -50,7 +52,10 @@ const printReceipt = () => {
 
 onMounted(() => {
     if (page.props.flash?.warning) {
-        toast.warning(page.props.flash.warning, 'Peringatan');
+        toast.warning(page.props.flash.warning, 'Perhatian');
+    }
+    if (page.props.flash?.print_success) {
+        toast.success(page.props.flash.print_success, 'Berhasil');
     }
 });
 </script>

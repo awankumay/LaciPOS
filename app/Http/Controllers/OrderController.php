@@ -13,6 +13,23 @@ class OrderController extends Controller
         $validated = $request->validated();
         $items = $validated['items'];
 
+        // Cek ketersediaan stok
+        $requiredQuantities = [];
+        foreach ($items as $item) {
+            $productId = $item['productId'];
+            $requiredQuantities[$productId] = ($requiredQuantities[$productId] ?? 0) + $item['quantity'];
+        }
+
+        foreach ($requiredQuantities as $productId => $quantity) {
+            $product = \App\Models\Product::find($productId);
+            if (!$product) {
+                return back()->with('error', "Produk tidak valid.");
+            }
+            if ($product->stock < $quantity) {
+                return back()->with('error', "Stok produk '{$product->name}' tidak mencukupi. Sisa stok: {$product->stock}.");
+            }
+        }
+
         // Hitung total
         $totalAmount = collect($items)->sum(fn ($item) => $item['price'] * $item['quantity']);
 
@@ -65,6 +82,8 @@ class OrderController extends Controller
             $printResult = $printService->printReceipt($order);
             if (!$printResult['success']) {
                 $redirect->with('warning', $printResult['message']);
+            } else {
+                $redirect->with('print_success', $printResult['message']);
             }
         }
 

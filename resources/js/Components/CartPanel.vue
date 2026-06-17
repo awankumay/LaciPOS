@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { Input } from '@/Components/ui/input';
 import { useCart } from '@/composables/useCart';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
+import { useToast } from '@/composables/useToast';
 import { Trash2, Plus, Minus, MessageSquare, ShoppingBag, X } from 'lucide-vue-next';
 
 const emit = defineEmits(['checkout']);
@@ -16,15 +17,41 @@ const {
     getSubtotal,
     total,
     totalItems,
-    isEmpty
+    isEmpty,
+    getQuantityByProductId
 } = useCart();
 
 const { formatRupiah } = useFormatCurrency();
+const toast = useToast();
 
 const showNotes = ref({});
 
 const toggleNotes = (cartId) => {
     showNotes.value[cartId] = !showNotes.value[cartId];
+};
+
+const handleUpdateQuantity = (item, newQuantity) => {
+    if (newQuantity <= 0) {
+        updateQuantity(item.cartId, newQuantity);
+        return;
+    }
+    
+    // Hitung total quantity produk ini saat ini di cart (termasuk varian lain)
+    const currentQtyForProduct = getQuantityByProductId(item.productId);
+    const qtyOtherVariants = currentQtyForProduct - item.quantity;
+    
+    if (qtyOtherVariants + newQuantity > item.stock) {
+        toast.error('Jumlah melebihi stok yang tersedia.');
+        // Set ke maksimal yang diperbolehkan
+        const maxAllowed = item.stock - qtyOtherVariants;
+        if (maxAllowed > 0) {
+            updateQuantity(item.cartId, maxAllowed);
+        }
+        // Jika input diketik manual melebihi batas, kembalikan ke batas maksimal agar reaktif
+        item.quantity = maxAllowed;
+    } else {
+        updateQuantity(item.cartId, newQuantity);
+    }
 };
 </script>
 
@@ -97,7 +124,7 @@ const toggleNotes = (cartId) => {
                         <div class="qty-control">
                             <button
                                 class="qty-btn"
-                                @click="updateQuantity(item.cartId, item.quantity - 1)"
+                                @click="handleUpdateQuantity(item, item.quantity - 1)"
                             >
                                 <Minus class="icon-xs" />
                             </button>
@@ -105,11 +132,14 @@ const toggleNotes = (cartId) => {
                                 type="number"
                                 class="qty-input"
                                 :value="item.quantity"
-                                @change="e => updateQuantity(item.cartId, parseInt(e.target.value) || 1)"
+                                @change="e => {
+                                    handleUpdateQuantity(item, parseInt(e.target.value) || 1);
+                                    e.target.value = item.quantity; // Force reset input if over stock
+                                }"
                             />
                             <button
                                 class="qty-btn"
-                                @click="updateQuantity(item.cartId, item.quantity + 1)"
+                                @click="handleUpdateQuantity(item, item.quantity + 1)"
                             >
                                 <Plus class="icon-xs" />
                             </button>

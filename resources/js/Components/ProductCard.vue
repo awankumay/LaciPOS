@@ -1,6 +1,8 @@
 <script setup>
 import { Package, Plus } from 'lucide-vue-next';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
+import { useCart } from '@/composables/useCart';
+import { computed } from 'vue';
 
 const props = defineProps({
     product: { type: Object, required: true },
@@ -8,13 +10,21 @@ const props = defineProps({
 
 const emit = defineEmits(['click']);
 const { formatRupiah } = useFormatCurrency();
+const { getQuantityByProductId } = useCart();
+
+const isOverStock = computed(() => {
+    return getQuantityByProductId(props.product.id) >= props.product.stock;
+});
 </script>
 
 <template>
     <button
         @click="$emit('click', product)"
         class="product-card"
-        :class="{ 'product-card--out-of-stock': product.stock <= 0 }"
+        :class="{
+            'product-card--out-of-stock': product.stock <= 0,
+            'product-card--over-stock': product.stock > 0 && isOverStock
+        }"
         :disabled="product.stock <= 0"
     >
         <!-- Photo -->
@@ -44,6 +54,7 @@ const { formatRupiah } = useFormatCurrency();
         <!-- Info -->
         <div class="product-card__info">
             <p class="product-card__name">{{ product.name }}</p>
+            <p class="product-card__stock-text">Stok: {{ product.stock }}</p>
             <div class="product-card__footer">
                 <p class="product-card__price">{{ formatRupiah(product.price) }}</p>
                 <div class="product-card__add-btn">
@@ -93,6 +104,11 @@ const { formatRupiah } = useFormatCurrency();
 .product-card--out-of-stock:hover {
     transform: none;
     box-shadow: none;
+}
+
+.product-card--over-stock {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
 
 /* Photo */
@@ -177,6 +193,12 @@ const { formatRupiah } = useFormatCurrency();
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.product-card__stock-text {
+    font-size: 12px;
+    color: #5c6c7a;
+    margin-top: -4px;
 }
 
 .product-card__footer {

@@ -6,6 +6,7 @@ import VariantPickerModal from '@/Components/VariantPickerModal.vue';
 import PaymentModal from '@/Components/PaymentModal.vue';
 import { ref } from 'vue';
 import { useCart } from '@/composables/useCart';
+import { useToast } from '@/composables/useToast';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -13,7 +14,8 @@ const props = defineProps({
     categories: Array,
 });
 
-const { items, addItem, total, clearCart } = useCart();
+const { items, addItem, total, clearCart, getQuantityByProductId } = useCart();
+const toast = useToast();
 
 const showVariantModal = ref(false);
 const selectedProduct = ref(null);
@@ -30,23 +32,37 @@ const handleProductClick = (product) => {
 };
 
 const addToCartDirect = (product) => {
+    const currentQty = getQuantityByProductId(product.id);
+    if (currentQty >= product.stock) {
+        toast.error(`Stok produk '${product.name}' tidak mencukupi.`);
+        return;
+    }
+
     addItem({
         productId: product.id,
         productName: product.name,
         variantLabel: null,
         price: Number(product.price),
         cogs: Number(product.cogs),
+        stock: product.stock,
         photoUrl: product.photo_url,
     });
 };
 
 const addToCartFromModal = (data) => {
+    const currentQty = getQuantityByProductId(data.product.id);
+    if (currentQty >= data.product.stock) {
+        toast.error(`Stok produk '${data.product.name}' tidak mencukupi.`);
+        return;
+    }
+
     addItem({
         productId: data.product.id,
         productName: data.product.name,
         variantLabel: data.variantLabel,
         price: data.finalPrice,
         cogs: data.finalCogs,
+        stock: data.product.stock,
         photoUrl: data.product.photo_url,
     });
 };

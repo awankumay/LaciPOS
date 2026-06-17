@@ -12,9 +12,9 @@ class PrintController extends Controller
         $result = $printService->printReceipt($order);
 
         if ($result['success']) {
-            return redirect()->back()->with('success', $result['message']);
+            return redirect()->back()->with('print_success', $result['message']);
         } else {
-            return redirect()->back()->with('error', $result['message']);
+            return redirect()->back()->with('warning', $result['message']);
         }
     }
 }

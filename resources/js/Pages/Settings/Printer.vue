@@ -10,6 +10,9 @@ import { Switch } from '@/Components/ui/switch';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
 import { useToast } from '@/composables/useToast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
+import { Check, ChevronsUpDown } from 'lucide-vue-next';
 
 const props = defineProps({
     profile: {
@@ -29,6 +32,7 @@ const form = useForm({
 });
 
 const toast = useToast();
+const openAutoPrintBox = ref(false);
 
 const submit = () => {
     form.post('/settings/printer', {
@@ -115,16 +119,59 @@ const testPrint = () => {
 
                             <div class="flex flex-row items-center justify-between rounded-lg border p-4">
                                 <div class="space-y-0.5">
-                                    <Label class="text-base">Auto Print</Label>
+                                    <Label class="text-base" for="auto_print">Auto Print</Label>
                                     <p class="text-sm text-muted-foreground">
                                         Otomatis cetak struk setelah transaksi berhasil.
                                     </p>
                                 </div>
-                                <div>
-                                    <Switch
-                                        :checked="form.auto_print"
-                                        @update:checked="form.auto_print = $event"
-                                    />
+                                <div class="w-[160px]">
+                                    <Popover v-model:open="openAutoPrintBox">
+                                        <PopoverTrigger as-child>
+                                            <button
+                                                type="button"
+                                                role="combobox"
+                                                :aria-expanded="openAutoPrintBox"
+                                                class="flex items-center justify-between h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                                            >
+                                                <span class="truncate">{{ form.auto_print ? 'Aktif' : 'Nonaktif' }}</span>
+                                                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent class="w-[160px] p-0 bg-white" align="start">
+                                            <Command>
+                                                <CommandList>
+                                                    <CommandGroup>
+                                                        <CommandItem
+                                                            value="Aktif"
+                                                            @select="() => {
+                                                                form.auto_print = true;
+                                                                openAutoPrintBox = false;
+                                                            }"
+                                                            class="text-sm cursor-pointer"
+                                                        >
+                                                            Aktif
+                                                            <Check
+                                                                :class="['ml-auto h-4 w-4', form.auto_print === true ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                            />
+                                                        </CommandItem>
+                                                        <CommandItem
+                                                            value="Nonaktif"
+                                                            @select="() => {
+                                                                form.auto_print = false;
+                                                                openAutoPrintBox = false;
+                                                            }"
+                                                            class="text-sm cursor-pointer"
+                                                        >
+                                                            Nonaktif
+                                                            <Check
+                                                                :class="['ml-auto h-4 w-4', form.auto_print === false ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                            />
+                                                        </CommandItem>
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                             </div>
                         </CardContent>

@@ -81,7 +81,7 @@ class PrinterSettingController extends Controller
         if ($result['success']) {
             return redirect()->back()->with('success', 'Test print berhasil dikirim ke printer.');
         } else {
-            return redirect()->back()->with('error', $result['message']);
+            return redirect()->back()->with('warning', $result['message']);
         }
     }
 }
