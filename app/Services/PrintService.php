@@ -37,13 +37,9 @@ class PrintService
 
                 \Native\Laravel\Facades\System::print($html, $targetPrinter, [
                     'silent' => true,
-                    'printBackground' => true,
+                    'printBackground' => false,
                     'margins' => [
                         'marginType' => 'none',
-                    ],
-                    'pageSize' => [
-                        'width' => $pageWidthMicrons,
-                        'height' => 2000000,
                     ],
                 ]);
             } else {

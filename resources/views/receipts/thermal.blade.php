@@ -10,8 +10,6 @@
             margin: 0mm;
         }
         * {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
             box-sizing: border-box;
         }
         html, body {
@@ -25,7 +23,7 @@
             line-height: 1.3;
             color: #000;
             padding: 4mm 3mm;
-            background: #fff;
+            background: transparent;
             word-break: break-word;
             overflow-wrap: break-word;
         }
