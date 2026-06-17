@@ -94,3 +94,16 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
 Route::get('/', function () {
     return redirect('/dashboard');
 });
+
+// Route serve gambar untuk NativePHP Desktop App.
+Route::get('/img/{path}', function (string $path) {
+    // Cegah path traversal
+    $safePath = ltrim(str_replace(['..', "\0"], '', $path), '/\\');
+    $filePath = storage_path('app/public/' . $safePath);
+
+    if (!file_exists($filePath) || !is_file($filePath)) {
+        abort(404);
+    }
+
+    return response()->file($filePath);
+})->where('path', '.*')->name('app.img');

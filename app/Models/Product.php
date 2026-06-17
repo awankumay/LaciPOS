@@ -64,7 +64,11 @@ class Product extends Model
     // --- Accessors ---
     public function getPhotoUrlAttribute(): ?string
     {
-        return $this->photo_path ? asset('storage/' . $this->photo_path) : null;
+        if (!$this->photo_path) {
+            return null;
+        }
+
+        return route('app.img', ['path' => $this->photo_path]);
     }
 
     public function getIsLowStockAttribute(): bool

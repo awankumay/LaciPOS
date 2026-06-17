@@ -50,6 +50,9 @@ class StoreProfile extends Model
     /**
      * Dapatkan URL logo toko.
      * Return null jika logo belum diupload.
+     *
+     * Menggunakan built-in Laravel 11 route 'storage.local' agar bekerja
+     * di NativePHP desktop app tanpa bergantung pada symlink.
      */
     public function getLogoUrlAttribute(): ?string
     {
@@ -57,6 +60,6 @@ class StoreProfile extends Model
             return null;
         }
 
-        return asset('storage/' . $this->logo_path);
+        return route('app.img', ['path' => $this->logo_path]);
     }
 }
