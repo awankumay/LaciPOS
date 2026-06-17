@@ -17,7 +17,7 @@ class PrintService
     public function printReceipt(Order $order): array
     {
         $store = StoreProfile::getProfile();
-        $paperSize = $store?->paper_size ?? '80mm';
+        $paperSize = $store?->paper_size ?? '58mm';
 
         try {
             $html = $this->receiptService->renderReceiptHtml($order, $paperSize);
@@ -33,8 +33,18 @@ class PrintService
                     }
                 }
                 
+                $pageWidthMicrons = $paperSize === '58mm' ? 58000 : 80000;
+
                 \Native\Laravel\Facades\System::print($html, $targetPrinter, [
                     'silent' => true,
+                    'printBackground' => true,
+                    'margins' => [
+                        'marginType' => 'none',
+                    ],
+                    'pageSize' => [
+                        'width' => $pageWidthMicrons,
+                        'height' => 2000000,
+                    ],
                 ]);
             } else {
                 Log::info("Print function is bypassed because NativePHP is not available in current environment. HTML length: " . strlen($html));

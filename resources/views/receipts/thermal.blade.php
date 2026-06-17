@@ -6,49 +6,73 @@
     <title>Struk #{{ $order['number'] }}</title>
     <style>
         @page {
+            size: {{ $paperSize == '58mm' ? '58mm' : '80mm' }} auto;
+            margin: 0mm;
+        }
+        * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: {{ $paperSize == '58mm' ? '58mm' : '80mm' }};
             margin: 0;
+            padding: 0;
         }
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            line-height: 1.2;
+            font-size: {{ $paperSize == '58mm' ? '10px' : '12px' }};
+            line-height: 1.3;
             color: #000;
-            margin: 0;
-            padding: 10px;
-            width: {{ $paperSize == '58mm' ? '58mm' : '80mm' }};
-            box-sizing: border-box;
+            padding: 4mm 3mm;
+            background: #fff;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
         .text-left { text-align: left; }
         .font-bold { font-weight: bold; }
-        .mb-1 { margin-bottom: 5px; }
-        .mb-2 { margin-bottom: 10px; }
-        .mt-2 { margin-top: 10px; }
-        .border-top { border-top: 1px dashed #000; padding-top: 5px; }
-        .border-bottom { border-bottom: 1px dashed #000; padding-bottom: 5px; }
-        
+        .mb-1 { margin-bottom: 4px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mt-2 { margin-top: 8px; }
+        .border-top { border-top: 1px dashed #000; padding-top: 4px; margin-top: 4px; }
+        .border-bottom { border-bottom: 1px dashed #000; padding-bottom: 4px; margin-bottom: 4px; }
+
         .logo {
-            max-width: 80%;
+            max-width: 70%;
             height: auto;
-            margin: 0 auto 5px;
+            margin: 0 auto 4px;
             display: block;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
         table td {
             vertical-align: top;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
-        
+
         .item-row td {
-            padding-bottom: 3px;
+            padding-bottom: 2px;
         }
-        
+
         .totals td {
             padding-top: 2px;
+        }
+
+        @media print {
+            html, body {
+                width: {{ $paperSize == '58mm' ? '58mm' : '80mm' }};
+            }
+            @page {
+                size: {{ $paperSize == '58mm' ? '58mm' : '80mm' }} auto;
+                margin: 0mm;
+            }
         }
     </style>
 </head>

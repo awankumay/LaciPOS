@@ -27,7 +27,7 @@ const props = defineProps({
 
 const form = useForm({
     printer_name: props.profile?.printer_name || '',
-    paper_size: props.profile?.paper_size || '80mm',
+    paper_size: props.profile?.paper_size || '58mm',
     auto_print: props.profile?.auto_print ? true : false,
 });
 
@@ -76,7 +76,7 @@ const testPrint = () => {
                                         <SelectTrigger class="w-full">
                                             <SelectValue placeholder="Pilih printer OS..." />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent class="bg-white">
                                             <SelectItem v-for="printer in printers" :key="printer.name" :value="printer.name">
                                                 {{ printer.displayName }}
                                             </SelectItem>

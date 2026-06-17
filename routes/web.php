@@ -81,6 +81,7 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
         Route::get('/orders/{order}/success', [App\Http\Controllers\OrderController::class, 'success'])->name('order.success');
         Route::post('/orders/{order}/print', [App\Http\Controllers\PrintController::class, 'print'])->name('order.print');
+        Route::get('/orders/{order}/download', [App\Http\Controllers\PrintController::class, 'download'])->name('order.download');
         
         // Riwayat transaksi
         Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');

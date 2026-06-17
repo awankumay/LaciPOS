@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
-import { CheckCircle2, Receipt, ArrowLeft, Calendar, User } from 'lucide-vue-next';
+import { CheckCircle2, Receipt, ArrowLeft, Calendar, User, Download } from 'lucide-vue-next';
 
 const props = defineProps({
     order: {
@@ -27,6 +27,13 @@ import { onMounted, ref } from 'vue';
 const toast = useToast();
 const page = usePage();
 const isPrinting = ref(false);
+const isDownloading = ref(false);
+
+const downloadReceipt = () => {
+    isDownloading.value = true;
+    window.open(`/orders/${props.order.id}/download`, '_blank');
+    setTimeout(() => { isDownloading.value = false; }, 2000);
+};
 
 const printReceipt = () => {
     isPrinting.value = true;
@@ -133,16 +140,26 @@ onMounted(() => {
             </div>
 
             <!-- Actions -->
-            <div class="p-6 bg-slate-50 border-t border-slate-100 grid grid-cols-2 gap-3">
+            <div class="p-6 bg-slate-50 border-t border-slate-100 grid grid-cols-3 gap-3">
                 <Button variant="outline" class="w-full h-12 bg-white" as-child>
                     <Link href="/pos">
                         <ArrowLeft class="mr-2 h-4 w-4" />
                         Transaksi Baru
                     </Link>
                 </Button>
-                <!-- Tombol Print (T041) -->
-                <Button 
-                    class="w-full h-12 bg-slate-900 text-white hover:bg-slate-800" 
+                <!-- Tombol Download -->
+                <Button
+                    variant="outline"
+                    class="w-full h-12 bg-white border-slate-300 hover:bg-slate-50"
+                    @click="downloadReceipt"
+                    :disabled="isDownloading"
+                >
+                    <Download class="mr-2 h-4 w-4" />
+                    {{ isDownloading ? 'Memproses...' : 'Unduh Struk' }}
+                </Button>
+                <!-- Tombol Print -->
+                <Button
+                    class="w-full h-12 bg-slate-900 text-white hover:bg-slate-800"
                     @click="printReceipt"
                     :disabled="isPrinting"
                 >
