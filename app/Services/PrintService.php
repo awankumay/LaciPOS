@@ -21,6 +21,13 @@ class PrintService
 
         try {
             $html = $this->receiptService->renderReceiptHtml($order, $paperSize);
+            
+            // Encode only specific characters that break data: URIs natively
+            // '#' breaks the URL (acts as fragment) and '%' causes invalid encoding exception
+            // Also STRIP ALL NEWLINES because unescaped newlines in a data URI will cause
+            // Chromium's URL parser to silently abort or truncate the document!
+            $html = str_replace(["\r", "\n"], '', $html);
+            $html = str_replace(['%', '#'], ['%25', '%23'], $html);
 
             if (class_exists(\Native\Laravel\Facades\System::class)) {
                 $targetPrinter = null;
@@ -33,14 +40,23 @@ class PrintService
                     }
                 }
                 
-                $pageWidthMicrons = $paperSize === '58mm' ? 58000 : 80000;
-
-                \Native\Laravel\Facades\System::print($html, $targetPrinter, [
-                    'silent' => true,
-                    'printBackground' => false,
-                    'margins' => [
-                        'marginType' => 'none',
-                    ],
+                $widthMicrons = $paperSize === '58mm' ? 58000 : 80000;
+                
+                $client = app(\Native\Laravel\Client\Client::class);
+                $response = $client->post('system/print', [
+                    'html' => $html,
+                    'printer' => $targetPrinter->name ?? '',
+                    'settings' => [
+                        'silent' => true,
+                        'printBackground' => false,
+                        'margins' => [
+                            'marginType' => 'none',
+                        ],
+                        'pageSize' => [
+                            'width' => $widthMicrons,
+                            'height' => 3276000
+                        ]
+                    ]
                 ]);
             } else {
                 Log::info("Print function is bypassed because NativePHP is not available in current environment. HTML length: " . strlen($html));

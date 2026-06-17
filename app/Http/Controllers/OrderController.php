@@ -79,12 +79,9 @@ class OrderController extends Controller
         // Auto print jika setting aktif
         $storeProfile = \App\Models\StoreProfile::getProfile();
         if ($storeProfile && $storeProfile->auto_print) {
-            $printResult = $printService->printReceipt($order);
-            if (!$printResult['success']) {
-                $redirect->with('warning', $printResult['message']);
-            } else {
-                $redirect->with('print_success', $printResult['message']);
-            }
+            $printService->printReceipt($order);
+            
+            $redirect->with('print_success', 'Perintah cetak struk otomatis telah dikirim.');
         }
 
         return $redirect;
