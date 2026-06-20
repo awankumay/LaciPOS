@@ -12,6 +12,7 @@ import { router } from '@inertiajs/vue3';
 const props = defineProps({
     products: Array,
     categories: Array,
+    next_order_number: String,
 });
 
 const { items, addItem, finalTotal, clearCart, getQuantityByProductId, getDiscountedQuantityByProductId, cartDiscountType, cartDiscountValue, cartDiscountNote } = useCart();
@@ -166,6 +167,7 @@ const handleConfirmPayment = (paymentData) => {
                     <ProductGrid
                         :products="products"
                         :categories="categories"
+                        :next-order-number="next_order_number"
                         @add-to-cart="handleProductClick"
                     />
                 </div>

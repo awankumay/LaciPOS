@@ -7,6 +7,7 @@ import ProductCard from '@/Components/ProductCard.vue';
 const props = defineProps({
     products: { type: Array, default: () => [] },
     categories: { type: Array, default: () => [] },
+    nextOrderNumber: { type: String, default: null },
 });
 
 const emit = defineEmits(['add-to-cart']);
@@ -38,6 +39,10 @@ const selectCategory = (catId) => {
     <div class="product-grid-root">
         <!-- Top Bar: Search -->
         <div class="product-grid-topbar">
+            <div v-if="nextOrderNumber" class="mb-3 flex items-center justify-between">
+                <span class="text-sm font-semibold text-[#001e2b]">Daftar Produk</span>
+                <span class="text-[11px] font-mono font-medium text-[#5c6c7a] bg-white border border-[#c1ccd6] px-2.5 py-1 rounded-md shadow-sm" title="Estimasi Nomor Transaksi Berikutnya">Order: #{{ nextOrderNumber }}</span>
+            </div>
             <div class="search-wrapper">
                 <Search class="search-icon" />
                 <input
