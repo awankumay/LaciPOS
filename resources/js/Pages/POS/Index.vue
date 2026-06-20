@@ -14,7 +14,7 @@ const props = defineProps({
     categories: Array,
 });
 
-const { items, addItem, finalTotal, clearCart, getQuantityByProductId } = useCart();
+const { items, addItem, finalTotal, clearCart, getQuantityByProductId, getDiscountedQuantityByProductId, cartDiscountType, cartDiscountValue, cartDiscountNote } = useCart();
 const toast = useToast();
 
 const showVariantModal = ref(false);
@@ -39,6 +39,27 @@ const addToCartDirect = (product) => {
         return;
     }
 
+    let applyDiscount = false;
+    let discountType = null;
+    let discountValue = null;
+
+    if (product.is_discount_active) {
+        if (product.discount_quota_remaining !== null) {
+            const discountedQtyInCart = getDiscountedQuantityByProductId(product.id);
+            if (discountedQtyInCart < product.discount_quota_remaining) {
+                applyDiscount = true;
+                discountType = product.discount_type;
+                discountValue = product.discount_value;
+            } else {
+                toast.warning(`Kuota diskon '${product.name}' telah habis. Ditambahkan dengan harga normal.`);
+            }
+        } else {
+            applyDiscount = true;
+            discountType = product.discount_type;
+            discountValue = product.discount_value;
+        }
+    }
+
     addItem({
         productId: product.id,
         productName: product.name,
@@ -47,6 +68,9 @@ const addToCartDirect = (product) => {
         cogs: Number(product.cogs),
         stock: product.stock,
         photoUrl: product.photo_url,
+        discountType: discountType,
+        discountValue: discountValue,
+        discountQuotaRemaining: product.discount_quota_remaining,
     });
 };
 
@@ -57,6 +81,27 @@ const addToCartFromModal = (data) => {
         return;
     }
 
+    let applyDiscount = false;
+    let discountType = null;
+    let discountValue = null;
+
+    if (data.product.is_discount_active) {
+        if (data.product.discount_quota_remaining !== null) {
+            const discountedQtyInCart = getDiscountedQuantityByProductId(data.product.id);
+            if (discountedQtyInCart < data.product.discount_quota_remaining) {
+                applyDiscount = true;
+                discountType = data.product.discount_type;
+                discountValue = data.product.discount_value;
+            } else {
+                toast.warning(`Kuota diskon '${data.product.name}' telah habis. Ditambahkan dengan harga normal.`);
+            }
+        } else {
+            applyDiscount = true;
+            discountType = data.product.discount_type;
+            discountValue = data.product.discount_value;
+        }
+    }
+
     addItem({
         productId: data.product.id,
         productName: data.product.name,
@@ -65,6 +110,9 @@ const addToCartFromModal = (data) => {
         cogs: data.finalCogs,
         stock: data.product.stock,
         photoUrl: data.product.photo_url,
+        discountType: discountType,
+        discountValue: discountValue,
+        discountQuotaRemaining: data.product.discount_quota_remaining,
     });
 };
 
@@ -84,7 +132,12 @@ const handleConfirmPayment = (paymentData) => {
             quantity: item.quantity,
             variantLabel: item.variantLabel,
             notes: item.notes,
+            discount_type: item.discountType,
+            discount_value: item.discountValue,
         })),
+        discount_type: cartDiscountType.value,
+        discount_value: cartDiscountValue.value,
+        discount_note: cartDiscountNote.value,
     }, {
         onSuccess: () => {
             clearCart();

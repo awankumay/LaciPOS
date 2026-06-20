@@ -105,7 +105,8 @@ const getStatusColor = (statusText) => {
                                         </p>
                                     </td>
                                     <td class="px-5 py-4 text-right">
-                                        {{ formatRupiah(item.snapshot_price) }}
+                                        <p :class="{ 'line-through text-[#a8b3bc] text-xs': item.snapshot_discount_amount > 0 }">{{ formatRupiah(item.snapshot_price) }}</p>
+                                        <p v-if="item.snapshot_discount_amount > 0" class="text-sm text-[#001e2b] font-medium">{{ formatRupiah(item.snapshot_price - item.snapshot_discount_amount) }}</p>
                                     </td>
                                     <td class="px-5 py-4 text-right font-medium">
                                         {{ item.quantity }}x
@@ -138,6 +139,12 @@ const getStatusColor = (statusText) => {
                         <div class="flex justify-between">
                             <dt class="text-[#7c8c9a]">Subtotal</dt>
                             <dd class="font-medium text-[#001e2b] text-right">{{ formatRupiah(order.subtotal) }}</dd>
+                        </div>
+                        <div v-if="order.discount_amount > 0" class="flex justify-between">
+                            <dt class="text-[#7c8c9a]">
+                                Diskon Transaksi <span v-if="order.discount_note" class="block text-xs mt-0.5 opacity-80">{{ order.discount_note }}</span>
+                            </dt>
+                            <dd class="font-medium text-red-500 text-right">-{{ formatRupiah(order.discount_amount) }}</dd>
                         </div>
                         <div v-if="order.tax_amount > 0" class="flex justify-between">
                             <dt class="text-[#7c8c9a]">

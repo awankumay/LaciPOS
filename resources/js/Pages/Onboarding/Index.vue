@@ -21,7 +21,8 @@ const formData = reactive({
     address: props.existingProfile?.address || '',
     phone: props.existingProfile?.phone || '',
     logo: null,
-    receipt_footer: props.existingProfile?.receipt_footer || 'Terima kasih sudah berkunjung!',
+    receipt_footer: props.existingProfile?.receipt_footer || 'Terima kasih sudah berbelanja di toko kami!',
+    timezone: props.existingProfile?.timezone || 'Asia/Jakarta',
 });
 
 // Preview URL untuk logo
@@ -49,6 +50,7 @@ const submitOnboarding = () => {
     if (formData.phone) data.append('phone', formData.phone);
     if (formData.logo) data.append('logo', formData.logo);
     if (formData.receipt_footer) data.append('receipt_footer', formData.receipt_footer);
+    if (formData.timezone) data.append('timezone', formData.timezone);
 
     router.post('/onboarding', data, {
         forceFormData: true,
@@ -92,7 +94,8 @@ const submitOnboarding = () => {
                     <OnboardingStep2
                         v-else-if="currentStep === 2"
                         key="step2"
-                        v-model="formData.address"
+                        v-model:address="formData.address"
+                        v-model:timezone="formData.timezone"
                         @next="nextStep"
                         @back="prevStep"
                     />

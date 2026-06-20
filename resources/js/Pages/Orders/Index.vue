@@ -3,7 +3,6 @@ import { ref, watch } from 'vue';
 import { router, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Search, Filter, Calendar, CreditCard, ChevronRight } from 'lucide-vue-next';
-import Pagination from '@/Components/Pagination.vue'; // Assume Pagination component exists or I will just use simple buttons
 
 const props = defineProps({
     orders: Object,

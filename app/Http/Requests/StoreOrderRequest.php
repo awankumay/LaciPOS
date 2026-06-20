@@ -21,6 +21,11 @@ class StoreOrderRequest extends FormRequest
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.variantLabel' => ['nullable', 'string'],
             'items.*.notes' => ['nullable', 'string', 'max:500'],
+            'discount_type' => ['nullable', 'string', 'in:percentage,nominal'],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
+            'discount_note' => ['nullable', 'string', 'max:255'],
+            'items.*.discount_type' => ['nullable', 'string', 'in:percentage,nominal'],
+            'items.*.discount_value' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

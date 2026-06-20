@@ -11,6 +11,7 @@ class StoreProfile extends Model
 
     protected $fillable = [
         'store_name',
+        'timezone',
         'address',
         'phone',
         'logo_path',

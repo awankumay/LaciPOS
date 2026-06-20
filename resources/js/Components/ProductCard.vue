@@ -56,8 +56,16 @@ const isOverStock = computed(() => {
             <p class="product-card__name">{{ product.name }}</p>
             <p class="product-card__stock-text">Stok: {{ product.stock }}</p>
             <div class="product-card__footer">
-                <p class="product-card__price">{{ formatRupiah(product.price) }}</p>
-                <div class="product-card__add-btn">
+                <div class="flex flex-col flex-1 min-w-0 mr-2">
+                    <div v-if="product.is_discount_active" class="flex items-center gap-1 mb-0.5">
+                        <span v-if="product.discount_type === 'percentage'" class="text-[10px] font-bold bg-red-100 text-red-600 px-1 py-0.5 rounded leading-none">{{ Number(product.discount_value) }}%</span>
+                        <span class="product-card__price-original truncate">{{ formatRupiah(product.price) }}</span>
+                    </div>
+                    <p class="product-card__price" :class="{ 'text-red-600': product.is_discount_active }">
+                        {{ product.is_discount_active ? formatRupiah(product.price - product.calculated_discount_amount) : formatRupiah(product.price) }}
+                    </p>
+                </div>
+                <div class="product-card__add-btn mt-auto mb-auto">
                     <Plus class="product-card__add-icon" />
                 </div>
             </div>
@@ -215,6 +223,12 @@ const isOverStock = computed(() => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.product-card__price-original {
+    font-size: 11px;
+    color: #a8b3bc;
+    text-decoration: line-through;
 }
 
 .product-card__add-btn {

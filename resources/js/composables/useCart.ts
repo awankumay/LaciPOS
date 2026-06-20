@@ -2,20 +2,25 @@ import { ref, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
 export interface CartItem {
-    cartId: string;         // Unique ID per entry di cart (product_id + variant combo)
+    cartId: string;
     productId: string;
     productName: string;
     variantLabel: string | null;
-    price: number;          // Harga jual final (termasuk modifier)
-    cogs: number;           // Harga modal final (termasuk modifier)
+    price: number;
+    cogs: number;
     quantity: number;
-    stock: number;          // Stok produk asli
+    stock: number;
     notes: string;
     photoUrl: string | null;
+    discountType?: string | null;
+    discountValue?: number | null;
+    discountQuotaRemaining?: number | null;
 }
 
-// State cart — menggunakan ref biasa (tidak persisted)
 const items = ref<CartItem[]>([]);
+const cartDiscountType = ref<string | null>(null);
+const cartDiscountValue = ref<number | null>(null);
+const cartDiscountNote = ref<string | null>(null);
 
 export function useCart() {
     const page = usePage();
@@ -26,7 +31,8 @@ export function useCart() {
      * Jika item dengan productId + variantLabel yang sama sudah ada, tambah quantity.
      */
     const addItem = (item: Omit<CartItem, 'cartId' | 'quantity' | 'notes'>): void => {
-        const cartId = `${item.productId}_${item.variantLabel || 'default'}`;
+        const hasDiscount = !!(item.discountType && item.discountValue);
+        const cartId = `${item.productId}_${item.variantLabel || 'default'}_${hasDiscount ? 'discount' : 'normal'}`;
 
         const existing = items.value.find(i => i.cartId === cartId);
         if (existing) {
@@ -73,25 +79,55 @@ export function useCart() {
     };
 
     /**
-     * Kosongkan seluruh cart.
+     * Kosongkan seluruh cart dan hapus diskon keranjang.
      */
     const clearCart = (): void => {
         items.value = [];
+        cartDiscountType.value = null;
+        cartDiscountValue.value = null;
+        cartDiscountNote.value = null;
     };
 
     /**
-     * Hitung subtotal per item = price × quantity.
+     * Hitung subtotal per item = (price - diskon) × quantity.
      */
     const getSubtotal = (cartId: string): number => {
         const item = items.value.find(i => i.cartId === cartId);
-        return item ? item.price * item.quantity : 0;
+        if (!item) return 0;
+        let itemDiscountAmount = 0;
+        if (item.discountType && item.discountValue) {
+            if (item.discountType === 'percentage') {
+                itemDiscountAmount = item.price * (item.discountValue / 100);
+            } else {
+                itemDiscountAmount = Number(item.discountValue);
+            }
+        }
+        return (item.price - itemDiscountAmount) * item.quantity;
     };
 
     /**
-     * Subtotal seluruh cart.
+     * Subtotal seluruh cart (setelah diskon per item).
      */
     const subtotal = computed<number>(() => {
-        return items.value.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        return items.value.reduce((sum, item) => sum + getSubtotal(item.cartId), 0);
+    });
+
+    /**
+     * Total Diskon Keranjang
+     */
+    const cartDiscountAmount = computed<number>(() => {
+        if (!cartDiscountType.value || !cartDiscountValue.value) return 0;
+        if (cartDiscountType.value === 'percentage') {
+            return subtotal.value * (cartDiscountValue.value / 100);
+        }
+        return Number(cartDiscountValue.value);
+    });
+
+    /**
+     * Subtotal setelah Diskon Keranjang
+     */
+    const subtotalAfterCartDiscount = computed<number>(() => {
+        return Math.max(0, subtotal.value - cartDiscountAmount.value);
     });
 
     const taxType = computed<string>(() => storeSettings.value?.tax_type || 'percentage');
@@ -103,7 +139,7 @@ export function useCart() {
         
         const value = taxValue.value;
         if (taxType.value === 'percentage') {
-            return subtotal.value * (value / 100);
+            return subtotalAfterCartDiscount.value * (value / 100);
         }
         return value;
     });
@@ -117,16 +153,16 @@ export function useCart() {
         
         const value = serviceChargeValue.value;
         if (serviceChargeType.value === 'percentage') {
-            return subtotal.value * (value / 100);
+            return subtotalAfterCartDiscount.value * (value / 100);
         }
         return value;
     });
 
     /**
-     * Total akhir cart (subtotal + tax + service charge).
+     * Total akhir cart (subtotal setelah diskon + tax + service charge).
      */
     const finalTotal = computed<number>(() => {
-        return subtotal.value + taxAmount.value + serviceChargeAmount.value;
+        return subtotalAfterCartDiscount.value + taxAmount.value + serviceChargeAmount.value;
     });
 
     /**
@@ -145,8 +181,19 @@ export function useCart() {
         return items.value.filter(i => i.productId === productId).reduce((sum, item) => sum + item.quantity, 0);
     };
 
+    const getDiscountedQuantityByProductId = (productId: string): number => {
+        return items.value
+            .filter(i => i.productId === productId && !!(i.discountType && i.discountValue))
+            .reduce((sum, item) => sum + item.quantity, 0);
+    };
+
     return {
         items,
+        cartDiscountType,
+        cartDiscountValue,
+        cartDiscountNote,
+        cartDiscountAmount,
+        subtotalAfterCartDiscount,
         addItem,
         removeItem,
         updateQuantity,
@@ -164,5 +211,6 @@ export function useCart() {
         totalItems,
         isEmpty,
         getQuantityByProductId,
+        getDiscountedQuantityByProductId,
     };
 }

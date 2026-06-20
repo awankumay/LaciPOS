@@ -5,6 +5,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Discount;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -44,10 +45,11 @@ class ProductController extends Controller
 
     public function create()
     {
-        $profile = \App\Models\StoreProfile::getProfile();
+        $categories = Category::orderBy('name')->get();
+        $discounts = Discount::where('is_active', true)->orderBy('name')->get();
         return Inertia::render('Products/Create', [
-            'categories' => Category::orderBy('name')->get(),
-            'defaultMinStock' => $profile ? $profile->default_min_stock : 5,
+            'categories' => $categories,
+            'discounts' => $discounts,
         ]);
     }
 
@@ -85,11 +87,13 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        $discounts = Discount::where('is_active', true)->orderBy('name')->get();
         return Inertia::render('Products/Edit', [
             'product' => array_merge($product->load('variants.options')->toArray(), [
                 'photo_url' => $product->photo_url,
             ]),
             'categories' => Category::orderBy('name')->get(),
+            'discounts' => $discounts,
         ]);
     }
 

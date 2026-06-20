@@ -13,6 +13,7 @@ class Order extends Model
         'order_number', 'user_id', 'status', 'payment_method',
         'payment_provider', 'subtotal', 'tax_rate', 'tax_type', 'tax_amount',
         'service_charge_rate', 'service_charge_type', 'service_charge_amount',
+        'discount_type', 'discount_value', 'discount_amount', 'discount_note',
         'total_amount', 'cash_received', 'change_amount', 'notes',
     ];
 
@@ -24,6 +25,8 @@ class Order extends Model
             'tax_amount' => 'decimal:2',
             'service_charge_rate' => 'decimal:2',
             'service_charge_amount' => 'decimal:2',
+            'discount_value' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
             'cash_received' => 'decimal:2',
             'change_amount' => 'decimal:2',

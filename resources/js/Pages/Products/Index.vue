@@ -182,9 +182,12 @@ const executeDelete = () => {
                             </Badge>
                         </TableCell>
                         <TableCell class="text-center">
-                            <Badge :variant="product.is_active ? 'default' : 'outline'">
+                            <span :class="[
+                                'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium',
+                                product.is_active ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'
+                            ]">
                                 {{ product.is_active ? 'Aktif' : 'Nonaktif' }}
-                            </Badge>
+                            </span>
                         </TableCell>
                         <TableCell class="text-right">
                             <div class="flex items-center justify-end gap-1">

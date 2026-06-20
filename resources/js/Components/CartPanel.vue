@@ -22,16 +22,35 @@ const {
     serviceChargeType,
     serviceChargeValue,
     serviceChargeAmount,
+    cartDiscountType,
+    cartDiscountValue,
+    cartDiscountNote,
+    cartDiscountAmount,
+    subtotalAfterCartDiscount,
     finalTotal,
     totalItems,
     isEmpty,
-    getQuantityByProductId
+    getQuantityByProductId,
+    getDiscountedQuantityByProductId,
+    addItem
 } = useCart();
 
 const { formatRupiah } = useFormatCurrency();
 const toast = useToast();
 
 const showNotes = ref({});
+const showCartDiscount = ref(false);
+
+const toggleCartDiscount = () => {
+    showCartDiscount.value = !showCartDiscount.value;
+    if (!showCartDiscount.value) {
+        cartDiscountType.value = null;
+        cartDiscountValue.value = null;
+        cartDiscountNote.value = null;
+    } else {
+        cartDiscountType.value = 'percentage';
+    }
+};
 
 const toggleNotes = (cartId) => {
     showNotes.value[cartId] = !showNotes.value[cartId];
@@ -43,22 +62,54 @@ const handleUpdateQuantity = (item, newQuantity) => {
         return;
     }
     
-    // Hitung total quantity produk ini saat ini di cart (termasuk varian lain)
     const currentQtyForProduct = getQuantityByProductId(item.productId);
     const qtyOtherVariants = currentQtyForProduct - item.quantity;
     
     if (qtyOtherVariants + newQuantity > item.stock) {
         toast.error('Jumlah melebihi stok yang tersedia.');
-        // Set ke maksimal yang diperbolehkan
         const maxAllowed = item.stock - qtyOtherVariants;
         if (maxAllowed > 0) {
             updateQuantity(item.cartId, maxAllowed);
         }
-        // Jika input diketik manual melebihi batas, kembalikan ke batas maksimal agar reaktif
         item.quantity = maxAllowed;
-    } else {
-        updateQuantity(item.cartId, newQuantity);
+        return;
     }
+
+    // Check discount quota
+    if (newQuantity > item.quantity && item.discountType && item.discountQuotaRemaining !== null) {
+        const discountedQtyInCart = getDiscountedQuantityByProductId(item.productId);
+        const addedQty = newQuantity - item.quantity;
+        
+        if (discountedQtyInCart + addedQty > item.discountQuotaRemaining) {
+            const allowedDiscountQty = item.discountQuotaRemaining - discountedQtyInCart;
+            
+            if (allowedDiscountQty > 0) {
+                updateQuantity(item.cartId, item.quantity + allowedDiscountQty);
+            }
+            
+            const excessQty = addedQty - Math.max(0, allowedDiscountQty);
+            if (excessQty > 0) {
+                toast.warning(`Kuota diskon '${item.productName}' mencapai batas. Ditambahkan dengan harga normal.`);
+                for (let i = 0; i < excessQty; i++) {
+                    addItem({
+                        productId: item.productId,
+                        productName: item.productName,
+                        variantLabel: item.variantLabel,
+                        price: item.price,
+                        cogs: item.cogs,
+                        stock: item.stock,
+                        photoUrl: item.photoUrl,
+                        discountType: null,
+                        discountValue: null,
+                        discountQuotaRemaining: null,
+                    });
+                }
+            }
+            return;
+        }
+    }
+
+    updateQuantity(item.cartId, newQuantity);
 };
 </script>
 
@@ -105,7 +156,11 @@ const handleUpdateQuantity = (item, newQuantity) => {
                             <span v-if="item.variantLabel" class="cart-item__variant">
                                 {{ item.variantLabel }}
                             </span>
-                            <p class="cart-item__unit-price">{{ formatRupiah(item.price) }} / item</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <p class="cart-item__unit-price" :class="{ 'line-through text-[#a8b3bc]': item.discountValue }">{{ formatRupiah(item.price) }}</p>
+                                <p v-if="item.discountValue" class="text-xs font-semibold text-[#001e2b]">{{ formatRupiah(item.price - (item.discountType === 'percentage' ? item.price * (item.discountValue/100) : item.discountValue)) }}</p>
+                                <span class="cart-item__unit-price">/ item</span>
+                            </div>
                         </div>
                         <div class="cart-item__actions">
                             <button
@@ -170,9 +225,39 @@ const handleUpdateQuantity = (item, newQuantity) => {
 
         <!-- ── Footer / Checkout ── -->
         <div class="cart-footer">
-            <div class="cart-footer__total-row cart-footer__subtotal-row" v-if="taxAmount > 0 || serviceChargeAmount > 0">
+            <!-- Diskon Transaksi -->
+            <div class="cart-discount-section">
+                <button 
+                    v-if="!showCartDiscount" 
+                    class="cart-discount-toggle" 
+                    @click="toggleCartDiscount"
+                    :disabled="isEmpty"
+                >
+                    <Plus class="icon-xs" /> Tambah Diskon Transaksi
+                </button>
+                <div v-else class="cart-discount-form">
+                    <div class="cart-discount-header">
+                        <span class="cart-discount-title">Diskon Transaksi</span>
+                        <button class="cart-discount-close" @click="toggleCartDiscount"><X class="icon-xs" /></button>
+                    </div>
+                    <div class="cart-discount-inputs">
+                        <select v-model="cartDiscountType" class="cart-discount-select">
+                            <option value="percentage">%</option>
+                            <option value="nominal">Rp</option>
+                        </select>
+                        <input v-model="cartDiscountValue" type="number" min="0" placeholder="0" class="cart-discount-input" />
+                    </div>
+                    <input v-model="cartDiscountNote" type="text" placeholder="Keterangan (opsional)" class="cart-discount-note" />
+                </div>
+            </div>
+
+            <div class="cart-footer__total-row cart-footer__subtotal-row" v-if="taxAmount > 0 || serviceChargeAmount > 0 || cartDiscountAmount > 0">
                 <span class="cart-footer__label">Subtotal</span>
                 <span class="cart-footer__amount">{{ formatRupiah(subtotal) }}</span>
+            </div>
+            <div class="cart-footer__total-row cart-footer__tax-row" v-if="cartDiscountAmount > 0">
+                <span class="cart-footer__label">Diskon Transaksi</span>
+                <span class="cart-footer__amount text-red-500">-{{ formatRupiah(cartDiscountAmount) }}</span>
             </div>
             <div class="cart-footer__total-row cart-footer__tax-row" v-if="taxAmount > 0">
                 <span class="cart-footer__label">
@@ -630,5 +715,95 @@ const handleUpdateQuantity = (item, newQuantity) => {
 .icon-xs {
     width: 13px;
     height: 13px;
+}
+
+/* ── Cart Discount Form ── */
+.cart-discount-section {
+    margin-bottom: 4px;
+}
+
+.cart-discount-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px dashed #c1ccd6;
+    color: #5c6c7a;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.cart-discount-toggle:hover:not(:disabled) {
+    background: #f4f7f6;
+    border-color: #00684a;
+    color: #00684a;
+}
+
+.cart-discount-form {
+    background: #f9fbfa;
+    border: 1.5px solid #e1e5e8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cart-discount-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-discount-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3d4f5b;
+}
+
+.cart-discount-close {
+    background: transparent;
+    border: none;
+    color: #a8b3bc;
+    cursor: pointer;
+    padding: 2px;
+}
+.cart-discount-close:hover {
+    color: #dc2626;
+}
+
+.cart-discount-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.cart-discount-select {
+    width: 60px;
+    height: 32px;
+    border: 1px solid #c1ccd6;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    background: white;
+}
+
+.cart-discount-input, .cart-discount-note {
+    flex: 1;
+    height: 32px;
+    border: 1px solid #c1ccd6;
+    border-radius: 6px;
+    padding: 0 10px;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+}
+.cart-discount-input:focus, .cart-discount-note:focus, .cart-discount-select:focus {
+    border-color: #00684a;
 }
 </style>

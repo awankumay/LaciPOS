@@ -32,6 +32,10 @@ class ReceiptService
                 'service_charge_rate' => $order->service_charge_rate,
                 'service_charge_type' => $order->service_charge_type,
                 'service_charge_amount' => $order->service_charge_amount,
+                'discount_type' => $order->discount_type,
+                'discount_value' => $order->discount_value,
+                'discount_amount' => $order->discount_amount,
+                'discount_note' => $order->discount_note,
                 'total' => $order->total_amount,
                 'cash_received' => $order->cash_received,
                 'change' => $order->change_amount,
@@ -41,6 +45,7 @@ class ReceiptService
                 'variant' => $item->variant_label,
                 'quantity' => $item->quantity,
                 'price' => $item->snapshot_price,
+                'discount_amount' => $item->snapshot_discount_amount,
                 'subtotal' => $item->subtotal,
             ])->toArray(),
         ];

@@ -13,6 +13,7 @@ import VariantEditor from '@/Components/VariantEditor.vue';
 
 const props = defineProps({
     categories: Array,
+    discounts: Array,
     defaultMinStock: { type: Number, default: 5 },
 });
 
@@ -26,6 +27,7 @@ const form = useForm({
     min_stock_alert: props.defaultMinStock,
     is_active: true,
     variants: [],
+    discount_id: '',
 });
 
 const photoPreview = ref(null);
@@ -159,6 +161,26 @@ const submit = () => {
                     </CardHeader>
                     <CardContent>
                         <VariantEditor v-model="form.variants" />
+                    </CardContent>
+                </Card>
+
+                <!-- Pengaturan Diskon -->
+                <Card class="bg-white border-slate-200 shadow-sm rounded-xl">
+                    <CardHeader>
+                        <CardTitle class="text-lg font-semibold text-slate-900">Pengaturan Diskon</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-5">
+                        <div class="space-y-2">
+                            <Label class="text-sm font-medium text-slate-700">Pilih Master Diskon</Label>
+                            <select v-model="form.discount_id" class="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 shadow-sm outline-none transition-all focus:border-[#00684a] focus:ring-[2px] focus:ring-[#00684a]/10">
+                                <option value="">Tidak ada diskon</option>
+                                <option v-for="discount in discounts" :key="discount.id" :value="discount.id">
+                                    {{ discount.name }} ({{ discount.discount_type === 'percentage' ? discount.discount_value + '%' : 'Rp ' + discount.discount_value }})
+                                </option>
+                            </select>
+                            <p class="text-xs text-slate-500 mt-1">Diskon akan diterapkan pada produk ini saat checkout.</p>
+                            <p v-if="form.errors.discount_id" class="text-sm text-red-500">{{ form.errors.discount_id }}</p>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

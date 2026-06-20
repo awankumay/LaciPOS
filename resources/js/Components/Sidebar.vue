@@ -21,6 +21,7 @@ const ownerMenuItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/pos', icon: ShoppingCart, label: 'Kasir (POS)' },
     { href: '/products', icon: Package, label: 'Produk' },
+    { href: '/discounts', icon: Tags, label: 'Diskon' },
     { href: '/categories', icon: Tags, label: 'Kategori' },
     { href: '/reports', icon: BarChart3, label: 'Laporan' },
     { href: '/settings', icon: Settings, label: 'Pengaturan' },

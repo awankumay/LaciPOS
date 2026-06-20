@@ -121,7 +121,12 @@
             </tr>
             <tr class="item-row">
                 <td class="text-left">{{ $item['quantity'] }}x</td>
-                <td class="text-left">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
+                <td class="text-left">
+                    Rp {{ number_format($item['price'], 0, ',', '.') }}
+                    @if(!empty($item['discount_amount']) && $item['discount_amount'] > 0)
+                        <br><small>- Rp {{ number_format($item['discount_amount'], 0, ',', '.') }}</small>
+                    @endif
+                </td>
                 <td class="text-right">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</td>
             </tr>
             @endforeach
@@ -135,6 +140,12 @@
                 <td class="text-left">Subtotal</td>
                 <td class="text-right">Rp {{ number_format($order['subtotal'], 0, ',', '.') }}</td>
             </tr>
+            @if(!empty($order['discount_amount']) && $order['discount_amount'] > 0)
+            <tr>
+                <td class="text-left">Diskon Trx @if(!empty($order['discount_note']))<br><small>{{ $order['discount_note'] }}</small>@endif</td>
+                <td class="text-right">- Rp {{ number_format($order['discount_amount'], 0, ',', '.') }}</td>
+            </tr>
+            @endif
             @if($order['tax_amount'] > 0)
             <tr>
                 <td class="text-left">Pajak @if($order['tax_type'] == 'percentage') ({{ rtrim(rtrim(number_format($order['tax_rate'], 2, ',', '.'), '0'), ',') }}%) @endif</td>

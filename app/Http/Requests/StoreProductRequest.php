@@ -10,14 +10,16 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'category_id' => ['required', 'ulid', 'exists:categories,id'],
-            'photo' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:1024'],
-            'cogs' => ['required', 'numeric', 'min:0'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
-            'min_stock_alert' => ['required', 'integer', 'min:0'],
-            'is_active' => ['boolean'],
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'discount_id' => 'nullable|exists:discounts,id',
+            'photo' => 'nullable|image|max:2048',
+            'cogs' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'min_stock_alert' => 'required|integer|min:0',
+            'is_active' => 'boolean',
+            'variants' => 'nullable|array',
         ];
     }
 

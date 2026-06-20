@@ -4,10 +4,11 @@ import { Label } from '@/Components/ui/label';
 import { MapPin, ArrowRight, ArrowLeft } from 'lucide-vue-next';
 
 const props = defineProps({
-    modelValue: { type: String, default: '' },
+    address: { type: String, default: '' },
+    timezone: { type: String, default: 'Asia/Jakarta' },
 });
 
-const emit = defineEmits(['update:modelValue', 'next', 'back']);
+const emit = defineEmits(['update:address', 'update:timezone', 'next', 'back']);
 </script>
 
 <template>
@@ -33,13 +34,32 @@ const emit = defineEmits(['update:modelValue', 'next', 'back']);
             </Label>
             <Input
                 id="address"
-                :model-value="modelValue"
-                @update:model-value="$emit('update:modelValue', $event)"
+                :model-value="address"
+                @update:model-value="$emit('update:address', $event)"
                 type="text"
                 placeholder="Contoh: Jl. Merdeka No. 123, Jakarta"
                 autofocus
                 class="h-11"
             />
+        </div>
+
+        <!-- Field Timezone -->
+        <div class="space-y-2">
+            <Label for="timezone" class="text-sm font-medium text-[#1c2d38]">
+                Zona Waktu <span class="text-red-500">*</span>
+            </Label>
+            <select
+                id="timezone"
+                :value="timezone"
+                @change="$emit('update:timezone', $event.target.value)"
+                required
+                class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white focus:border-[#00684a] focus:ring-4 focus:ring-[#00684a]/10 transition-all text-sm font-medium text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none"
+            >
+                <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
+                <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
+                <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
+            </select>
+            <p class="text-xs text-[#5c6c7a] mt-1">Zona waktu yang digunakan untuk seluruh fitur sistem.</p>
         </div>
 
         <!-- Navigation -->

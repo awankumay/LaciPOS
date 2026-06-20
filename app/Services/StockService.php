@@ -37,6 +37,14 @@ class StockService
 
                 $product->increment('stock', $item->quantity);
 
+                if ($item->snapshot_discount_type !== null && $product->discount_quota !== null) {
+                    $product->decrement('discount_quota_used', $item->quantity);
+                    if ($product->discount_quota_used < 0) {
+                        $product->discount_quota_used = 0;
+                        $product->save();
+                    }
+                }
+
                 StockLog::create([
                     'product_id' => $product->id,
                     'change' => $item->quantity,

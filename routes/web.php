@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -29,9 +31,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'onboarding'])->group(function () {
     // Route khusus owner
     Route::middleware('role:owner')->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
+        Route::resource('discounts', DiscountController::class)->except(['show']);
     
     // Product & Stock Routes
     Route::get('/products/{product}/stock', [App\Http\Controllers\StockController::class, 'index'])->name('stock.index');

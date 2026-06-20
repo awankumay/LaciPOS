@@ -105,7 +105,10 @@ onMounted(() => {
                                 <p class="font-medium text-slate-800">{{ item.product_name }}</p>
                                 <p v-if="item.variant_label" class="text-xs text-slate-500">{{ item.variant_label }}</p>
                                 <p v-if="item.notes" class="text-xs text-slate-400 italic mt-0.5">Catatan: {{ item.notes }}</p>
-                                <p class="text-xs text-slate-500 mt-0.5">{{ item.quantity }} x {{ formatRupiah(item.price) }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">
+                                    {{ item.quantity }} x <span :class="{ 'line-through': item.discount_amount > 0 }">{{ formatRupiah(item.price) }}</span>
+                                    <span v-if="item.discount_amount > 0" class="text-slate-700 ml-1 font-medium">{{ formatRupiah(item.price - item.discount_amount) }}</span>
+                                </p>
                             </div>
                             <p class="font-semibold text-slate-900">{{ formatRupiah(item.subtotal) }}</p>
                         </div>
@@ -117,6 +120,13 @@ onMounted(() => {
                     <div class="flex justify-between text-sm">
                         <span class="text-slate-500">Subtotal</span>
                         <span class="font-medium text-slate-900">{{ formatRupiah(order.subtotal) }}</span>
+                    </div>
+
+                    <div v-if="order.discount_amount > 0" class="flex justify-between text-sm">
+                        <span class="text-slate-500">
+                            Diskon Transaksi <span v-if="order.discount_note" class="block text-xs mt-0.5">{{ order.discount_note }}</span>
+                        </span>
+                        <span class="font-medium text-red-500">-{{ formatRupiah(order.discount_amount) }}</span>
                     </div>
 
                     <div v-if="order.tax_amount > 0" class="flex justify-between text-sm">

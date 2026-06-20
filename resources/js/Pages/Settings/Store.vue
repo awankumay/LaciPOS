@@ -6,7 +6,9 @@ import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
-import { UploadCloud, X } from 'lucide-vue-next';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
+import { UploadCloud, X, Check, ChevronsUpDown } from 'lucide-vue-next';
 
 const props = defineProps({
     profile: {
@@ -22,7 +24,15 @@ const form = useForm({
     logo: null,
     remove_logo: false,
     receipt_footer: props.profile?.receipt_footer || 'Terima kasih sudah berkunjung!',
+    timezone: props.profile?.timezone || 'Asia/Jakarta',
 });
+
+const openTimezoneBox = ref(false);
+const timezones = [
+    { value: 'Asia/Jakarta', label: 'Asia/Jakarta (WIB)' },
+    { value: 'Asia/Makassar', label: 'Asia/Makassar (WITA)' },
+    { value: 'Asia/Jayapura', label: 'Asia/Jayapura (WIT)' }
+];
 
 const logoPreviewUrl = ref(props.profile?.logo_url || null);
 
@@ -90,6 +100,48 @@ const submit = () => {
                         class="h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10 px-4"
                     />
                     <p v-if="form.errors.phone" class="text-sm text-red-500">{{ form.errors.phone }}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Zona Waktu <span class="text-red-500">*</span></label>
+                    <Popover v-model:open="openTimezoneBox">
+                        <PopoverTrigger as-child>
+                            <button
+                                type="button"
+                                role="combobox"
+                                :aria-expanded="openTimezoneBox"
+                                class="flex items-center justify-between h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                            >
+                                <span class="truncate">{{ form.timezone ? timezones.find(tz => tz.value === form.timezone)?.label : 'Pilih Zona Waktu' }}</span>
+                                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                            </button>
+                        </PopoverTrigger>
+                        <PopoverContent class="w-full sm:w-[400px] p-0 bg-white" align="start">
+                            <Command>
+                                <CommandList>
+                                    <CommandGroup>
+                                        <CommandItem
+                                            v-for="tz in timezones"
+                                            :key="tz.value"
+                                            :value="tz.label"
+                                            @select="() => {
+                                                form.timezone = tz.value;
+                                                openTimezoneBox = false;
+                                            }"
+                                            class="text-sm cursor-pointer"
+                                        >
+                                            {{ tz.label }}
+                                            <Check
+                                                :class="['ml-auto h-4 w-4', form.timezone === tz.value ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                            />
+                                        </CommandItem>
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <p class="text-xs text-gray-500 mt-1">Zona waktu yang digunakan untuk seluruh fitur sistem (termasuk jam tayang diskon produk).</p>
+                    <p v-if="form.errors.timezone" class="text-sm text-red-500">{{ form.errors.timezone }}</p>
                 </div>
 
                 <div class="space-y-2">

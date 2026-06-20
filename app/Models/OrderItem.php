@@ -14,6 +14,7 @@ class OrderItem extends Model
         'order_id', 'product_id', 'product_name_snapshot',
         'snapshot_cogs', 'snapshot_price', 'variant_label',
         'quantity', 'subtotal', 'notes',
+        'snapshot_discount_type', 'snapshot_discount_value', 'snapshot_discount_amount',
     ];
 
     protected function casts(): array
@@ -23,6 +24,8 @@ class OrderItem extends Model
             'snapshot_price' => 'decimal:2',
             'subtotal' => 'decimal:2',
             'quantity' => 'integer',
+            'snapshot_discount_value' => 'decimal:2',
+            'snapshot_discount_amount' => 'decimal:2',
         ];
     }
 

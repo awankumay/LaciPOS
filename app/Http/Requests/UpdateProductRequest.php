@@ -12,6 +12,7 @@ class UpdateProductRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'ulid', 'exists:categories,id'],
+            'discount_id' => ['nullable', 'ulid', 'exists:discounts,id'],
             'photo' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:1024'],
             'remove_photo' => ['boolean'],
             'cogs' => ['required', 'numeric', 'min:0'],

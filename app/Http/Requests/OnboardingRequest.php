@@ -15,6 +15,7 @@ class OnboardingRequest extends FormRequest
     {
         return [
             'store_name' => ['required', 'string', 'max:255'],
+            'timezone' => ['required', 'string', 'timezone'],
             'address' => ['nullable', 'string', 'max:500'],
             'phone' => ['nullable', 'string', 'max:20'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],

@@ -20,6 +20,7 @@ class SettingsController extends Controller
                 'phone' => $profile->phone,
                 'logo_url' => $profile->logo_url,
                 'receipt_footer' => $profile->receipt_footer,
+                'timezone' => $profile->timezone,
             ] : null,
         ]);
     }
@@ -31,6 +32,7 @@ class SettingsController extends Controller
             'address' => $request->validated('address'),
             'phone' => $request->validated('phone'),
             'receipt_footer' => $request->validated('receipt_footer'),
+            'timezone' => $request->validated('timezone'),
         ];
 
         if ($request->hasFile('logo')) {

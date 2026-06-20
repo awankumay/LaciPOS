@@ -28,10 +28,51 @@ class OrderController extends Controller
             if ($product->stock < $quantity) {
                 return back()->with('error', "Stok produk '{$product->name}' tidak mencukupi. Sisa stok: {$product->stock}.");
             }
+            
+            // Cek kuota diskon: hanya hitung kuantitas item yang meminta diskon
+            $discountedQuantity = collect($items)
+                ->where('productId', $productId)
+                ->filter(function ($item) {
+                    return !empty($item['discount_type']);
+                })
+                ->sum('quantity');
+
+            if ($discountedQuantity > 0) {
+                if ($product->discount && $product->discount->quota !== null) {
+                    $remainingQuota = max(0, $product->discount->quota - $product->discount->quota_used);
+                    if ($discountedQuantity > $remainingQuota) {
+                        return back()->with('error', "Pembelian {$product->name} dengan diskon gagal. Sisa kuota diskon hanya {$remainingQuota} item.");
+                    }
+                }
+            }
         }
 
-        // Hitung total
-        $subtotal = collect($items)->sum(fn ($item) => $item['price'] * $item['quantity']);
+        // Hitung total dengan memperhitungkan diskon per item
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $price = $item['price'];
+            $itemDiscountAmount = 0;
+            if (!empty($item['discount_type']) && !empty($item['discount_value'])) {
+                if ($item['discount_type'] === 'percentage') {
+                    $itemDiscountAmount = $price * ($item['discount_value'] / 100);
+                } else {
+                    $itemDiscountAmount = $item['discount_value'];
+                }
+            }
+            $subtotal += ($price - $itemDiscountAmount) * $item['quantity'];
+        }
+
+        // Hitung Diskon Keranjang
+        $cartDiscountAmount = 0;
+        if (!empty($validated['discount_type']) && !empty($validated['discount_value'])) {
+            if ($validated['discount_type'] === 'percentage') {
+                $cartDiscountAmount = $subtotal * ($validated['discount_value'] / 100);
+            } else {
+                $cartDiscountAmount = $validated['discount_value'];
+            }
+        }
+        
+        $subtotalAfterCartDiscount = max(0, $subtotal - $cartDiscountAmount);
 
         $storeProfile = \App\Models\StoreProfile::getProfile();
 
@@ -42,7 +83,7 @@ class OrderController extends Controller
             $taxRate = $storeProfile->tax_value;
             $taxType = $storeProfile->tax_type;
             if ($taxType === 'percentage') {
-                $taxAmount = $subtotal * ($taxRate / 100);
+                $taxAmount = $subtotalAfterCartDiscount * ($taxRate / 100);
             } else {
                 $taxAmount = $taxRate;
             }
@@ -55,13 +96,13 @@ class OrderController extends Controller
             $serviceChargeRate = $storeProfile->service_charge_value;
             $serviceChargeType = $storeProfile->service_charge_type;
             if ($serviceChargeType === 'percentage') {
-                $serviceChargeAmount = $subtotal * ($serviceChargeRate / 100);
+                $serviceChargeAmount = $subtotalAfterCartDiscount * ($serviceChargeRate / 100);
             } else {
                 $serviceChargeAmount = $serviceChargeRate;
             }
         }
 
-        $totalAmount = $subtotal + $taxAmount + $serviceChargeAmount;
+        $totalAmount = round($subtotalAfterCartDiscount + $taxAmount + $serviceChargeAmount);
 
         // Validasi uang cukup untuk cash
         if ($validated['payment_method'] === 'cash') {
@@ -70,7 +111,7 @@ class OrderController extends Controller
             }
         }
 
-        $order = DB::transaction(function () use ($validated, $items, $subtotal, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $request) {
+        $order = DB::transaction(function () use ($validated, $items, $subtotal, $cartDiscountAmount, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $request) {
             // Buat order
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
@@ -79,6 +120,10 @@ class OrderController extends Controller
                 'payment_method' => $validated['payment_method'],
                 'payment_provider' => $validated['payment_provider'] ?? null,
                 'subtotal' => $subtotal,
+                'discount_type' => $validated['discount_type'] ?? null,
+                'discount_value' => $validated['discount_value'] ?? null,
+                'discount_amount' => $cartDiscountAmount,
+                'discount_note' => $validated['discount_note'] ?? null,
                 'tax_rate' => $taxRate,
                 'tax_type' => $taxType,
                 'tax_amount' => $taxAmount,
@@ -91,8 +136,23 @@ class OrderController extends Controller
                     ? ($validated['cash_received'] - $totalAmount) : null,
             ]);
 
-            // Buat order items dengan PRICE SNAPSHOT
+            // Buat order items dengan PRICE SNAPSHOT dan potong kuota diskon
             foreach ($items as $item) {
+                $itemDiscountAmount = 0;
+                if (!empty($item['discount_type']) && !empty($item['discount_value'])) {
+                    if ($item['discount_type'] === 'percentage') {
+                        $itemDiscountAmount = $item['price'] * ($item['discount_value'] / 100);
+                    } else {
+                        $itemDiscountAmount = $item['discount_value'];
+                    }
+                    
+                    // Potong kuota diskon pada master diskon
+                    $product = \App\Models\Product::with('discount')->find($item['productId']);
+                    if ($product && $product->discount && $product->discount->quota !== null) {
+                        $product->discount->increment('quota_used', $item['quantity']);
+                    }
+                }
+
                 $order->items()->create([
                     'product_id' => $item['productId'],
                     'product_name_snapshot' => $item['productName'],
@@ -100,7 +160,10 @@ class OrderController extends Controller
                     'snapshot_price' => $item['price'],
                     'variant_label' => $item['variantLabel'] ?? null,
                     'quantity' => $item['quantity'],
-                    'subtotal' => $item['price'] * $item['quantity'],
+                    'snapshot_discount_type' => $item['discount_type'] ?? null,
+                    'snapshot_discount_value' => $item['discount_value'] ?? null,
+                    'snapshot_discount_amount' => $itemDiscountAmount,
+                    'subtotal' => ($item['price'] - $itemDiscountAmount) * $item['quantity'],
                     'notes' => $item['notes'] ?? null,
                 ]);
             }
@@ -141,6 +204,10 @@ class OrderController extends Controller
                 'service_charge_type' => $order->service_charge_type,
                 'service_charge_rate' => $order->service_charge_rate,
                 'service_charge_amount' => $order->service_charge_amount,
+                'discount_type' => $order->discount_type,
+                'discount_value' => $order->discount_value,
+                'discount_amount' => $order->discount_amount,
+                'discount_note' => $order->discount_note,
                 'total_amount' => $order->total_amount,
                 'cash_received' => $order->cash_received,
                 'change_amount' => $order->change_amount,
@@ -151,6 +218,7 @@ class OrderController extends Controller
                     'variant_label' => $item->variant_label,
                     'quantity' => $item->quantity,
                     'price' => $item->snapshot_price,
+                    'discount_amount' => $item->snapshot_discount_amount,
                     'subtotal' => $item->subtotal,
                     'notes' => $item->notes,
                 ]),

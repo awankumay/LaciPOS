@@ -9,7 +9,7 @@ class POSController extends Controller
 {
     public function index()
     {
-        $products = Product::with('variants.options')
+        $products = Product::with(['variants.options', 'discount'])
             ->active()
             ->orderBy('name')
             ->get()
@@ -21,6 +21,11 @@ class POSController extends Controller
                 'stock' => $p->stock,
                 'photo_url' => $p->photo_url,
                 'category_id' => $p->category_id,
+                'is_discount_active' => $p->is_discount_active,
+                'discount_type' => $p->discount ? $p->discount->discount_type : null,
+                'discount_value' => $p->discount ? $p->discount->discount_value : null,
+                'discount_quota_remaining' => $p->discount && $p->discount->quota !== null ? max(0, $p->discount->quota - $p->discount->quota_used) : null,
+                'calculated_discount_amount' => $p->calculated_discount_amount,
                 'has_variants' => $p->variants->isNotEmpty(),
                 'variants' => $p->variants->map(fn ($v) => [
                     'id' => $v->id,
