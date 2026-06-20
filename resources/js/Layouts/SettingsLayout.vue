@@ -12,6 +12,7 @@ const navItems = [
     { name: 'Informasi Toko', url: '/settings/store' },
     { name: 'Printer', url: '/settings/printer' },
     { name: 'Manajemen Kasir', url: '/settings/cashiers' },
+    { name: 'Pajak & Layanan', url: '/settings/taxes' },
     { name: 'Stok', url: '/settings/inventory' },
     { name: 'Backup Database', url: '/settings/backup' },
 ];

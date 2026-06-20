@@ -51,115 +51,118 @@ const submit = () => {
 
 <template>
     <SettingsLayout title="Informasi Toko">
-        <div class="flex items-center justify-between space-y-2">
-            <h2 class="text-2xl font-bold tracking-tight text-[#001e2b]">Informasi Toko</h2>
-        </div>
-
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card class="col-span-2">
-                    <form @submit.prevent="submit">
-                        <CardHeader>
-                            <CardTitle>Profil Toko</CardTitle>
-                            <CardDescription>
-                                Informasi detail mengenai toko Anda yang akan muncul di struk transaksi.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent class="space-y-6">
-                            <div class="space-y-2">
-                                <Label for="store_name">Nama Toko <span class="text-destructive">*</span></Label>
-                                <Input
-                                    id="store_name"
-                                    v-model="form.store_name"
-                                    placeholder="Contoh: Toko Maju Jaya"
-                                    required
-                                />
-                                <p v-if="form.errors.store_name" class="text-sm text-destructive">{{ form.errors.store_name }}</p>
-                            </div>
-
-                            <div class="space-y-2">
-                                <Label for="address">Alamat Lengkap</Label>
-                                <Input
-                                    id="address"
-                                    v-model="form.address"
-                                    placeholder="Contoh: Jl. Merdeka No. 123, Jakarta"
-                                />
-                                <p v-if="form.errors.address" class="text-sm text-destructive">{{ form.errors.address }}</p>
-                            </div>
-
-                            <div class="space-y-2">
-                                <Label for="phone">Nomor Telepon</Label>
-                                <Input
-                                    id="phone"
-                                    v-model="form.phone"
-                                    placeholder="Contoh: 081234567890"
-                                />
-                                <p v-if="form.errors.phone" class="text-sm text-destructive">{{ form.errors.phone }}</p>
-                            </div>
-
-                            <div class="space-y-2">
-                                <Label>Logo Toko</Label>
-                                <div class="mt-2 flex items-center gap-6">
-                                    <!-- Preview area -->
-                                    <div class="relative shrink-0">
-                                        <div
-                                            class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-[#c1ccd6] bg-[#f8fafc]"
-                                        >
-                                            <img
-                                                v-if="logoPreviewUrl"
-                                                :src="logoPreviewUrl"
-                                                class="h-full w-full object-cover"
-                                                alt="Logo Toko"
-                                            />
-                                            <UploadCloud v-else class="h-8 w-8 text-[#a8b3bc]" />
-                                        </div>
-
-                                        <button
-                                            v-if="logoPreviewUrl"
-                                            type="button"
-                                            @click="removeLogo"
-                                            class="absolute -right-2 -top-2 rounded-full bg-white p-1 text-[#ff3b3b] shadow-sm hover:bg-[#fff0f0] border border-[#ff3b3b] z-10"
-                                        >
-                                            <X class="h-4 w-4" />
-                                        </button>
-                                    </div>
-
-                                    <!-- Upload button -->
-                                    <div>
-                                        <label
-                                            class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#c1ccd6] bg-white px-5 py-2.5 text-sm font-semibold text-[#3d4f5b] transition-colors hover:border-[#001e2b] hover:text-[#001e2b]"
-                                        >
-                                            <UploadCloud class="h-4 w-4" />
-                                            <span>Pilih Foto</span>
-                                            <input
-                                                type="file"
-                                                accept="image/png, image/jpeg, image/jpg"
-                                                class="hidden"
-                                                @change="handleLogoChange"
-                                            />
-                                        </label>
-                                        <p class="mt-2 text-xs text-[#7c8c9a]">
-                                            Format .PNG atau .JPG, maks. 2MB.
-                                        </p>
-                                    </div>
-                                </div>
-                                <p v-if="form.errors.logo" class="text-sm text-destructive">{{ form.errors.logo }}</p>
-                            </div>
-
-                            <div class="space-y-2">
-                                <Label for="receipt_footer">Pesan Footer Struk</Label>
-                                <Input
-                                    id="receipt_footer"
-                                    v-model="form.receipt_footer"
-                                    placeholder="Contoh: Terima kasih sudah berkunjung!"
-                                />
-                                <p v-if="form.errors.receipt_footer" class="text-sm text-destructive">{{ form.errors.receipt_footer }}</p>
-                            </div>
-                        </CardContent>
-                        <CardFooter class="flex justify-end">
-                            <Button type="submit" :disabled="form.processing" class="bg-[#001e2b] text-white hover:bg-[#1c2d38]">Simpan Perubahan</Button>
-                        </CardFooter>
-                    </form>
-                </Card>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-900">Informasi Toko</h2>
+                <p class="text-sm text-gray-500 mt-1">Informasi detail mengenai toko Anda yang akan muncul di struk transaksi.</p>
             </div>
+
+            <form @submit.prevent="submit" class="p-6 space-y-6">
+                <div class="space-y-2">
+                    <label for="store_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Toko <span class="text-red-500">*</span></label>
+                    <input
+                        id="store_name"
+                        v-model="form.store_name"
+                        placeholder="Contoh: Toko Maju Jaya"
+                        required
+                        class="h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10 px-4"
+                    />
+                    <p v-if="form.errors.store_name" class="text-sm text-red-500">{{ form.errors.store_name }}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
+                    <input
+                        id="address"
+                        v-model="form.address"
+                        placeholder="Contoh: Jl. Merdeka No. 123, Jakarta"
+                        class="h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10 px-4"
+                    />
+                    <p v-if="form.errors.address" class="text-sm text-red-500">{{ form.errors.address }}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
+                    <input
+                        id="phone"
+                        v-model="form.phone"
+                        placeholder="Contoh: 081234567890"
+                        class="h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10 px-4"
+                    />
+                    <p v-if="form.errors.phone" class="text-sm text-red-500">{{ form.errors.phone }}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Logo Toko</label>
+                    <div class="mt-2 flex items-center gap-6">
+                        <!-- Preview area -->
+                        <div class="relative shrink-0">
+                            <div
+                                class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-[#c1ccd6] bg-[#f8fafc]"
+                            >
+                                <img
+                                    v-if="logoPreviewUrl"
+                                    :src="logoPreviewUrl"
+                                    class="h-full w-full object-cover"
+                                    alt="Logo Toko"
+                                />
+                                <UploadCloud v-else class="h-8 w-8 text-[#a8b3bc]" />
+                            </div>
+
+                            <button
+                                v-if="logoPreviewUrl"
+                                type="button"
+                                @click="removeLogo"
+                                class="absolute -right-2 -top-2 rounded-full bg-white p-1 text-[#ff3b3b] shadow-sm hover:bg-[#fff0f0] border border-[#ff3b3b] z-10"
+                            >
+                                <X class="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        <!-- Upload button -->
+                        <div>
+                            <label
+                                class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#c1ccd6] bg-white px-5 py-2.5 text-sm font-semibold text-[#3d4f5b] transition-colors hover:border-[#001e2b] hover:text-[#001e2b]"
+                            >
+                                <UploadCloud class="h-4 w-4" />
+                                <span>Pilih Foto</span>
+                                <input
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/jpg"
+                                    class="hidden"
+                                    @change="handleLogoChange"
+                                />
+                            </label>
+                            <p class="mt-2 text-xs text-[#7c8c9a]">
+                                Format .PNG atau .JPG, maks. 2MB.
+                            </p>
+                        </div>
+                    </div>
+                    <p v-if="form.errors.logo" class="text-sm text-red-500">{{ form.errors.logo }}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="receipt_footer" class="block text-sm font-medium text-gray-700 mb-1">Pesan Footer Struk</label>
+                    <input
+                        id="receipt_footer"
+                        v-model="form.receipt_footer"
+                        placeholder="Contoh: Terima kasih sudah berkunjung!"
+                        class="h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10 px-4"
+                    />
+                    <p v-if="form.errors.receipt_footer" class="text-sm text-red-500">{{ form.errors.receipt_footer }}</p>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 flex justify-end">
+                    <button 
+                        type="submit" 
+                        class="px-6 py-2 bg-[#001e2b] text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="form.processing"
+                    >
+                        <span v-if="form.processing" class="mr-2">Menyimpan...</span>
+                        <span v-else>Simpan Perubahan</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </SettingsLayout>
 </template>
