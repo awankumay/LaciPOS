@@ -39,6 +39,9 @@ class ReceiptService
                 'total' => $order->total_amount,
                 'cash_received' => $order->cash_received,
                 'change' => $order->change_amount,
+                'customer_name' => $order->customer_name,
+                'table_number' => $order->table_number,
+                'notes' => $order->notes,
             ],
             'items' => $order->items->map(fn ($item) => [
                 'name' => $item->product_name_snapshot,

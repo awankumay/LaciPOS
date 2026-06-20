@@ -9,7 +9,7 @@ defineProps({
 const page = usePage();
 
 const navItems = [
-    { name: 'Informasi Toko', url: '/settings/store' },
+    { name: 'Informasi Umum', url: '/settings/store' },
     { name: 'Printer', url: '/settings/printer' },
     { name: 'Manajemen Kasir', url: '/settings/cashiers' },
     { name: 'Pajak & Layanan', url: '/settings/taxes' },

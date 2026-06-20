@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import { Dialog, DialogContent } from '@/Components/ui/dialog';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
 import { Banknote, CreditCard, Smartphone, X, CheckCircle2 } from 'lucide-vue-next';
@@ -13,9 +14,19 @@ const props = defineProps({
 const emit = defineEmits(['close', 'confirm-payment']);
 const { formatRupiah } = useFormatCurrency();
 
+const page = usePage();
+const storeSettings = computed(() => page.props.storeSettings || {});
+const enableCustomerName = computed(() => storeSettings.value.enable_customer_name || false);
+const enableTableNumber = computed(() => storeSettings.value.enable_table_number || false);
+const enableOrderNotes = computed(() => storeSettings.value.enable_order_notes || false);
+
 const paymentMethod = ref(null);
 const paymentProvider = ref('');
 const cashReceived = ref(0);
+
+const customerName = ref('');
+const tableNumber = ref('');
+const orderNotes = ref('');
 
 const BANK_PROVIDERS = ['BCA', 'Mandiri', 'BNI', 'BRI', 'BSI', 'Lainnya'];
 const EWALLET_PROVIDERS = ['GoPay', 'OVO', 'DANA', 'ShopeePay', 'LinkAja', 'Lainnya'];
@@ -25,6 +36,9 @@ watch(() => props.open, (isOpen) => {
         paymentMethod.value = null;
         paymentProvider.value = '';
         cashReceived.value = 0;
+        customerName.value = '';
+        tableNumber.value = '';
+        orderNotes.value = '';
     }
 });
 
@@ -34,6 +48,10 @@ const selectMethod = (method) => {
 };
 
 const canConfirm = computed(() => {
+    if (enableCustomerName.value && !customerName.value.trim()) return false;
+    if (enableTableNumber.value && !tableNumber.value.trim()) return false;
+    // Notes is optional even if enabled
+
     if (!paymentMethod.value) return false;
     if (paymentMethod.value === 'bank_transfer' || paymentMethod.value === 'e_wallet') {
         return paymentProvider.value.length > 0;
@@ -51,6 +69,9 @@ const handleConfirm = () => {
         payment_provider: paymentMethod.value === 'cash' ? null : paymentProvider.value,
         cash_received: paymentMethod.value === 'cash' ? cashReceived.value : null,
         change_amount: paymentMethod.value === 'cash' ? (cashReceived.value - props.total) : null,
+        customer_name: enableCustomerName.value ? customerName.value.trim() : null,
+        table_number: enableTableNumber.value ? tableNumber.value.trim() : null,
+        notes: enableOrderNotes.value ? orderNotes.value.trim() : null,
     });
     emit('close');
 };
@@ -72,6 +93,25 @@ const handleConfirm = () => {
 
             <!-- Body -->
             <div class="payment-modal__body">
+                
+                <!-- Customer Info Section -->
+                <div v-if="enableCustomerName || enableTableNumber || enableOrderNotes" class="payment-detail-panel" style="animation: none;">
+                    <div v-if="enableCustomerName">
+                        <label class="detail-label block mb-1">Nama Pemesan <span class="text-red-500">*</span></label>
+                        <input type="text" v-model="customerName" placeholder="Contoh: Budi" class="detail-input w-full" />
+                    </div>
+                    
+                    <div v-if="enableTableNumber">
+                        <label class="detail-label block mb-1">Nomor Meja <span class="text-red-500">*</span></label>
+                        <input type="text" v-model="tableNumber" placeholder="Contoh: Meja 4" class="detail-input w-full" />
+                    </div>
+                    
+                    <div v-if="enableOrderNotes">
+                        <label class="detail-label block mb-1">Catatan</label>
+                        <textarea v-model="orderNotes" placeholder="Contoh: Tolong dibungkus" rows="2" class="detail-input w-full resize-none"></textarea>
+                    </div>
+                </div>
+
                 <!-- Method Selector -->
                 <div class="payment-section">
                     <p class="payment-section__label">Metode Pembayaran</p>
@@ -169,6 +209,9 @@ const handleConfirm = () => {
     border: none !important;
     max-width: 420px !important;
     box-shadow: 0 16px 48px rgba(0, 30, 43, 0.16) !important;
+    max-height: 90vh !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 /* ── Header ── */
@@ -179,6 +222,7 @@ const handleConfirm = () => {
     padding: 24px;
     background: #001e2b;
     color: #ffffff;
+    flex-shrink: 0;
 }
 
 .payment-modal__header-label {
@@ -231,6 +275,8 @@ const handleConfirm = () => {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .payment-section__label {
@@ -305,7 +351,7 @@ const handleConfirm = () => {
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     animation: panelIn 0.18s ease;
 }
 
@@ -322,24 +368,29 @@ const handleConfirm = () => {
     letter-spacing: 0.6px;
 }
 
+.detail-input,
 .detail-select {
     width: 100%;
-    height: 44px;
-    padding: 0 12px;
+    padding: 10px 12px;
     border: 1.5px solid #c1ccd6;
     border-radius: 10px;
     font-size: 14px;
     color: #001e2b;
     background: #ffffff;
     outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.detail-select {
+    height: 44px;
     cursor: pointer;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c8c9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.detail-input:focus,
 .detail-select:focus {
     border-color: #00684a;
     box-shadow: 0 0 0 3px rgba(0, 104, 74, 0.1);
@@ -350,9 +401,10 @@ const handleConfirm = () => {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 10px;
-    padding: 24px;
+    padding: 20px 24px;
     background: #ffffff;
     border-top: 1px solid #eceff1;
+    flex-shrink: 0;
 }
 
 .footer-btn {

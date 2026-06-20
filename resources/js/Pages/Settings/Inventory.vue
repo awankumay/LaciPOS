@@ -28,13 +28,14 @@ const submit = () => {
 
 <template>
     <SettingsLayout title="Pengaturan Stok">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">Stok Minimum Global</h2>
-                <p class="text-sm text-gray-500 mt-1">Atur nilai default untuk peringatan stok menipis. Nilai ini akan otomatis digunakan saat Anda menambahkan produk baru.</p>
-            </div>
+        <form @submit.prevent="submit" class="space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h2 class="text-lg font-semibold text-gray-900">Stok Minimum Global</h2>
+                    <p class="text-sm text-gray-500 mt-1">Atur nilai default untuk peringatan stok menipis. Nilai ini akan otomatis digunakan saat Anda menambahkan produk baru.</p>
+                </div>
 
-            <form @submit.prevent="submit" class="p-6 space-y-6">
+                <div class="p-6 space-y-6">
                 <div class="space-y-2">
                     <label for="default_min_stock" class="block text-sm font-medium text-gray-700 mb-1">Minimum Stok Alert</label>
                     <input
@@ -49,17 +50,19 @@ const submit = () => {
                     <p v-if="form.errors.default_min_stock" class="text-sm text-red-500">{{ form.errors.default_min_stock }}</p>
                 </div>
 
-                <div class="pt-4 border-t border-gray-100 flex justify-end">
-                    <button 
-                        type="submit" 
-                        class="px-6 py-2 bg-[#001e2b] text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="form.processing"
-                    >
-                        <span v-if="form.processing" class="mr-2">Menyimpan...</span>
-                        <span v-else>Simpan Pengaturan</span>
-                    </button>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button 
+                    type="submit" 
+                    class="px-6 py-2 bg-[#001e2b] text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="form.processing"
+                >
+                    <span v-if="form.processing" class="mr-2">Menyimpan...</span>
+                    <span v-else>Simpan Perubahan</span>
+                </button>
+            </div>
+        </form>
     </SettingsLayout>
 </template>

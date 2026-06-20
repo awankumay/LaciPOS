@@ -20,6 +20,9 @@ class OnboardingRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
             'receipt_footer' => ['nullable', 'string', 'max:255'],
+            'enable_customer_name' => ['boolean'],
+            'enable_table_number' => ['boolean'],
+            'enable_order_notes' => ['boolean'],
         ];
     }
 

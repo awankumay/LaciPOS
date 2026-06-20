@@ -21,6 +21,9 @@ class SettingsController extends Controller
                 'logo_url' => $profile->logo_url,
                 'receipt_footer' => $profile->receipt_footer,
                 'timezone' => $profile->timezone,
+                'enable_customer_name' => (bool) $profile->enable_customer_name,
+                'enable_table_number' => (bool) $profile->enable_table_number,
+                'enable_order_notes' => (bool) $profile->enable_order_notes,
             ] : null,
         ]);
     }
@@ -33,6 +36,9 @@ class SettingsController extends Controller
             'phone' => $request->validated('phone'),
             'receipt_footer' => $request->validated('receipt_footer'),
             'timezone' => $request->validated('timezone'),
+            'enable_customer_name' => $request->boolean('enable_customer_name'),
+            'enable_table_number' => $request->boolean('enable_table_number'),
+            'enable_order_notes' => $request->boolean('enable_order_notes'),
         ];
 
         if ($request->hasFile('logo')) {

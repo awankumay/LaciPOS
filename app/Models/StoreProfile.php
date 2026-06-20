@@ -26,6 +26,9 @@ class StoreProfile extends Model
         'service_charge_enabled',
         'service_charge_type',
         'service_charge_value',
+        'enable_customer_name',
+        'enable_table_number',
+        'enable_order_notes',
     ];
 
     protected function casts(): array
@@ -36,6 +39,9 @@ class StoreProfile extends Model
             'tax_value' => 'decimal:2',
             'service_charge_enabled' => 'boolean',
             'service_charge_value' => 'decimal:2',
+            'enable_customer_name' => 'boolean',
+            'enable_table_number' => 'boolean',
+            'enable_order_notes' => 'boolean',
         ];
     }
 

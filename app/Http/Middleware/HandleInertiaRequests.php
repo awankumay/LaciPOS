@@ -62,6 +62,9 @@ class HandleInertiaRequests extends Middleware
                     'service_charge_enabled' => $profile->service_charge_enabled,
                     'service_charge_type' => $profile->service_charge_type,
                     'service_charge_value' => $profile->service_charge_value,
+                    'enable_customer_name' => $profile->enable_customer_name,
+                    'enable_table_number' => $profile->enable_table_number,
+                    'enable_order_notes' => $profile->enable_order_notes,
                 ] : null;
             },
         ];

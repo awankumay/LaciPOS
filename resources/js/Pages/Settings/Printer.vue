@@ -55,13 +55,14 @@ const testPrint = () => {
 
 <template>
     <SettingsLayout title="Pengaturan Printer">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">Pengaturan Printer</h2>
-                <p class="text-sm text-gray-500 mt-1">Konfigurasi printer thermal untuk mencetak struk transaksi.</p>
-            </div>
+        <form @submit.prevent="submit" class="space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h2 class="text-lg font-semibold text-gray-900">Pengaturan Printer</h2>
+                    <p class="text-sm text-gray-500 mt-1">Konfigurasi printer thermal untuk mencetak struk transaksi.</p>
+                </div>
 
-            <form @submit.prevent="submit" class="p-6 space-y-6">
+                <div class="p-6 space-y-6">
                 <div class="space-y-2">
                     <label for="printer_name" class="block text-sm font-medium text-gray-700 mb-1">Pilih Printer</label>
                     <div class="flex gap-2 items-center">
@@ -168,20 +169,22 @@ const testPrint = () => {
                     </div>
                 </div>
 
-                <div class="pt-4 border-t border-gray-100 flex justify-between">
-                    <button type="button" @click="testPrint" :disabled="isTesting" class="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm flex items-center disabled:opacity-50">
-                        {{ isTesting ? 'Mencetak...' : 'Test Print' }}
-                    </button>
-                    <button 
-                        type="submit" 
-                        class="px-6 py-2 bg-[#001e2b] text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="form.processing"
-                    >
-                        <span v-if="form.processing" class="mr-2">Menyimpan...</span>
-                        <span v-else>Simpan Pengaturan</span>
-                    </button>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <button type="button" @click="testPrint" :disabled="isTesting" class="px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm flex items-center disabled:opacity-50">
+                    {{ isTesting ? 'Mencetak...' : 'Test Print' }}
+                </button>
+                <button 
+                    type="submit" 
+                    class="px-6 py-2 bg-[#001e2b] text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="form.processing"
+                >
+                    <span v-if="form.processing" class="mr-2">Menyimpan...</span>
+                    <span v-else>Simpan Perubahan</span>
+                </button>
+            </div>
+        </form>
     </SettingsLayout>
 </template>

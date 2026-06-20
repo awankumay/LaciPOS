@@ -15,6 +15,7 @@ class Order extends Model
         'service_charge_rate', 'service_charge_type', 'service_charge_amount',
         'discount_type', 'discount_value', 'discount_amount', 'discount_note',
         'total_amount', 'cash_received', 'change_amount', 'notes',
+        'customer_name', 'table_number',
     ];
 
     protected function casts(): array

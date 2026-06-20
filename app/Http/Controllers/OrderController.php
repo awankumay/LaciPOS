@@ -134,6 +134,9 @@ class OrderController extends Controller
                 'cash_received' => $validated['cash_received'] ?? null,
                 'change_amount' => $validated['payment_method'] === 'cash'
                     ? ($validated['cash_received'] - $totalAmount) : null,
+                'customer_name' => $validated['customer_name'] ?? null,
+                'table_number' => $validated['table_number'] ?? null,
+                'notes' => $validated['notes'] ?? null,
             ]);
 
             // Buat order items dengan PRICE SNAPSHOT dan potong kuota diskon

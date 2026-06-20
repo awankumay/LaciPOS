@@ -117,6 +117,23 @@ onMounted(() => {
 
                 <!-- Payment Summary -->
                 <div class="bg-slate-50 rounded-xl p-4 space-y-3 border border-slate-100">
+                    <div v-if="order.customer_name" class="flex justify-between text-sm">
+                        <span class="text-slate-500">Nama Pemesan</span>
+                        <span class="font-medium text-slate-900">{{ order.customer_name }}</span>
+                    </div>
+
+                    <div v-if="order.table_number" class="flex justify-between text-sm">
+                        <span class="text-slate-500">Nomor Meja</span>
+                        <span class="font-medium text-slate-900">{{ order.table_number }}</span>
+                    </div>
+
+                    <div v-if="order.notes" class="flex justify-between text-sm">
+                        <span class="text-slate-500">Catatan</span>
+                        <span class="font-medium text-slate-900 max-w-[200px] text-right">{{ order.notes }}</span>
+                    </div>
+
+                    <div v-if="order.customer_name || order.table_number || order.notes" class="border-t border-slate-200 mt-2 mb-2"></div>
+
                     <div class="flex justify-between text-sm">
                         <span class="text-slate-500">Subtotal</span>
                         <span class="font-medium text-slate-900">{{ formatRupiah(order.subtotal) }}</span>

@@ -104,6 +104,16 @@
             <tr>
                 <td class="text-left">Kasir: {{ $order['cashier'] }}</td>
             </tr>
+            @if(!empty($order['customer_name']))
+            <tr>
+                <td class="text-left">Pemesan: {{ $order['customer_name'] }}</td>
+            </tr>
+            @endif
+            @if(!empty($order['table_number']))
+            <tr>
+                <td class="text-left">Meja: {{ $order['table_number'] }}</td>
+            </tr>
+            @endif
         </table>
     </div>
 
@@ -132,6 +142,14 @@
             @endforeach
         </table>
     </div>
+
+    @if(!empty($order['notes']))
+    <!-- Order Notes -->
+    <div class="mb-2 border-bottom">
+        <div class="text-left font-bold mb-1">Catatan Pesanan:</div>
+        <div class="text-left mb-1">{{ $order['notes'] }}</div>
+    </div>
+    @endif
 
     <!-- Totals -->
     <div class="mb-2 border-bottom totals">

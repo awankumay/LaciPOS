@@ -130,6 +130,20 @@ const getStatusColor = (statusText) => {
                     <h2 class="text-sm font-semibold text-[#001e2b] mb-4">Ringkasan Pembayaran</h2>
                     
                     <dl class="space-y-3 text-sm">
+                        <div v-if="order.customer_name" class="flex justify-between">
+                            <dt class="text-[#7c8c9a]">Nama Pemesan</dt>
+                            <dd class="font-medium text-[#001e2b] text-right">{{ order.customer_name }}</dd>
+                        </div>
+                        <div v-if="order.table_number" class="flex justify-between">
+                            <dt class="text-[#7c8c9a]">Nomor Meja</dt>
+                            <dd class="font-medium text-[#001e2b] text-right">{{ order.table_number }}</dd>
+                        </div>
+                        <div v-if="order.notes" class="flex justify-between">
+                            <dt class="text-[#7c8c9a]">Catatan</dt>
+                            <dd class="font-medium text-[#001e2b] text-right max-w-[200px]">{{ order.notes }}</dd>
+                        </div>
+                        <div v-if="order.customer_name || order.table_number || order.notes" class="border-t border-[#e1e5e8] my-3"></div>
+
                         <div class="flex justify-between">
                             <dt class="text-[#7c8c9a]">Tanggal Transaksi</dt>
                             <dd class="font-medium text-[#001e2b] text-right whitespace-pre-line leading-tight">{{ formatDate(order.created_at) }}</dd>
