@@ -136,6 +136,22 @@ const getStatusColor = (statusText) => {
                             <dd class="font-medium text-[#001e2b] text-right">{{ order.user?.name || 'Unknown' }}</dd>
                         </div>
                         <div class="flex justify-between">
+                            <dt class="text-[#7c8c9a]">Subtotal</dt>
+                            <dd class="font-medium text-[#001e2b] text-right">{{ formatRupiah(order.subtotal) }}</dd>
+                        </div>
+                        <div v-if="order.tax_amount > 0" class="flex justify-between">
+                            <dt class="text-[#7c8c9a]">
+                                Pajak <span v-if="order.tax_type === 'percentage'">({{ Number(order.tax_rate) }}%)</span>
+                            </dt>
+                            <dd class="font-medium text-[#001e2b] text-right">{{ formatRupiah(order.tax_amount) }}</dd>
+                        </div>
+                        <div v-if="order.service_charge_amount > 0" class="flex justify-between">
+                            <dt class="text-[#7c8c9a]">
+                                Biaya Layanan <span v-if="order.service_charge_type === 'percentage'">({{ Number(order.service_charge_rate) }}%)</span>
+                            </dt>
+                            <dd class="font-medium text-[#001e2b] text-right">{{ formatRupiah(order.service_charge_amount) }}</dd>
+                        </div>
+                        <div class="flex justify-between pt-3 mt-3 border-t border-[#e1e5e8]">
                             <dt class="text-[#7c8c9a]">Metode Pembayaran</dt>
                             <dd class="font-semibold uppercase text-[#001e2b] text-right">{{ order.payment_method }}</dd>
                         </div>

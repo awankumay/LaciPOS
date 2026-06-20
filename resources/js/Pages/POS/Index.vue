@@ -14,13 +14,14 @@ const props = defineProps({
     categories: Array,
 });
 
-const { items, addItem, total, clearCart, getQuantityByProductId } = useCart();
+const { items, addItem, finalTotal, clearCart, getQuantityByProductId } = useCart();
 const toast = useToast();
 
 const showVariantModal = ref(false);
 const selectedProduct = ref(null);
 
 const showPaymentModal = ref(false);
+const paymentTotal = ref(0);
 
 const handleProductClick = (product) => {
     if (product.has_variants) {
@@ -67,7 +68,8 @@ const addToCartFromModal = (data) => {
     });
 };
 
-const handleCheckout = () => {
+const handleCheckout = (total) => {
+    paymentTotal.value = total;
     showPaymentModal.value = true;
 };
 
@@ -130,7 +132,7 @@ const handleConfirmPayment = (paymentData) => {
 
             <PaymentModal
                 :open="showPaymentModal"
-                :total="total"
+                :total="paymentTotal"
                 @close="showPaymentModal = false"
                 @confirm-payment="handleConfirmPayment"
             />

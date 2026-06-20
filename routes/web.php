@@ -62,6 +62,10 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::post('/settings/cashiers', [App\Http\Controllers\CashierController::class, 'store']);
         Route::put('/settings/cashiers/{cashier}', [App\Http\Controllers\CashierController::class, 'update']);
 
+        // Taxes Settings
+        Route::get('/settings/taxes', [App\Http\Controllers\SettingsController::class, 'taxes'])->name('settings.taxes');
+        Route::post('/settings/taxes', [App\Http\Controllers\SettingsController::class, 'updateTaxes'])->name('settings.taxes.update');
+
         // Inventory Settings
         Route::get('/settings/inventory', [App\Http\Controllers\SettingsController::class, 'inventory'])->name('settings.inventory');
         Route::post('/settings/inventory', [App\Http\Controllers\SettingsController::class, 'updateInventory'])->name('settings.inventory.update');

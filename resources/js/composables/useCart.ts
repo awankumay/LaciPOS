@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 
 export interface CartItem {
     cartId: string;         // Unique ID per entry di cart (product_id + variant combo)
@@ -17,6 +18,9 @@ export interface CartItem {
 const items = ref<CartItem[]>([]);
 
 export function useCart() {
+    const page = usePage();
+    const storeSettings = computed(() => page.props.storeSettings as any);
+
     /**
      * Tambah item ke cart.
      * Jika item dengan productId + variantLabel yang sama sudah ada, tambah quantity.
@@ -84,10 +88,45 @@ export function useCart() {
     };
 
     /**
-     * Total seluruh cart.
+     * Subtotal seluruh cart.
      */
-    const total = computed<number>(() => {
+    const subtotal = computed<number>(() => {
         return items.value.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    });
+
+    const taxType = computed<string>(() => storeSettings.value?.tax_type || 'percentage');
+    const taxValue = computed<number>(() => Number(storeSettings.value?.tax_value) || 0);
+
+    const taxAmount = computed<number>(() => {
+        const settings = storeSettings.value;
+        if (!settings?.tax_enabled) return 0;
+        
+        const value = taxValue.value;
+        if (taxType.value === 'percentage') {
+            return subtotal.value * (value / 100);
+        }
+        return value;
+    });
+
+    const serviceChargeType = computed<string>(() => storeSettings.value?.service_charge_type || 'percentage');
+    const serviceChargeValue = computed<number>(() => Number(storeSettings.value?.service_charge_value) || 0);
+
+    const serviceChargeAmount = computed<number>(() => {
+        const settings = storeSettings.value;
+        if (!settings?.service_charge_enabled) return 0;
+        
+        const value = serviceChargeValue.value;
+        if (serviceChargeType.value === 'percentage') {
+            return subtotal.value * (value / 100);
+        }
+        return value;
+    });
+
+    /**
+     * Total akhir cart (subtotal + tax + service charge).
+     */
+    const finalTotal = computed<number>(() => {
+        return subtotal.value + taxAmount.value + serviceChargeAmount.value;
     });
 
     /**
@@ -114,7 +153,14 @@ export function useCart() {
         updateNotes,
         clearCart,
         getSubtotal,
-        total,
+        subtotal,
+        taxType,
+        taxValue,
+        taxAmount,
+        serviceChargeType,
+        serviceChargeValue,
+        serviceChargeAmount,
+        finalTotal,
         totalItems,
         isEmpty,
         getQuantityByProductId,

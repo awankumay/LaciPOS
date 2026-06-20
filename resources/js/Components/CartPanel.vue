@@ -15,7 +15,14 @@ const {
     updateNotes,
     clearCart,
     getSubtotal,
-    total,
+    subtotal,
+    taxType,
+    taxValue,
+    taxAmount,
+    serviceChargeType,
+    serviceChargeValue,
+    serviceChargeAmount,
+    finalTotal,
     totalItems,
     isEmpty,
     getQuantityByProductId
@@ -163,15 +170,31 @@ const handleUpdateQuantity = (item, newQuantity) => {
 
         <!-- ── Footer / Checkout ── -->
         <div class="cart-footer">
-            <div class="cart-footer__total-row">
+            <div class="cart-footer__total-row cart-footer__subtotal-row" v-if="taxAmount > 0 || serviceChargeAmount > 0">
+                <span class="cart-footer__label">Subtotal</span>
+                <span class="cart-footer__amount">{{ formatRupiah(subtotal) }}</span>
+            </div>
+            <div class="cart-footer__total-row cart-footer__tax-row" v-if="taxAmount > 0">
+                <span class="cart-footer__label">
+                    Pajak <span v-if="taxType === 'percentage'">({{ taxValue }}%)</span>
+                </span>
+                <span class="cart-footer__amount">{{ formatRupiah(taxAmount) }}</span>
+            </div>
+            <div class="cart-footer__total-row cart-footer__tax-row" v-if="serviceChargeAmount > 0">
+                <span class="cart-footer__label">
+                    Service Charge <span v-if="serviceChargeType === 'percentage'">({{ serviceChargeValue }}%)</span>
+                </span>
+                <span class="cart-footer__amount">{{ formatRupiah(serviceChargeAmount) }}</span>
+            </div>
+            <div class="cart-footer__total-row cart-footer__final-row">
                 <span class="cart-footer__total-label">Total Tagihan</span>
-                <span class="cart-footer__total-amount">{{ formatRupiah(total) }}</span>
+                <span class="cart-footer__total-amount">{{ formatRupiah(finalTotal) }}</span>
             </div>
             <button
                 class="cart-footer__checkout-btn"
                 :class="{ 'cart-footer__checkout-btn--disabled': isEmpty }"
                 :disabled="isEmpty"
-                @click="$emit('checkout')"
+                @click="$emit('checkout', finalTotal)"
             >
                 Bayar Sekarang
             </button>
@@ -525,6 +548,28 @@ const handleUpdateQuantity = (item, newQuantity) => {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+}
+
+.cart-footer__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #5c6c7a;
+}
+
+.cart-footer__amount {
+    font-size: 13px;
+    font-weight: 600;
+    color: #001e2b;
+}
+
+.cart-footer__subtotal-row, .cart-footer__tax-row {
+    margin-bottom: -4px;
+}
+
+.cart-footer__final-row {
+    margin-top: 4px;
+    border-top: 1px dashed #e1e5e8;
+    padding-top: 8px;
 }
 
 .cart-footer__total-label {

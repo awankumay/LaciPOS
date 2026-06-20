@@ -11,13 +11,19 @@ class Order extends Model
 
     protected $fillable = [
         'order_number', 'user_id', 'status', 'payment_method',
-        'payment_provider', 'total_amount', 'cash_received',
-        'change_amount', 'notes',
+        'payment_provider', 'subtotal', 'tax_rate', 'tax_type', 'tax_amount',
+        'service_charge_rate', 'service_charge_type', 'service_charge_amount',
+        'total_amount', 'cash_received', 'change_amount', 'notes',
     ];
 
     protected function casts(): array
     {
         return [
+            'subtotal' => 'decimal:2',
+            'tax_rate' => 'decimal:2',
+            'tax_amount' => 'decimal:2',
+            'service_charge_rate' => 'decimal:2',
+            'service_charge_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
             'cash_received' => 'decimal:2',
             'change_amount' => 'decimal:2',

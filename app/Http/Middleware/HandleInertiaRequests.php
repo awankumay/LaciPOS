@@ -53,6 +53,17 @@ class HandleInertiaRequests extends Middleware
                 'print_success' => fn () => $request->session()->get('print_success'),
             ],
             'onboardingCompleted' => fn () => StoreProfile::isOnboardingCompleted(),
+            'storeSettings' => function () {
+                $profile = StoreProfile::getProfile();
+                return $profile ? [
+                    'tax_enabled' => $profile->tax_enabled,
+                    'tax_type' => $profile->tax_type,
+                    'tax_value' => $profile->tax_value,
+                    'service_charge_enabled' => $profile->service_charge_enabled,
+                    'service_charge_type' => $profile->service_charge_type,
+                    'service_charge_value' => $profile->service_charge_value,
+                ] : null;
+            },
         ];
     }
 }

@@ -31,7 +31,37 @@ class OrderController extends Controller
         }
 
         // Hitung total
-        $totalAmount = collect($items)->sum(fn ($item) => $item['price'] * $item['quantity']);
+        $subtotal = collect($items)->sum(fn ($item) => $item['price'] * $item['quantity']);
+
+        $storeProfile = \App\Models\StoreProfile::getProfile();
+
+        $taxRate = 0;
+        $taxType = null;
+        $taxAmount = 0;
+        if ($storeProfile && $storeProfile->tax_enabled) {
+            $taxRate = $storeProfile->tax_value;
+            $taxType = $storeProfile->tax_type;
+            if ($taxType === 'percentage') {
+                $taxAmount = $subtotal * ($taxRate / 100);
+            } else {
+                $taxAmount = $taxRate;
+            }
+        }
+
+        $serviceChargeRate = 0;
+        $serviceChargeType = null;
+        $serviceChargeAmount = 0;
+        if ($storeProfile && $storeProfile->service_charge_enabled) {
+            $serviceChargeRate = $storeProfile->service_charge_value;
+            $serviceChargeType = $storeProfile->service_charge_type;
+            if ($serviceChargeType === 'percentage') {
+                $serviceChargeAmount = $subtotal * ($serviceChargeRate / 100);
+            } else {
+                $serviceChargeAmount = $serviceChargeRate;
+            }
+        }
+
+        $totalAmount = $subtotal + $taxAmount + $serviceChargeAmount;
 
         // Validasi uang cukup untuk cash
         if ($validated['payment_method'] === 'cash') {
@@ -40,7 +70,7 @@ class OrderController extends Controller
             }
         }
 
-        $order = DB::transaction(function () use ($validated, $items, $totalAmount, $request) {
+        $order = DB::transaction(function () use ($validated, $items, $subtotal, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $request) {
             // Buat order
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
@@ -48,6 +78,13 @@ class OrderController extends Controller
                 'status' => 'pending', // Akan diubah ke completed setelah items dibuat
                 'payment_method' => $validated['payment_method'],
                 'payment_provider' => $validated['payment_provider'] ?? null,
+                'subtotal' => $subtotal,
+                'tax_rate' => $taxRate,
+                'tax_type' => $taxType,
+                'tax_amount' => $taxAmount,
+                'service_charge_rate' => $serviceChargeRate,
+                'service_charge_type' => $serviceChargeType,
+                'service_charge_amount' => $serviceChargeAmount,
                 'total_amount' => $totalAmount,
                 'cash_received' => $validated['cash_received'] ?? null,
                 'change_amount' => $validated['payment_method'] === 'cash'
@@ -77,7 +114,6 @@ class OrderController extends Controller
         $redirect = redirect()->route('order.success', $order->id)->with('success', 'Transaksi berhasil!');
 
         // Auto print jika setting aktif
-        $storeProfile = \App\Models\StoreProfile::getProfile();
         if ($storeProfile && $storeProfile->auto_print) {
             $printService->printReceipt($order);
             
@@ -98,6 +134,13 @@ class OrderController extends Controller
                 'status' => $order->status,
                 'payment_method' => $order->payment_method,
                 'payment_provider' => $order->payment_provider,
+                'subtotal' => $order->subtotal,
+                'tax_type' => $order->tax_type,
+                'tax_rate' => $order->tax_rate,
+                'tax_amount' => $order->tax_amount,
+                'service_charge_type' => $order->service_charge_type,
+                'service_charge_rate' => $order->service_charge_rate,
+                'service_charge_amount' => $order->service_charge_amount,
                 'total_amount' => $order->total_amount,
                 'cash_received' => $order->cash_received,
                 'change_amount' => $order->change_amount,

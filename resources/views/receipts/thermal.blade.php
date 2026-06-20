@@ -132,6 +132,22 @@
     <div class="mb-2 border-bottom totals">
         <table>
             <tr>
+                <td class="text-left">Subtotal</td>
+                <td class="text-right">Rp {{ number_format($order['subtotal'], 0, ',', '.') }}</td>
+            </tr>
+            @if($order['tax_amount'] > 0)
+            <tr>
+                <td class="text-left">Pajak @if($order['tax_type'] == 'percentage') ({{ rtrim(rtrim(number_format($order['tax_rate'], 2, ',', '.'), '0'), ',') }}%) @endif</td>
+                <td class="text-right">Rp {{ number_format($order['tax_amount'], 0, ',', '.') }}</td>
+            </tr>
+            @endif
+            @if($order['service_charge_amount'] > 0)
+            <tr>
+                <td class="text-left">Layanan @if($order['service_charge_type'] == 'percentage') ({{ rtrim(rtrim(number_format($order['service_charge_rate'], 2, ',', '.'), '0'), ',') }}%) @endif</td>
+                <td class="text-right">Rp {{ number_format($order['service_charge_amount'], 0, ',', '.') }}</td>
+            </tr>
+            @endif
+            <tr>
                 <td class="text-left font-bold">Total</td>
                 <td class="text-right font-bold">Rp {{ number_format($order['total'], 0, ',', '.') }}</td>
             </tr>

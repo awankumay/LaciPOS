@@ -19,12 +19,22 @@ class StoreProfile extends Model
         'paper_size',
         'auto_print',
         'default_min_stock',
+        'tax_enabled',
+        'tax_type',
+        'tax_value',
+        'service_charge_enabled',
+        'service_charge_type',
+        'service_charge_value',
     ];
 
     protected function casts(): array
     {
         return [
             'auto_print' => 'boolean',
+            'tax_enabled' => 'boolean',
+            'tax_value' => 'decimal:2',
+            'service_charge_enabled' => 'boolean',
+            'service_charge_value' => 'decimal:2',
         ];
     }
 

@@ -73,4 +73,33 @@ class SettingsController extends Controller
 
         return back()->with('success', 'Pengaturan stok berhasil disimpan.');
     }
+
+    public function taxes()
+    {
+        $profile = StoreProfile::getProfile();
+        return Inertia::render('Settings/Taxes', [
+            'tax_enabled' => $profile?->tax_enabled ?? false,
+            'tax_type' => $profile?->tax_type ?? 'percentage',
+            'tax_value' => $profile?->tax_value ?? 0,
+            'service_charge_enabled' => $profile?->service_charge_enabled ?? false,
+            'service_charge_type' => $profile?->service_charge_type ?? 'percentage',
+            'service_charge_value' => $profile?->service_charge_value ?? 0,
+        ]);
+    }
+
+    public function updateTaxes(\Illuminate\Http\Request $request)
+    {
+        $validated = $request->validate([
+            'tax_enabled' => ['required', 'boolean'],
+            'tax_type' => ['required', 'string', 'in:percentage,nominal'],
+            'tax_value' => ['required', 'numeric', 'min:0'],
+            'service_charge_enabled' => ['required', 'boolean'],
+            'service_charge_type' => ['required', 'string', 'in:percentage,nominal'],
+            'service_charge_value' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        StoreProfile::updateOrCreate([], $validated);
+
+        return back()->with('success', 'Pengaturan Pajak & Layanan berhasil disimpan.');
+    }
 }

@@ -115,6 +115,25 @@ onMounted(() => {
                 <!-- Payment Summary -->
                 <div class="bg-slate-50 rounded-xl p-4 space-y-3 border border-slate-100">
                     <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">Subtotal</span>
+                        <span class="font-medium text-slate-900">{{ formatRupiah(order.subtotal) }}</span>
+                    </div>
+
+                    <div v-if="order.tax_amount > 0" class="flex justify-between text-sm">
+                        <span class="text-slate-500">
+                            Pajak <span v-if="order.tax_type === 'percentage'">({{ Number(order.tax_rate) }}%)</span>
+                        </span>
+                        <span class="font-medium text-slate-900">{{ formatRupiah(order.tax_amount) }}</span>
+                    </div>
+
+                    <div v-if="order.service_charge_amount > 0" class="flex justify-between text-sm">
+                        <span class="text-slate-500">
+                            Biaya Layanan <span v-if="order.service_charge_type === 'percentage'">({{ Number(order.service_charge_rate) }}%)</span>
+                        </span>
+                        <span class="font-medium text-slate-900">{{ formatRupiah(order.service_charge_amount) }}</span>
+                    </div>
+
+                    <div class="flex justify-between text-sm mt-3 pt-3 border-t border-slate-200">
                         <span class="text-slate-500">Metode Bayar</span>
                         <span class="font-medium text-slate-900">
                             {{ paymentMethodLabels[order.payment_method] }} 
