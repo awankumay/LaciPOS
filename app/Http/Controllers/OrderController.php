@@ -245,6 +245,10 @@ class OrderController extends Controller
             $query->where('payment_method', $request->input('payment_method'));
         }
 
+        if ($request->input('search')) {
+            $query->where('order_number', 'like', '%' . $request->input('search') . '%');
+        }
+
         if ($request->user()->isCashier()) {
             $query->where('user_id', $request->user()->id);
         }
@@ -253,7 +257,7 @@ class OrderController extends Controller
 
         return Inertia::render('Orders/Index', [
             'orders' => $orders,
-            'filters' => $request->only(['start_date', 'end_date', 'status', 'payment_method']),
+            'filters' => $request->only(['start_date', 'end_date', 'status', 'payment_method', 'search']),
         ]);
     }
 

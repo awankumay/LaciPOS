@@ -12,8 +12,10 @@ const formatRupiah = (value) => {
 };
 
 const formatDate = (dateString) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleDateString('id-ID', options);
+    const date = new Date(dateString);
+    const datePart = date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timePart = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    return `${datePart}\n${timePart}`;
 };
 
 const printReceipt = () => {
@@ -63,13 +65,13 @@ const getStatusColor = (statusText) => {
                 <div 
                     class="rounded-xl border px-4 py-3 flex items-center gap-3"
                     :class="[
-                        order.status === 'completed' ? 'bg-[#e3fcef] border-[#00ed64]/30 text-[#00684a]' : 
-                        order.status === 'cancelled' ? 'bg-[#fde8e8] border-red-200 text-red-800' : 
-                        'bg-yellow-50 border-yellow-200 text-yellow-800'
+                        order.status === 'completed' ? 'bg-[#00684a] border-[#00684a] text-white shadow-sm' : 
+                        order.status === 'cancelled' ? 'bg-red-600 border-red-600 text-white shadow-sm' : 
+                        'bg-yellow-500 border-yellow-500 text-white shadow-sm'
                     ]"
                 >
-                    <CheckCircle v-if="order.status === 'completed'" class="h-5 w-5 shrink-0 text-[#00ed64]" />
-                    <XCircle v-else-if="order.status === 'cancelled'" class="h-5 w-5 shrink-0 text-red-500" />
+                    <CheckCircle v-if="order.status === 'completed'" class="h-5 w-5 shrink-0 text-white" />
+                    <XCircle v-else-if="order.status === 'cancelled'" class="h-5 w-5 shrink-0 text-white" />
                     <div>
                         <p class="text-sm font-bold uppercase tracking-wider">{{ order.status }}</p>
                         <p class="text-xs opacity-80 mt-0.5">
@@ -130,7 +132,7 @@ const getStatusColor = (statusText) => {
                     <dl class="space-y-3 text-sm">
                         <div class="flex justify-between">
                             <dt class="text-[#7c8c9a]">Tanggal Transaksi</dt>
-                            <dd class="font-medium text-[#001e2b] text-right">{{ formatDate(order.created_at) }}</dd>
+                            <dd class="font-medium text-[#001e2b] text-right whitespace-pre-line leading-tight">{{ formatDate(order.created_at) }}</dd>
                         </div>
                         <div class="flex justify-between">
                             <dt class="text-[#7c8c9a]">Kasir</dt>
@@ -173,7 +175,7 @@ const getStatusColor = (statusText) => {
                         
                         <div class="pt-4 border-t border-[#e1e5e8] flex justify-between items-center">
                             <dt class="text-base font-bold text-[#001e2b]">Total Harga</dt>
-                            <dd class="text-xl font-bold text-[#00ed64]">{{ formatRupiah(order.total_amount) }}</dd>
+                            <dd class="text-xl font-bold text-[#001e2b]">{{ formatRupiah(order.total_amount) }}</dd>
                         </div>
                     </dl>
                 </div>

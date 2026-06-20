@@ -23,6 +23,7 @@ const ownerMenuItems = [
     { href: '/products', icon: Package, label: 'Produk' },
     { href: '/discounts', icon: Tags, label: 'Diskon' },
     { href: '/categories', icon: Tags, label: 'Kategori' },
+    { href: '/orders', icon: BarChart3, label: 'Riwayat Transaksi' },
     { href: '/reports', icon: BarChart3, label: 'Laporan' },
     { href: '/settings', icon: Settings, label: 'Pengaturan' },
 ];
