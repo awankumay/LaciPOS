@@ -19,7 +19,7 @@ const isOverStock = computed(() => {
 
 <template>
     <button
-        @click="$emit('click', product)"
+        @click="(e) => $emit('click', product, e)"
         class="product-card"
         :class="{
             'product-card--out-of-stock': product.stock <= 0,

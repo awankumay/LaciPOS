@@ -81,7 +81,7 @@ const selectCategory = (catId) => {
                     v-for="product in filteredProducts"
                     :key="product.id"
                     :product="product"
-                    @click="$emit('add-to-cart', product)"
+                    @click="(_, nativeEvent) => $emit('add-to-cart', product, nativeEvent)"
                 />
             </div>
 
