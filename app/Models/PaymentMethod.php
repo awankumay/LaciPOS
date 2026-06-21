@@ -10,7 +10,8 @@ class PaymentMethod extends Model
         'name',
         'category',
         'account_details',
-        'admin_fee_percentage',
+        'admin_fee_type',
+        'admin_fee',
         'min_amount_for_fee',
         'is_active'
     ];
@@ -18,7 +19,7 @@ class PaymentMethod extends Model
     protected function casts(): array
     {
         return [
-            'admin_fee_percentage' => 'decimal:2',
+            'admin_fee' => 'decimal:2',
             'min_amount_for_fee' => 'decimal:2',
             'is_active' => 'boolean',
         ];

@@ -195,7 +195,7 @@ const getStatusColor = (statusText) => {
                         <!-- Rincian MDR Khusus Owner -->
                         <template v-if="$page.props.auth.user.role === 'owner' && order.payment_admin_fee_amount > 0">
                             <div class="pt-3 border-t border-[#e1e5e8] mt-3 flex justify-between items-center">
-                                <dt class="text-xs text-orange-600">Potongan MDR ({{ Number(order.payment_admin_fee_rate) }}%)</dt>
+                                <dt class="text-xs text-orange-600">Potongan MDR ({{ order.payment_admin_fee_type === 'percentage' ? Number(order.payment_admin_fee) + '%' : 'Rp ' + Number(order.payment_admin_fee).toLocaleString('id-ID') }})</dt>
                                 <dd class="text-xs font-semibold text-orange-600 text-right">-{{ formatRupiah(order.payment_admin_fee_amount) }}</dd>
                             </div>
                             <div class="pt-2 flex justify-between items-center">

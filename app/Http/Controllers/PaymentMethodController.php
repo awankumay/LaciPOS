@@ -22,7 +22,8 @@ class PaymentMethodController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'required|in:bank_transfer,e_wallet,qris',
             'account_details' => 'nullable|string|max:255',
-            'admin_fee_percentage' => 'required|numeric|min:0|max:100',
+            'admin_fee_type' => 'required|in:percentage,nominal',
+            'admin_fee' => 'required|numeric|min:0' . ($request->admin_fee_type === 'percentage' ? '|max:100' : ''),
             'min_amount_for_fee' => 'required|numeric|min:0',
             'is_active' => 'boolean'
         ]);
@@ -46,7 +47,8 @@ class PaymentMethodController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'required|in:bank_transfer,e_wallet,qris',
             'account_details' => 'nullable|string|max:255',
-            'admin_fee_percentage' => 'required|numeric|min:0|max:100',
+            'admin_fee_type' => 'required|in:percentage,nominal',
+            'admin_fee' => 'required|numeric|min:0' . ($request->admin_fee_type === 'percentage' ? '|max:100' : ''),
             'min_amount_for_fee' => 'required|numeric|min:0',
             'is_active' => 'boolean'
         ]);

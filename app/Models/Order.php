@@ -17,7 +17,7 @@ class Order extends Model
         'total_amount', 'cash_received', 'change_amount', 'notes',
         'customer_name', 'table_number',
         'payment_method_id', 'payment_method_name', 'payment_account_details',
-        'payment_admin_fee_rate', 'payment_admin_fee_amount',
+        'payment_admin_fee_type', 'payment_admin_fee', 'payment_admin_fee_amount',
     ];
 
     protected function casts(): array
@@ -33,7 +33,7 @@ class Order extends Model
             'total_amount' => 'decimal:2',
             'cash_received' => 'decimal:2',
             'change_amount' => 'decimal:2',
-            'payment_admin_fee_rate' => 'decimal:2',
+            'payment_admin_fee' => 'decimal:2',
             'payment_admin_fee_amount' => 'decimal:2',
         ];
     }

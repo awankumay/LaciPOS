@@ -105,7 +105,8 @@ class OrderController extends Controller
         $totalAmount = round($subtotalAfterCartDiscount + $taxAmount + $serviceChargeAmount);
 
         $paymentMethodId = $validated['payment_method_id'] ?? null;
-        $paymentAdminFeeRate = 0;
+        $paymentAdminFeeType = 'percentage';
+        $paymentAdminFee = 0;
         $paymentAdminFeeAmount = 0;
         $paymentMethodName = null;
         $paymentAccountDetails = null;
@@ -115,9 +116,14 @@ class OrderController extends Controller
             if ($paymentMethod) {
                 $paymentMethodName = $paymentMethod->name;
                 $paymentAccountDetails = $paymentMethod->account_details;
-                $paymentAdminFeeRate = $paymentMethod->admin_fee_percentage;
+                $paymentAdminFeeType = $paymentMethod->admin_fee_type;
+                $paymentAdminFee = $paymentMethod->admin_fee;
                 if ($totalAmount >= $paymentMethod->min_amount_for_fee) {
-                    $paymentAdminFeeAmount = $totalAmount * ($paymentAdminFeeRate / 100);
+                    if ($paymentAdminFeeType === 'percentage') {
+                        $paymentAdminFeeAmount = $totalAmount * ($paymentAdminFee / 100);
+                    } else {
+                        $paymentAdminFeeAmount = $paymentAdminFee;
+                    }
                 }
             }
         }
@@ -129,7 +135,7 @@ class OrderController extends Controller
             }
         }
 
-        $order = DB::transaction(function () use ($validated, $items, $subtotal, $cartDiscountAmount, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $paymentMethodId, $paymentMethodName, $paymentAccountDetails, $paymentAdminFeeRate, $paymentAdminFeeAmount, $request) {
+        $order = DB::transaction(function () use ($validated, $items, $subtotal, $cartDiscountAmount, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $paymentMethodId, $paymentMethodName, $paymentAccountDetails, $paymentAdminFeeType, $paymentAdminFee, $paymentAdminFeeAmount, $request) {
             // Buat order
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
@@ -158,7 +164,8 @@ class OrderController extends Controller
                 'payment_method_id' => $paymentMethodId,
                 'payment_method_name' => $paymentMethodName,
                 'payment_account_details' => $paymentAccountDetails,
-                'payment_admin_fee_rate' => $paymentAdminFeeRate,
+                'payment_admin_fee_type' => $paymentAdminFeeType,
+                'payment_admin_fee' => $paymentAdminFee,
                 'payment_admin_fee_amount' => $paymentAdminFeeAmount,
             ]);
 

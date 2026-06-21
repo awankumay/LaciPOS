@@ -19,7 +19,8 @@ const form = useForm({
     name: '',
     category: 'bank_transfer',
     account_details: '',
-    admin_fee_percentage: 0,
+    admin_fee_type: 'percentage',
+    admin_fee: 0,
     min_amount_for_fee: 0,
     is_active: true,
 });
@@ -42,6 +43,18 @@ const getCategoryLabel = (val) => {
     return found ? found.label : '';
 };
 
+const openAdminFeeTypeBox = ref(false);
+
+const adminFeeTypes = [
+    { value: 'percentage', label: 'Persentase (%)' },
+    { value: 'nominal', label: 'Nominal (Rp)' }
+];
+
+const getAdminFeeTypeLabel = (val) => {
+    const found = adminFeeTypes.find(c => c.value === val);
+    return found ? found.label : '';
+};
+
 const openAddModal = () => {
     editingId.value = null;
     form.reset();
@@ -53,7 +66,8 @@ const openEditModal = (method) => {
     form.name = method.name;
     form.category = method.category;
     form.account_details = method.account_details || '';
-    form.admin_fee_percentage = method.admin_fee_percentage;
+    form.admin_fee_type = method.admin_fee_type || 'percentage';
+    form.admin_fee = method.admin_fee;
     form.min_amount_for_fee = method.min_amount_for_fee;
     form.is_active = method.is_active;
     isModalOpen.value = true;
@@ -86,7 +100,8 @@ const toggleActive = (method) => {
         name: method.name,
         category: method.category,
         account_details: method.account_details,
-        admin_fee_percentage: method.admin_fee_percentage,
+        admin_fee_type: method.admin_fee_type,
+        admin_fee: method.admin_fee,
         min_amount_for_fee: method.min_amount_for_fee,
         is_active: !method.is_active
     }, { preserveScroll: true });
@@ -115,7 +130,7 @@ const toggleActive = (method) => {
                                 <th class="px-6 py-4">Nama Metode</th>
                                 <th class="px-6 py-4">Kategori</th>
                                 <th class="px-6 py-4">Detail Akun</th>
-                                <th class="px-6 py-4">MDR (%)</th>
+                                <th class="px-6 py-4">MDR</th>
                                 <th class="px-6 py-4">Min. Transaksi (MDR)</th>
                                 <th class="px-6 py-4 text-center">Status</th>
                                 <th class="px-6 py-4 text-right">Aksi</th>
@@ -126,7 +141,7 @@ const toggleActive = (method) => {
                                 <td class="px-6 py-4 font-medium text-gray-900">{{ method.name }}</td>
                                 <td class="px-6 py-4 text-gray-500">{{ categories[method.category] }}</td>
                                 <td class="px-6 py-4 text-gray-500">{{ method.category === 'cash' ? '-' : (method.account_details || '-') }}</td>
-                                <td class="px-6 py-4 text-gray-500">{{ method.category === 'cash' ? '-' : (Number(method.admin_fee_percentage) + '%') }}</td>
+                                <td class="px-6 py-4 text-gray-500">{{ method.category === 'cash' ? '-' : (method.admin_fee_type === 'percentage' ? Number(method.admin_fee) + '%' : 'Rp ' + Number(method.admin_fee).toLocaleString('id-ID')) }}</td>
                                 <td class="px-6 py-4 text-gray-500">{{ method.category === 'cash' ? '-' : ('Rp ' + Number(method.min_amount_for_fee).toLocaleString('id-ID')) }}</td>
                                 <td class="px-6 py-4 text-center">
                                     <label class="relative inline-flex items-center cursor-pointer">
@@ -221,13 +236,55 @@ const toggleActive = (method) => {
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">MDR / Admin (%) <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <input v-model="form.admin_fee_percentage" type="number" step="0.01" min="0" class="h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10 px-4 pr-8" required />
-                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">%</span>
-                        </div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipe MDR / Admin <span class="text-red-500">*</span></label>
+                        <Popover v-model:open="openAdminFeeTypeBox">
+                            <PopoverTrigger as-child>
+                                <button
+                                    type="button"
+                                    role="combobox"
+                                    :aria-expanded="openAdminFeeTypeBox"
+                                    class="flex items-center justify-between h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                                >
+                                    <span class="truncate">{{ getAdminFeeTypeLabel(form.admin_fee_type) }}</span>
+                                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent class="w-full p-0 bg-white" align="start">
+                                <Command>
+                                    <CommandList>
+                                        <CommandGroup>
+                                            <CommandItem
+                                                v-for="type in adminFeeTypes"
+                                                :key="type.value"
+                                                :value="type.label"
+                                                @select="() => {
+                                                    form.admin_fee_type = type.value;
+                                                    openAdminFeeTypeBox = false;
+                                                }"
+                                                class="text-sm cursor-pointer"
+                                            >
+                                                {{ type.label }}
+                                                <Check
+                                                    :class="['ml-auto h-4 w-4', form.admin_fee_type === type.value ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                />
+                                            </CommandItem>
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">MDR / Admin <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span v-if="form.admin_fee_type === 'nominal'" class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rp</span>
+                            <input v-model="form.admin_fee" type="number" step="0.01" min="0" :class="['h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10', form.admin_fee_type === 'nominal' ? 'pl-9 pr-4' : 'px-4 pr-8']" required />
+                            <span v-if="form.admin_fee_type === 'percentage'" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Berlaku Mulai <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rp</span>
@@ -235,7 +292,6 @@ const toggleActive = (method) => {
                         </div>
                         <p class="text-[10px] text-gray-500 mt-1">Isi 0 jika selalu kena MDR.</p>
                     </div>
-                </div>
 
                 <div class="flex items-center gap-2 mt-4 mb-2">
                     <input type="checkbox" id="is_active" v-model="form.is_active" class="rounded text-[#00684a] focus:ring-[#00684a]" />

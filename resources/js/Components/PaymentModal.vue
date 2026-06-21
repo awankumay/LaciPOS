@@ -258,8 +258,8 @@ const handleConfirm = () => {
                     <div v-if="selectedMethodDetails && selectedCategory !== 'cash'" class="p-3 bg-gray-50 rounded-xl border border-gray-100">
                         <p class="text-xs text-gray-500 mb-1">Diktekan ke Pelanggan:</p>
                         <p class="text-sm font-semibold text-gray-900">{{ selectedMethodDetails.account_details || '-' }}</p>
-                        <p v-if="selectedMethodDetails.admin_fee_percentage > 0 && total >= selectedMethodDetails.min_amount_for_fee" class="text-xs text-orange-600 mt-1">
-                            *Catatan Kasir: Transaksi ini dikenakan MDR {{ Number(selectedMethodDetails.admin_fee_percentage) }}% (ditanggung toko)
+                        <p v-if="selectedMethodDetails.admin_fee > 0 && total >= selectedMethodDetails.min_amount_for_fee" class="text-xs text-orange-600 mt-1">
+                            *Catatan Kasir: Transaksi ini dikenakan MDR {{ selectedMethodDetails.admin_fee_type === 'percentage' ? Number(selectedMethodDetails.admin_fee) + '%' : 'Rp ' + Number(selectedMethodDetails.admin_fee).toLocaleString('id-ID') }} (ditanggung toko)
                         </p>
                     </div>
 
