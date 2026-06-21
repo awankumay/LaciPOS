@@ -10,9 +10,10 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => ['required', 'in:cash,bank_transfer,e_wallet'],
-            'payment_provider' => ['required_if:payment_method,bank_transfer,e_wallet', 'nullable', 'string'],
-            'cash_received' => ['required_if:payment_method,cash', 'nullable', 'numeric', 'min:0'],
+            'payment_method_id' => ['nullable', 'exists:payment_methods,id'],
+            'payment_method' => ['required', 'string'],
+            'payment_provider' => ['nullable', 'string'],
+            'cash_received' => ['nullable', 'numeric', 'min:0'],
             'customer_name' => ['nullable', 'string', 'max:255'],
             'table_number' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string', 'max:500'],

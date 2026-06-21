@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\PaymentMethod;
 use Inertia\Inertia;
 
 class POSController extends Controller
@@ -42,11 +43,13 @@ class POSController extends Controller
 
         $categories = Category::orderBy('name')->get(['id', 'name']);
         $nextOrderNumber = Order::generateOrderNumber();
+        $paymentMethods = PaymentMethod::where('is_active', true)->get();
 
         return Inertia::render('POS/Index', [
             'products' => $products,
             'categories' => $categories,
             'next_order_number' => $nextOrderNumber,
+            'payment_methods' => $paymentMethods,
         ]);
     }
 }

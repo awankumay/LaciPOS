@@ -1,14 +1,17 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Dialog, DialogContent } from '@/Components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/Components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
-import { Banknote, CreditCard, Smartphone, X, CheckCircle2 } from 'lucide-vue-next';
+import { Banknote, CreditCard, Smartphone, X, CheckCircle2, Check, ChevronsUpDown } from 'lucide-vue-next';
 import CashCalculator from '@/Components/CashCalculator.vue';
 
 const props = defineProps({
     open: { type: Boolean, default: false },
     total: { type: Number, default: 0 },
+    paymentMethods: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(['close', 'confirm-payment']);
@@ -20,21 +23,37 @@ const enableCustomerName = computed(() => storeSettings.value.enable_customer_na
 const enableTableNumber = computed(() => storeSettings.value.enable_table_number || false);
 const enableOrderNotes = computed(() => storeSettings.value.enable_order_notes || false);
 
-const paymentMethod = ref(null);
-const paymentProvider = ref('');
+const selectedCategory = ref(null);
+const selectedMethodId = ref(null);
+const openMethodBox = ref(false);
 const cashReceived = ref(0);
 
 const customerName = ref('');
 const tableNumber = ref('');
 const orderNotes = ref('');
 
-const BANK_PROVIDERS = ['BCA', 'Mandiri', 'BNI', 'BRI', 'BSI', 'Lainnya'];
-const EWALLET_PROVIDERS = ['GoPay', 'OVO', 'DANA', 'ShopeePay', 'LinkAja', 'Lainnya'];
+const hasCategory = (cat) => {
+    if (!props.paymentMethods || props.paymentMethods.length === 0) {
+        // Fallback jika tidak ada data dari DB
+        return cat === 'cash';
+    }
+    return props.paymentMethods.some(m => m.category === cat);
+};
+
+const methodsByCategory = computed(() => {
+    return props.paymentMethods.filter(m => m.category === selectedCategory.value);
+});
+
+const selectedMethodDetails = computed(() => {
+    if (!selectedMethodId.value) return null;
+    return props.paymentMethods.find(m => m.id === selectedMethodId.value);
+});
 
 watch(() => props.open, (isOpen) => {
     if (isOpen) {
-        paymentMethod.value = null;
-        paymentProvider.value = '';
+        selectedCategory.value = null;
+        selectedMethodId.value = null;
+        openMethodBox.value = false;
         cashReceived.value = 0;
         customerName.value = '';
         tableNumber.value = '';
@@ -42,33 +61,52 @@ watch(() => props.open, (isOpen) => {
     }
 });
 
-const selectMethod = (method) => {
-    paymentMethod.value = method;
-    paymentProvider.value = '';
+const selectCategory = (cat) => {
+    selectedCategory.value = cat;
+    const available = methodsByCategory.value;
+    if (available.length === 1) {
+        selectedMethodId.value = available[0].id;
+    } else {
+        selectedMethodId.value = null;
+    }
 };
 
 const canConfirm = computed(() => {
     if (enableCustomerName.value && !customerName.value.trim()) return false;
     if (enableTableNumber.value && !tableNumber.value.trim()) return false;
-    // Notes is optional even if enabled
 
-    if (!paymentMethod.value) return false;
-    if (paymentMethod.value === 'bank_transfer' || paymentMethod.value === 'e_wallet') {
-        return paymentProvider.value.length > 0;
+    if (!selectedCategory.value) return false;
+    
+    // Jika data master kosong, izinkan transaksi cash fallback
+    if (!props.paymentMethods || props.paymentMethods.length === 0) {
+        if (selectedCategory.value === 'cash') {
+            return cashReceived.value >= props.total;
+        }
+        return false;
     }
-    if (paymentMethod.value === 'cash') {
+
+    if (!selectedMethodId.value) return false;
+
+    if (selectedCategory.value === 'cash') {
         return cashReceived.value >= props.total;
     }
-    return false;
+    return true;
 });
 
 const handleConfirm = () => {
     if (!canConfirm.value) return;
+    
+    let paymentProvider = null;
+    if (selectedMethodDetails.value) {
+        paymentProvider = selectedMethodDetails.value.name;
+    }
+
     emit('confirm-payment', {
-        payment_method: paymentMethod.value,
-        payment_provider: paymentMethod.value === 'cash' ? null : paymentProvider.value,
-        cash_received: paymentMethod.value === 'cash' ? cashReceived.value : null,
-        change_amount: paymentMethod.value === 'cash' ? (cashReceived.value - props.total) : null,
+        payment_method_id: selectedMethodId.value,
+        payment_method: selectedCategory.value,
+        payment_provider: paymentProvider,
+        cash_received: selectedCategory.value === 'cash' ? cashReceived.value : null,
+        change_amount: selectedCategory.value === 'cash' ? (cashReceived.value - props.total) : null,
         customer_name: enableCustomerName.value ? customerName.value.trim() : null,
         table_number: enableTableNumber.value ? tableNumber.value.trim() : null,
         notes: enableOrderNotes.value ? orderNotes.value.trim() : null,
@@ -117,67 +155,121 @@ const handleConfirm = () => {
                     <p class="payment-section__label">Metode Pembayaran</p>
                     <div class="method-grid">
                         <button
+                            v-if="hasCategory('cash')"
                             class="method-btn"
-                            :class="{ 'method-btn--active': paymentMethod === 'cash' }"
-                            @click="selectMethod('cash')"
+                            :class="{ 'method-btn--active': selectedCategory === 'cash' }"
+                            @click="selectCategory('cash')"
                         >
                             <Banknote class="method-btn__icon" />
                             <span>Tunai</span>
-                            <span v-if="paymentMethod === 'cash'" class="method-btn__check">
+                            <span v-if="selectedCategory === 'cash'" class="method-btn__check">
                                 <CheckCircle2 class="method-btn__check-icon" />
                             </span>
                         </button>
 
                         <button
+                            v-if="hasCategory('bank_transfer')"
                             class="method-btn"
-                            :class="{ 'method-btn--active': paymentMethod === 'bank_transfer' }"
-                            @click="selectMethod('bank_transfer')"
+                            :class="{ 'method-btn--active': selectedCategory === 'bank_transfer' }"
+                            @click="selectCategory('bank_transfer')"
                         >
                             <CreditCard class="method-btn__icon" />
                             <span>Transfer</span>
-                            <span v-if="paymentMethod === 'bank_transfer'" class="method-btn__check">
+                            <span v-if="selectedCategory === 'bank_transfer'" class="method-btn__check">
                                 <CheckCircle2 class="method-btn__check-icon" />
                             </span>
                         </button>
 
                         <button
+                            v-if="hasCategory('e_wallet')"
                             class="method-btn"
-                            :class="{ 'method-btn--active': paymentMethod === 'e_wallet' }"
-                            @click="selectMethod('e_wallet')"
+                            :class="{ 'method-btn--active': selectedCategory === 'e_wallet' }"
+                            @click="selectCategory('e_wallet')"
                         >
                             <Smartphone class="method-btn__icon" />
                             <span>E-Wallet</span>
-                            <span v-if="paymentMethod === 'e_wallet'" class="method-btn__check">
+                            <span v-if="selectedCategory === 'e_wallet'" class="method-btn__check">
+                                <CheckCircle2 class="method-btn__check-icon" />
+                            </span>
+                        </button>
+
+                        <button
+                            v-if="hasCategory('qris')"
+                            class="method-btn"
+                            :class="{ 'method-btn--active': selectedCategory === 'qris' }"
+                            @click="selectCategory('qris')"
+                        >
+                            <Smartphone class="method-btn__icon" /> <!-- Reuse icon or change -->
+                            <span>QRIS</span>
+                            <span v-if="selectedCategory === 'qris'" class="method-btn__check">
                                 <CheckCircle2 class="method-btn__check-icon" />
                             </span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Cash Calculator -->
-                <div v-if="paymentMethod === 'cash'" class="payment-detail-panel">
-                    <CashCalculator
-                        :total-amount="total"
-                        @update:cashReceived="val => cashReceived = val"
-                    />
-                </div>
+                <!-- Payment Options Form based on Category -->
+                <div v-if="selectedCategory" class="payment-detail-panel">
+                    
+                    <!-- Pilihan sub-metode jika ada lebih dari 1 atau wajib dipilih -->
+                    <div v-if="methodsByCategory.length > 1 || (['bank_transfer', 'e_wallet', 'qris'].includes(selectedCategory) && methodsByCategory.length > 0)" class="mb-2">
+                        <label class="detail-label mb-1 block">Pilih Metode {{ selectedCategory === 'bank_transfer' ? 'Transfer' : (selectedCategory === 'e_wallet' ? 'E-Wallet' : 'QRIS') }}</label>
+                        <Popover v-model:open="openMethodBox">
+                            <PopoverTrigger as-child>
+                                <button
+                                    type="button"
+                                    role="combobox"
+                                    :aria-expanded="openMethodBox"
+                                    class="flex items-center justify-between h-10 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                                >
+                                    <span class="truncate">{{ selectedMethodDetails ? selectedMethodDetails.name : '-- Pilih --' }}</span>
+                                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent class="w-full p-0 bg-white" align="start">
+                                <Command>
+                                    <CommandInput placeholder="Cari metode..." class="h-9 border-none focus:ring-0" />
+                                    <CommandEmpty>Tidak ada metode yang cocok.</CommandEmpty>
+                                    <CommandList>
+                                        <CommandGroup>
+                                            <CommandItem
+                                                v-for="m in methodsByCategory"
+                                                :key="m.id"
+                                                :value="m.name"
+                                                @select="() => {
+                                                    selectedMethodId = m.id;
+                                                    openMethodBox = false;
+                                                }"
+                                                class="text-sm cursor-pointer"
+                                            >
+                                                {{ m.name }}
+                                                <Check
+                                                    :class="['ml-auto h-4 w-4', selectedMethodId === m.id ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                />
+                                            </CommandItem>
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
 
-                <!-- Bank Transfer -->
-                <div v-if="paymentMethod === 'bank_transfer'" class="payment-detail-panel">
-                    <label class="detail-label">Pilih Bank</label>
-                    <select v-model="paymentProvider" class="detail-select">
-                        <option value="" disabled>-- Pilih Bank --</option>
-                        <option v-for="bank in BANK_PROVIDERS" :key="bank" :value="bank">{{ bank }}</option>
-                    </select>
-                </div>
+                    <!-- Informasi Rekening / Detail (Hanya muncul jika sudah pilih metode non-tunai) -->
+                    <div v-if="selectedMethodDetails && selectedCategory !== 'cash'" class="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <p class="text-xs text-gray-500 mb-1">Diktekan ke Pelanggan:</p>
+                        <p class="text-sm font-semibold text-gray-900">{{ selectedMethodDetails.account_details || '-' }}</p>
+                        <p v-if="selectedMethodDetails.admin_fee_percentage > 0 && total >= selectedMethodDetails.min_amount_for_fee" class="text-xs text-orange-600 mt-1">
+                            *Catatan Kasir: Transaksi ini dikenakan MDR {{ Number(selectedMethodDetails.admin_fee_percentage) }}% (ditanggung toko)
+                        </p>
+                    </div>
 
-                <!-- E-Wallet -->
-                <div v-if="paymentMethod === 'e_wallet'" class="payment-detail-panel">
-                    <label class="detail-label">Pilih E-Wallet</label>
-                    <select v-model="paymentProvider" class="detail-select">
-                        <option value="" disabled>-- Pilih E-Wallet --</option>
-                        <option v-for="wallet in EWALLET_PROVIDERS" :key="wallet" :value="wallet">{{ wallet }}</option>
-                    </select>
+                    <!-- Cash Calculator -->
+                    <div v-if="selectedCategory === 'cash'" class="mt-4">
+                        <CashCalculator
+                            :total-amount="total"
+                            @update:cashReceived="val => cashReceived = val"
+                        />
+                    </div>
                 </div>
             </div>
 

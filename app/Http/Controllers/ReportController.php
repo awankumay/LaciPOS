@@ -53,12 +53,25 @@ class ReportController extends Controller
         $totalRevenue = (float) $data->total_revenue;
         $totalCogs = (float) $data->total_cogs;
         $grossProfit = (float) $data->gross_profit;
-        $marginPercentage = $totalRevenue > 0 ? round(($grossProfit / $totalRevenue) * 100, 2) : 0;
+        
+        $ordersStats = \App\Models\Order::where('status', 'completed')
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->select(
+                DB::raw("SUM(payment_admin_fee_amount) as total_mdr")
+            )->first();
+            
+        $totalMdr = (float) $ordersStats->total_mdr;
+        $netProfit = $grossProfit - $totalMdr;
+        
+        $marginPercentage = $totalRevenue > 0 ? round(($netProfit / $totalRevenue) * 100, 2) : 0;
 
         return Inertia::render('Reports/ProfitLoss', [
             'totalRevenue' => $totalRevenue,
             'totalCogs' => $totalCogs,
             'grossProfit' => $grossProfit,
+            'totalMdr' => $totalMdr,
+            'netProfit' => $netProfit,
             'marginPercentage' => $marginPercentage,
             'filters' => ['start_date' => $startDate, 'end_date' => $endDate],
         ]);

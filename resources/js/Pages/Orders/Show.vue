@@ -191,6 +191,18 @@ const getStatusColor = (statusText) => {
                             <dt class="text-base font-bold text-[#001e2b]">Total Harga</dt>
                             <dd class="text-xl font-bold text-[#001e2b]">{{ formatRupiah(order.total_amount) }}</dd>
                         </div>
+
+                        <!-- Rincian MDR Khusus Owner -->
+                        <template v-if="$page.props.auth.user.role === 'owner' && order.payment_admin_fee_amount > 0">
+                            <div class="pt-3 border-t border-[#e1e5e8] mt-3 flex justify-between items-center">
+                                <dt class="text-xs text-orange-600">Potongan MDR ({{ Number(order.payment_admin_fee_rate) }}%)</dt>
+                                <dd class="text-xs font-semibold text-orange-600 text-right">-{{ formatRupiah(order.payment_admin_fee_amount) }}</dd>
+                            </div>
+                            <div class="pt-2 flex justify-between items-center">
+                                <dt class="text-sm font-bold text-[#00684a]">Dana Cair (Bersih)</dt>
+                                <dd class="text-sm font-bold text-[#00684a] text-right">{{ formatRupiah(order.total_amount - order.payment_admin_fee_amount) }}</dd>
+                            </div>
+                        </template>
                     </dl>
                 </div>
 

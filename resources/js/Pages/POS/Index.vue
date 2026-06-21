@@ -14,6 +14,7 @@ const props = defineProps({
     products: Array,
     categories: Array,
     next_order_number: String,
+    payment_methods: Array,
 });
 
 const { items, addItem, finalTotal, clearCart, getQuantityByProductId, getDiscountedQuantityByProductId, cartDiscountType, cartDiscountValue, cartDiscountNote } = useCart();
@@ -242,6 +243,7 @@ const handleConfirmPayment = (paymentData) => {
             <PaymentModal
                 :open="showPaymentModal"
                 :total="paymentTotal"
+                :payment-methods="payment_methods"
                 @close="showPaymentModal = false"
                 @confirm-payment="handleConfirmPayment"
             />

@@ -104,6 +104,24 @@ class OrderController extends Controller
 
         $totalAmount = round($subtotalAfterCartDiscount + $taxAmount + $serviceChargeAmount);
 
+        $paymentMethodId = $validated['payment_method_id'] ?? null;
+        $paymentAdminFeeRate = 0;
+        $paymentAdminFeeAmount = 0;
+        $paymentMethodName = null;
+        $paymentAccountDetails = null;
+
+        if ($paymentMethodId) {
+            $paymentMethod = \App\Models\PaymentMethod::find($paymentMethodId);
+            if ($paymentMethod) {
+                $paymentMethodName = $paymentMethod->name;
+                $paymentAccountDetails = $paymentMethod->account_details;
+                $paymentAdminFeeRate = $paymentMethod->admin_fee_percentage;
+                if ($totalAmount >= $paymentMethod->min_amount_for_fee) {
+                    $paymentAdminFeeAmount = $totalAmount * ($paymentAdminFeeRate / 100);
+                }
+            }
+        }
+
         // Validasi uang cukup untuk cash
         if ($validated['payment_method'] === 'cash') {
             if ($validated['cash_received'] < $totalAmount) {
@@ -111,7 +129,7 @@ class OrderController extends Controller
             }
         }
 
-        $order = DB::transaction(function () use ($validated, $items, $subtotal, $cartDiscountAmount, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $request) {
+        $order = DB::transaction(function () use ($validated, $items, $subtotal, $cartDiscountAmount, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $paymentMethodId, $paymentMethodName, $paymentAccountDetails, $paymentAdminFeeRate, $paymentAdminFeeAmount, $request) {
             // Buat order
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
@@ -137,6 +155,11 @@ class OrderController extends Controller
                 'customer_name' => $validated['customer_name'] ?? null,
                 'table_number' => $validated['table_number'] ?? null,
                 'notes' => $validated['notes'] ?? null,
+                'payment_method_id' => $paymentMethodId,
+                'payment_method_name' => $paymentMethodName,
+                'payment_account_details' => $paymentAccountDetails,
+                'payment_admin_fee_rate' => $paymentAdminFeeRate,
+                'payment_admin_fee_amount' => $paymentAdminFeeAmount,
             ]);
 
             // Buat order items dengan PRICE SNAPSHOT dan potong kuota diskon

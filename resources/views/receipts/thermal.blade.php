@@ -180,14 +180,21 @@
                 <td class="text-left font-bold">Total</td>
                 <td class="text-right font-bold">Rp {{ number_format($order['total'], 0, ',', '.') }}</td>
             </tr>
+            @if(strtolower($order['payment_method']) === 'cash' || strtolower($order['payment_method']) === 'tunai')
             <tr>
                 <td class="text-left">Bayar ({{ $order['payment_method'] }})</td>
-                <td class="text-right">Rp {{ number_format($order['cash_received'], 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($order['cash_received'] ?? 0, 0, ',', '.') }}</td>
             </tr>
             <tr>
                 <td class="text-left">Kembali</td>
-                <td class="text-right">Rp {{ number_format($order['change'], 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($order['change'] ?? 0, 0, ',', '.') }}</td>
             </tr>
+            @else
+            <tr>
+                <td class="text-left">Bayar ({{ $order['payment_method'] }})</td>
+                <td class="text-right">Rp {{ number_format($order['total'], 0, ',', '.') }}</td>
+            </tr>
+            @endif
         </table>
     </div>
 

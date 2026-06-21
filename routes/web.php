@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PaymentMethodController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -77,6 +78,9 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::get('/settings/backup', [App\Http\Controllers\BackupController::class, 'index'])->name('settings.backup');
         Route::post('/settings/backup', [App\Http\Controllers\BackupController::class, 'store'])->name('settings.backup.store');
         Route::get('/settings/backup/{filename}/download', [App\Http\Controllers\BackupController::class, 'download'])->name('settings.backup.download');
+
+        // Payment Methods
+        Route::resource('/settings/payment-methods', PaymentMethodController::class)->except(['create', 'show', 'edit']);
     });
 
     // Route yang bisa diakses owner DAN cashier

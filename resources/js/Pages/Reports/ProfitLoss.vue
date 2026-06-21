@@ -9,6 +9,8 @@ const props = defineProps({
     totalRevenue: [String, Number],
     totalCogs: [String, Number],
     grossProfit: [String, Number],
+    totalMdr: [String, Number],
+    netProfit: [String, Number],
     marginPercentage: [String, Number],
     filters: Object,
 });
@@ -127,19 +129,43 @@ const formatRupiah = (value) => {
                 </div>
 
                 <!-- Laba Kotor -->
+                <div class="rounded-2xl border border-[#e1e5e8] bg-white p-6 shadow-[0_1px_2px_rgba(0,30,43,0.04)] flex items-center gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#001e2b]">
+                        <Wallet class="h-7 w-7 text-[#00ed64]" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-[#7c8c9a]">Laba Kotor Semula</p>
+                        <p class="text-2xl font-bold" :class="grossProfit >= 0 ? 'text-[#00684a]' : 'text-red-600'">
+                            {{ formatRupiah(grossProfit) }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Potongan MDR -->
+                <div class="rounded-2xl border border-[#e1e5e8] bg-white p-6 shadow-[0_1px_2px_rgba(0,30,43,0.04)] flex items-center gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-50">
+                        <ArrowDownCircle class="h-7 w-7 text-orange-600" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-[#7c8c9a]">Total Potongan MDR</p>
+                        <p class="text-2xl font-bold text-orange-600">-{{ formatRupiah(totalMdr) }}</p>
+                    </div>
+                </div>
+
+                <!-- Dana Cair (Laba Bersih) -->
                 <div class="rounded-2xl border border-[#e1e5e8] bg-white p-6 shadow-[0_1px_2px_rgba(0,30,43,0.04)] flex items-center gap-4 relative overflow-hidden">
                     <!-- Decor -->
                     <div class="absolute -right-4 -top-4 opacity-5">
                         <Wallet class="h-32 w-32" />
                     </div>
                     
-                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#001e2b]">
-                        <Wallet class="h-7 w-7 text-[#00ed64]" />
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#00684a]">
+                        <Wallet class="h-7 w-7 text-white" />
                     </div>
                     <div class="relative z-10">
-                        <p class="text-sm font-medium text-[#7c8c9a]">Laba Kotor</p>
-                        <p class="text-2xl font-bold" :class="grossProfit >= 0 ? 'text-[#00684a]' : 'text-red-600'">
-                            {{ formatRupiah(grossProfit) }}
+                        <p class="text-sm font-medium text-[#7c8c9a]">Total Dana Cair (Bersih)</p>
+                        <p class="text-2xl font-bold" :class="netProfit >= 0 ? 'text-[#00684a]' : 'text-red-600'">
+                            {{ formatRupiah(netProfit) }}
                         </p>
                         <p class="mt-1 text-xs font-semibold" :class="marginPercentage >= 0 ? 'text-[#00ed64]' : 'text-red-500'">
                             Margin: {{ marginPercentage }}%
