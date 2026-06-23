@@ -29,13 +29,7 @@ watch(() => page.props.flash, handleFlash, { deep: true });
     <Head :title="title" />
 
     <div class="min-h-screen bg-[#f4f7f6] flex flex-col items-center justify-center p-6">
-        <!-- Logo / Brand -->
-        <div class="mb-10 flex items-center gap-2.5">
-            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#001e2b]">
-                <Store class="h-5 w-5 text-[#00ed64]" />
-            </div>
-            <span class="text-xl font-bold tracking-tight text-[#001e2b]">POS Desktop</span>
-        </div>
+
 
         <!-- Content Slot -->
         <div class="w-full max-w-lg">

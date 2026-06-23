@@ -23,10 +23,8 @@ const submit = () => {
     <GuestLayout title="Daftar Akun">
         <div class="rounded-2xl border border-[#e1e5e8] bg-white shadow-[0_4px_12px_rgba(0,30,43,0.08)]">
             <!-- Header band -->
-            <div class="rounded-t-2xl bg-[#001e2b] px-8 py-7 text-center">
-                <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#00ed64]">
-                    <UserPlus class="h-6 w-6 text-[#001e2b]" />
-                </div>
+            <div class="rounded-t-2xl bg-[#001e2b] px-8 py-7">
+                <img src="/assets/logo/logo.png" alt="Logo" class="mb-0 h-16 w-auto object-contain" />
                 <h1 class="text-xl font-bold text-white">Buat Akun Baru</h1>
                 <p class="mt-1 text-sm text-[#a8b3bc]">Daftarkan toko Anda untuk mulai menggunakan POS Desktop.</p>
             </div>
