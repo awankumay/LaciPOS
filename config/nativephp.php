@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'app_name' => env('APP_NAME', 'POS Desktop'),
+    'app_name' => env('APP_NAME', 'Laci POS Desktop'),
 
     /**
      * The version of your app.
@@ -15,7 +15,7 @@ return [
      * usually in the form of a reverse domain name.
      * For example: com.nativephp.app
      */
-    'app_id' => env('NATIVEPHP_APP_ID', 'com.pos.desktop'),
+    'app_id' => env('NATIVEPHP_APP_ID', 'com.laci.pos.desktop'),
 
     /**
      * If your application allows deep linking, you can specify the scheme
