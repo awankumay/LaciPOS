@@ -15,7 +15,7 @@ const navItems = [
     { name: 'Pajak & Layanan', url: '/settings/taxes' },
     { name: 'Metode Pembayaran', url: '/settings/payment-methods' },
     { name: 'Stok', url: '/settings/inventory' },
-    { name: 'Backup Database', url: '/settings/backup' },
+    { name: 'Backup & Restore', url: '/settings/backup' },
 ];
 </script>
 

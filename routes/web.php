@@ -77,6 +77,7 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         // Backup Settings
         Route::get('/settings/backup', [App\Http\Controllers\BackupController::class, 'index'])->name('settings.backup');
         Route::post('/settings/backup', [App\Http\Controllers\BackupController::class, 'store'])->name('settings.backup.store');
+        Route::post('/settings/restore', [App\Http\Controllers\BackupController::class, 'restore'])->name('settings.backup.restore');
         Route::get('/settings/backup/{filename}/download', [App\Http\Controllers\BackupController::class, 'download'])->name('settings.backup.download');
 
         // Payment Methods

@@ -32,6 +32,42 @@ class BackupService
     }
 
     /**
+     * Restore database dari file backup.
+     * Mengganti database.sqlite saat ini dengan file backup yang diunggah.
+     */
+    public function restoreBackup($uploadedFile)
+    {
+        // 1. Perintahkan SQLite secara native untuk melebur dan MENGOSONGKAN (0 bytes) file WAL.
+        // Ini mencegah sisa data di file WAL (seperti stok 120) tertimpa balik ke file database yang baru direstore.
+        DB::statement('PRAGMA wal_checkpoint(TRUNCATE);');
+
+        // 2. Disconnect aktifkan PDO, baru purge dari manager agar Windows melepaskan lock file.
+        DB::disconnect('sqlite');
+        DB::purge('sqlite');
+
+        $dbPath = database_path('database.sqlite');
+        $walPath = database_path('database.sqlite-wal');
+        $shmPath = database_path('database.sqlite-shm');
+        
+        // 3. Hapus file WAL dan SHM secara fisik (jika masih tersisa). 
+        // Menggunakan @unlink saja, JANGAN menggunakan file_put_contents karena akan merusak header SQLite dan memicu Disk I/O Error.
+        if (File::exists($walPath)) {
+            @unlink($walPath);
+        }
+        if (File::exists($shmPath)) {
+            @unlink($shmPath);
+        }
+
+        // 4. Timpa file database
+        if (!File::copy($uploadedFile->getRealPath(), $dbPath)) {
+            throw new \Exception("Gagal menimpa database utama. Pastikan tidak ada program lain yang sedang membuka database.");
+        }
+        
+        // 5. Reconnect
+        DB::reconnect('sqlite');
+    }
+
+    /**
      * Dapatkan daftar backup yang ada.
      */
     public function listBackups(): array
