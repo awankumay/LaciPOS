@@ -103,10 +103,6 @@ const testPrint = () => {
                             <input type="radio" v-model="form.paper_size" value="58mm" class="w-4 h-4 text-[#00ed64] focus:ring-[#00ed64]" />
                             <span class="text-sm text-gray-700">58 mm (Kecil)</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" v-model="form.paper_size" value="80mm" class="w-4 h-4 text-[#00ed64] focus:ring-[#00ed64]" />
-                            <span class="text-sm text-gray-700">80 mm (Standar)</span>
-                        </label>
                     </div>
                     <p v-if="form.errors.paper_size" class="text-sm text-red-500 mt-1">{{ form.errors.paper_size }}</p>
                 </div>
