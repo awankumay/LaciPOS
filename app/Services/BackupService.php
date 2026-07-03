@@ -16,7 +16,7 @@ class BackupService
         // Pastikan WAL mode di-checkpoint sebelum backup untuk konsistensi data
         DB::statement('PRAGMA wal_checkpoint(TRUNCATE);');
 
-        $sourceDb = database_path('database.sqlite');
+        $sourceDb = DB::connection()->getDatabaseName();
         $backupDir = storage_path('app/backups');
 
         if (!File::isDirectory($backupDir)) {
@@ -41,15 +41,17 @@ class BackupService
         // Ini mencegah sisa data di file WAL (seperti stok 120) tertimpa balik ke file database yang baru direstore.
         DB::statement('PRAGMA wal_checkpoint(TRUNCATE);');
 
-        // 2. Disconnect aktifkan PDO, baru purge dari manager agar Windows melepaskan lock file.
-        DB::disconnect('sqlite');
-        DB::purge('sqlite');
+        // 2. Dapatkan path database aktif sebelum disconnect
+        $dbPath = DB::connection()->getDatabaseName();
+        $walPath = $dbPath . '-wal';
+        $shmPath = $dbPath . '-shm';
 
-        $dbPath = database_path('database.sqlite');
-        $walPath = database_path('database.sqlite-wal');
-        $shmPath = database_path('database.sqlite-shm');
-        
-        // 3. Hapus file WAL dan SHM secara fisik (jika masih tersisa). 
+        // 3. Disconnect aktifkan PDO, baru purge dari manager agar Windows melepaskan lock file.
+        $connection = DB::getDefaultConnection();
+        DB::disconnect($connection);
+        DB::purge($connection);
+
+        // 4. Hapus file WAL dan SHM secara fisik (jika masih tersisa).
         // Menggunakan @unlink saja, JANGAN menggunakan file_put_contents karena akan merusak header SQLite dan memicu Disk I/O Error.
         if (File::exists($walPath)) {
             @unlink($walPath);
@@ -58,13 +60,13 @@ class BackupService
             @unlink($shmPath);
         }
 
-        // 4. Timpa file database
+        // 5. Timpa file database
         if (!File::copy($uploadedFile->getRealPath(), $dbPath)) {
             throw new \Exception("Gagal menimpa database utama. Pastikan tidak ada program lain yang sedang membuka database.");
         }
-        
-        // 5. Reconnect
-        DB::reconnect('sqlite');
+
+        // 6. Reconnect
+        DB::reconnect($connection);
     }
 
     /**
