@@ -1,11 +1,15 @@
 <script setup>
-import { router, Link } from '@inertiajs/vue3';
+import { router, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ArrowLeft, Printer, Ban, Download, Receipt, CheckCircle, XCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 const props = defineProps({
     order: Object,
 });
+
+const page = usePage();
+const storeTimezone = computed(() => page.props.storeSettings?.timezone || 'Asia/Jakarta');
 
 const formatRupiah = (value) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
@@ -13,8 +17,9 @@ const formatRupiah = (value) => {
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const datePart = date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const timePart = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    const tz = storeTimezone.value;
+    const datePart = date.toLocaleDateString('id-ID', { timeZone: tz, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timePart = date.toLocaleTimeString('id-ID', { timeZone: tz, hour: '2-digit', minute: '2-digit' });
     return `${datePart}\n${timePart}`;
 };
 

@@ -1,6 +1,6 @@
 <script setup>
-import { ref, watch } from 'vue';
-import { router, Link } from '@inertiajs/vue3';
+import { ref, watch, computed } from 'vue';
+import { router, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -63,8 +63,11 @@ const applyFilters = () => {
     });
 };
 
+const page = usePage();
+const storeTimezone = computed(() => page.props.storeSettings?.timezone || 'Asia/Jakarta');
+
 const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const options = { timeZone: storeTimezone.value, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('id-ID', options);
 };
 </script>
