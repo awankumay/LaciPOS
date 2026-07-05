@@ -61,12 +61,20 @@ const removeOption = (variantIndex, optionIndex) => {
 
             <!-- Options -->
             <div class="space-y-2 pl-4 border-l-2 border-slate-100">
-                <div v-for="(option, oIdx) in variant.options" :key="oIdx" class="flex items-center gap-2">
-                    <Input v-model="option.label" placeholder="Label opsi" class="flex-1" />
-                    <div class="w-32">
-                        <Input v-model="option.price_modifier" type="number" step="500" placeholder="± Harga" />
+                <div v-for="(option, oIdx) in variant.options" :key="oIdx" class="flex items-start gap-2">
+                    <div class="flex-1">
+                        <Label class="text-xs text-slate-500">Label Opsi</Label>
+                        <Input v-model="option.label" placeholder="Contoh: Small, Medium, Large" class="mt-1" />
                     </div>
-                    <Button type="button" v-if="variant.options.length > 1" variant="ghost" size="sm"
+                    <div class="w-28">
+                        <Label class="text-xs text-slate-500">+ Harga</Label>
+                        <Input v-model="option.price_modifier" type="number" step="500" placeholder="0" class="mt-1" />
+                    </div>
+                    <div class="w-28">
+                        <Label class="text-xs text-slate-500">+ Modal</Label>
+                        <Input v-model="option.cogs_modifier" type="number" step="500" placeholder="0" class="mt-1" />
+                    </div>
+                    <Button type="button" v-if="variant.options.length > 1" variant="ghost" size="sm" class="mt-6"
                         @click="removeOption(vIdx, oIdx)">
                         <Trash2 class="h-3 w-3 text-slate-400" />
                     </Button>
@@ -74,6 +82,9 @@ const removeOption = (variantIndex, optionIndex) => {
                 <Button type="button" variant="outline" size="sm" @click="addOption(vIdx)">
                     <Plus class="mr-1 h-3 w-3" /> Tambah Opsi
                 </Button>
+                <p class="text-xs text-slate-400 mt-2">
+                    Isi nilai tambahan harga dan modal untuk opsi ini. Nilai ini akan ditambahkan ke harga dan modal dasar produk saat pelanggan memilih opsi ini di kasir. Contoh: Jika harga produk Rp 10.000 dan opsi "Large" diberi + Rp 2.000, maka harga akhir menjadi Rp 12.000.
+                </p>
             </div>
         </div>
 
