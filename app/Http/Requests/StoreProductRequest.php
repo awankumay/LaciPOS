@@ -23,6 +23,18 @@ class StoreProductRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $cogs = $this->input('cogs');
+            $price = $this->input('price');
+
+            if (is_numeric($cogs) && is_numeric($price) && (float) $price < (float) $cogs) {
+                $validator->errors()->add('price', 'Harga jual tidak boleh kurang dari harga modal.');
+            }
+        });
+    }
+
     public function messages(): array
     {
         return [

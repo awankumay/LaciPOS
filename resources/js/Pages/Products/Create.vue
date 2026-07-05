@@ -208,6 +208,10 @@ const submit = () => {
                             <span class="text-sm text-green-700 font-medium">Estimasi Margin:</span>
                             <span class="text-sm text-green-700 font-bold">{{ Math.round(((Number(form.price) - Number(form.cogs)) / Number(form.cogs)) * 100) }}%</span>
                         </div>
+                        <div v-if="form.cogs && form.price && Number(form.price) < Number(form.cogs)"
+                            class="p-3 bg-red-50 rounded-lg border border-red-100">
+                            <p class="text-sm text-red-600 font-medium">Harga jual lebih rendah dari harga modal! Produk akan dijual rugi.</p>
+                        </div>
                     </CardContent>
                 </Card>
 
