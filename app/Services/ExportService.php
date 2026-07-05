@@ -56,6 +56,8 @@ class ExportService
             fputcsv($handle, ['Total Pendapatan (Penjualan)', $data['totalRevenue']]);
             fputcsv($handle, ['Total Harga Pokok Penjualan (HPP)', $data['totalCogs']]);
             fputcsv($handle, ['Laba Kotor (Gross Profit)', $data['grossProfit']]);
+            fputcsv($handle, ['Total Biaya Admin (MDR)', $data['totalMdr']]);
+            fputcsv($handle, ['Laba Bersih (Net Profit)', $data['netProfit']]);
             fputcsv($handle, ['Margin (%)', $data['marginPercentage']]);
 
             fclose($handle);

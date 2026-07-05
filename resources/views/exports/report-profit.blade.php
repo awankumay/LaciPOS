@@ -26,7 +26,7 @@
     <div class="header">
         <h1 class="store-name">{{ $store_name }}</h1>
         <p class="store-address">{{ $store_address }}</p>
-        <h2 class="report-title">Laporan Laba/Rugi (Kotor)</h2>
+        <h2 class="report-title">Laporan Laba/Rugi</h2>
     </div>
 
     <table class="meta-table">
@@ -48,7 +48,17 @@
         <tr class="{{ $grossProfit >= 0 ? 'profit-box' : 'loss-box' }}">
             <th>Laba Kotor (Gross Profit)</th>
             <td style="{{ $grossProfit >= 0 ? 'color: #2e7d32;' : 'color: #c62828;' }}">
-                Rp {{ number_format($grossProfit, 0, ',', '.') }} 
+                Rp {{ number_format($grossProfit, 0, ',', '.') }}
+            </td>
+        </tr>
+        <tr>
+            <th>Total Biaya Admin (MDR)</th>
+            <td style="color: #d32f2f;">- Rp {{ number_format($totalMdr, 0, ',', '.') }}</td>
+        </tr>
+        <tr class="{{ $netProfit >= 0 ? 'profit-box' : 'loss-box' }}">
+            <th>Laba Bersih (Net Profit)</th>
+            <td style="{{ $netProfit >= 0 ? 'color: #2e7d32;' : 'color: #c62828;' }}">
+                Rp {{ number_format($netProfit, 0, ',', '.') }}
                 <span style="font-size: 12px; margin-left: 10px;">(Margin: {{ $marginPercentage }}%)</span>
             </td>
         </tr>
@@ -56,7 +66,7 @@
 
     <div class="disclaimer">
         <strong>* Catatan Penting:</strong><br>
-        Laporan ini hanya menampilkan <strong>Laba Kotor</strong>, yang dihitung murni dari selisih Harga Jual dan Harga Modal (HPP) dari produk yang terjual pada rentang waktu yang dipilih. Angka di atas belum dikurangi dengan biaya-biaya operasional toko (seperti listrik, sewa, gaji karyawan, dan lain-lain) untuk mendapatkan Laba Bersih.
+        Laporan ini menampilkan <strong>Laba Bersih</strong> setelah dikurangi Biaya Admin (MDR) dari pembayaran non-tunai. Angka di atas belum dikurangi dengan biaya-biaya operasional toko (seperti listrik, sewa, gaji karyawan, dan lain-lain).
     </div>
 </body>
 </html>

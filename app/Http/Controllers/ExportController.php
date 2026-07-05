@@ -62,7 +62,16 @@ class ExportController extends Controller
         $totalRevenue = (float) $dataDb->total_revenue;
         $totalCogs = (float) $dataDb->total_cogs;
         $grossProfit = (float) $dataDb->gross_profit;
-        $marginPercentage = $totalRevenue > 0 ? round(($grossProfit / $totalRevenue) * 100, 2) : 0;
+
+        $ordersStats = Order::where('status', 'completed')
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->select(DB::raw("SUM(payment_admin_fee_amount) as total_mdr"))
+            ->first();
+
+        $totalMdr = (float) $ordersStats->total_mdr;
+        $netProfit = $grossProfit - $totalMdr;
+        $marginPercentage = $totalRevenue > 0 ? round(($netProfit / $totalRevenue) * 100, 2) : 0;
         $storeProfile = StoreProfile::getProfile();
 
         $data = [
@@ -73,6 +82,8 @@ class ExportController extends Controller
             'totalRevenue' => $totalRevenue,
             'totalCogs' => $totalCogs,
             'grossProfit' => $grossProfit,
+            'totalMdr' => $totalMdr,
+            'netProfit' => $netProfit,
             'marginPercentage' => $marginPercentage,
             'print_date' => now()->format('d M Y H:i:s'),
         ];
@@ -118,12 +129,23 @@ class ExportController extends Controller
         $totalRevenue = (float) $dataDb->total_revenue;
         $totalCogs = (float) $dataDb->total_cogs;
         $grossProfit = (float) $dataDb->gross_profit;
-        $marginPercentage = $totalRevenue > 0 ? round(($grossProfit / $totalRevenue) * 100, 2) : 0;
+
+        $ordersStats = Order::where('status', 'completed')
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->select(DB::raw("SUM(payment_admin_fee_amount) as total_mdr"))
+            ->first();
+
+        $totalMdr = (float) $ordersStats->total_mdr;
+        $netProfit = $grossProfit - $totalMdr;
+        $marginPercentage = $totalRevenue > 0 ? round(($netProfit / $totalRevenue) * 100, 2) : 0;
 
         $data = [
             'totalRevenue' => $totalRevenue,
             'totalCogs' => $totalCogs,
             'grossProfit' => $grossProfit,
+            'totalMdr' => $totalMdr,
+            'netProfit' => $netProfit,
             'marginPercentage' => $marginPercentage,
         ];
 
