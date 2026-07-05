@@ -47,9 +47,11 @@ class ProductController extends Controller
     {
         $categories = Category::orderBy('name')->get();
         $discounts = Discount::where('is_active', true)->orderBy('name')->get();
+        $profile = \App\Models\StoreProfile::getProfile();
         return Inertia::render('Products/Create', [
             'categories' => $categories,
             'discounts' => $discounts,
+            'defaultMinStock' => $profile?->default_min_stock ?? 5,
         ]);
     }
 
