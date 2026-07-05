@@ -1,7 +1,7 @@
 <script setup>
 import { router, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ArrowLeft, Printer, Ban, Receipt, CheckCircle, XCircle } from 'lucide-vue-next';
+import { ArrowLeft, Printer, Ban, Download, Receipt, CheckCircle, XCircle } from 'lucide-vue-next';
 
 const props = defineProps({
     order: Object,
@@ -210,9 +210,16 @@ const getStatusColor = (statusText) => {
                 <div class="rounded-2xl border border-[#e1e5e8] bg-white p-5 shadow-[0_1px_2px_rgba(0,30,43,0.04)]">
                     <h2 class="text-sm font-semibold text-[#001e2b] mb-4">Tindakan</h2>
                     <div class="space-y-3">
+                        <a
+                            :href="`/orders/${order.id}/download`"
+                            class="w-full flex items-center justify-center gap-2 rounded-lg bg-[#001e2b] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c2d38] transition-colors"
+                        >
+                            <Download class="h-4 w-4" />
+                            Download Struk PDF
+                        </a>
                         <button
                             @click="printReceipt"
-                            class="w-full flex items-center justify-center gap-2 rounded-lg bg-[#001e2b] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c2d38] transition-colors"
+                            class="w-full flex items-center justify-center gap-2 rounded-lg bg-white border border-[#001e2b] px-4 py-2.5 text-sm font-semibold text-[#001e2b] hover:bg-[#f4f7f6] transition-colors"
                         >
                             <Printer class="h-4 w-4" />
                             Cetak Ulang Struk
