@@ -294,8 +294,12 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show(Order $order)
+    public function show(Order $order, \Illuminate\Http\Request $request)
     {
+        if ($request->user()->isCashier() && $order->user_id !== $request->user()->id) {
+            return redirect()->route('orders.index')->with('error', 'Anda tidak diizinkan mengakses transaksi ini.');
+        }
+
         $order->load(['items', 'user']);
 
         return Inertia::render('Orders/Show', [
@@ -303,8 +307,12 @@ class OrderController extends Controller
         ]);
     }
 
-    public function cancel(Order $order)
+    public function cancel(Order $order, \Illuminate\Http\Request $request)
     {
+        if ($request->user()->isCashier() && $order->user_id !== $request->user()->id) {
+            return redirect()->route('orders.index')->with('error', 'Anda tidak diizinkan membatalkan transaksi ini.');
+        }
+
         if ($order->status !== 'completed') {
             return back()->with('error', 'Hanya transaksi completed yang bisa dibatalkan.');
         }
