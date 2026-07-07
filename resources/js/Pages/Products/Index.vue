@@ -167,9 +167,9 @@ const executeDelete = () => {
                                 <Package v-else class="h-5 w-5 text-slate-300" />
                             </div>
                         </TableCell>
-                        <TableCell class="font-medium">
+                        <TableCell class="font-medium max-w-[250px] truncate" :title="product.name">
                             {{ product.name }}
-                            <Badge v-if="product.variants_count > 0" variant="outline" class="ml-2">
+                            <Badge v-if="product.variants_count > 0" variant="outline" class="ml-2 shrink-0">
                                 {{ product.variants_count }} varian
                             </Badge>
                         </TableCell>
@@ -234,8 +234,10 @@ const executeDelete = () => {
             :show="showDeleteDialog"
             @update:show="showDeleteDialog = $event"
             title="Hapus Produk"
-            :description="`Apakah Anda yakin ingin menghapus produk \u0022${deletingProduct?.name}\u0022? Data produk ini tidak akan ditampilkan lagi, namun riwayat penjualan tetap tersimpan.`"
         >
+            <p class="text-sm text-slate-600 break-all">
+                Apakah Anda yakin ingin menghapus produk <strong class="break-all">{{ deletingProduct?.name }}</strong>? Data produk ini tidak akan ditampilkan lagi, namun riwayat penjualan tetap tersimpan.
+            </p>
             <template #footer>
                 <Button variant="outline" @click="showDeleteDialog = false">Batal</Button>
                 <Button variant="destructive" @click="executeDelete" class="bg-red-600 text-white">Hapus</Button>

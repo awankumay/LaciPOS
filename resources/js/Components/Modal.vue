@@ -16,7 +16,7 @@ defineEmits(['update:show', 'close']);
         <DialogContent :class="['p-6', maxWidth]">
             <DialogHeader>
                 <DialogTitle>{{ title }}</DialogTitle>
-                <DialogDescription v-if="description">
+                <DialogDescription v-if="description" class="break-words">
                     {{ description }}
                 </DialogDescription>
             </DialogHeader>

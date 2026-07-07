@@ -53,7 +53,7 @@ const isOverStock = computed(() => {
 
         <!-- Info -->
         <div class="product-card__info">
-            <p class="product-card__name">{{ product.name }}</p>
+            <p class="product-card__name" :title="product.name">{{ product.name }}</p>
             <p class="product-card__stock-text">Stok: {{ product.stock }}</p>
             <div class="product-card__footer">
                 <div class="flex flex-col flex-1 min-w-0 mr-2">
@@ -201,6 +201,8 @@ const isOverStock = computed(() => {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .product-card__stock-text {
