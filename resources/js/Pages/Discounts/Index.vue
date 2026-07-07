@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
+import Modal from '@/Components/Modal.vue';
 import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
 import { Command, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
 import { Plus, Pencil, Trash2, Calendar, Clock, PercentCircle, Search, Filter, ChevronsUpDown, Check } from 'lucide-vue-next';
@@ -46,10 +47,21 @@ const applyFilters = () => {
     });
 };
 
-const deleteDiscount = (id) => {
-    if (confirm('Apakah Anda yakin ingin menghapus diskon ini?')) {
-        router.delete(`/discounts/${id}`);
-    }
+const showDeleteDialog = ref(false);
+const deletingDiscount = ref(null);
+
+const confirmDelete = (discount) => {
+    deletingDiscount.value = discount;
+    showDeleteDialog.value = true;
+};
+
+const executeDelete = () => {
+    router.delete(`/discounts/${deletingDiscount.value.id}`, {
+        onFinish: () => {
+            showDeleteDialog.value = false;
+            deletingDiscount.value = null;
+        },
+    });
 };
 
 const formatDate = (dateString) => {
@@ -202,7 +214,7 @@ const formatDate = (dateString) => {
                                                 <Pencil class="h-4 w-4" />
                                             </button>
                                         </Link>
-                                        <button @click="deleteDiscount(discount.id)" class="flex h-8 w-8 items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-colors">
+                                        <button @click="confirmDelete(discount)" class="flex h-8 w-8 items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-colors">
                                             <Trash2 class="h-4 w-4" />
                                         </button>
                                     </div>
@@ -228,5 +240,18 @@ const formatDate = (dateString) => {
                 </template>
             </div>
         </div>
+
+        <!-- Delete Confirmation Modal -->
+        <Modal
+            :show="showDeleteDialog"
+            @update:show="showDeleteDialog = $event"
+            title="Hapus Diskon"
+            :description="`Apakah Anda yakin ingin menghapus diskon \u0022${deletingDiscount?.name}\u0022? Diskon ini tidak akan bisa digunakan lagi.`"
+        >
+            <template #footer>
+                <Button variant="outline" @click="showDeleteDialog = false">Batal</Button>
+                <Button class="bg-red-600 text-white hover:bg-red-700" @click="executeDelete">Hapus</Button>
+            </template>
+        </Modal>
     </AppLayout>
 </template>

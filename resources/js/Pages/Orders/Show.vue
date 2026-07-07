@@ -2,7 +2,9 @@
 import { router, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ArrowLeft, Printer, Ban, Download, Receipt, CheckCircle, XCircle } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import Modal from '@/Components/Modal.vue';
+import { Button } from '@/Components/ui/button';
 
 const props = defineProps({
     order: Object,
@@ -33,12 +35,19 @@ const printReceipt = () => {
     });
 };
 
-const cancelOrder = () => {
-    if (confirm('Apakah Anda yakin ingin membatalkan transaksi ini? Stok produk akan otomatis dikembalikan.')) {
-        router.post(`/orders/${props.order.id}/cancel`, {}, {
-            preserveScroll: true,
-        });
-    }
+const showCancelDialog = ref(false);
+
+const confirmCancel = () => {
+    showCancelDialog.value = true;
+};
+
+const executeCancel = () => {
+    router.post(`/orders/${props.order.id}/cancel`, {}, {
+        preserveScroll: true,
+        onFinish: () => {
+            showCancelDialog.value = false;
+        },
+    });
 };
 
 const getStatusColor = (statusText) => {
@@ -233,7 +242,7 @@ const getStatusColor = (statusText) => {
                         
                         <button
                             v-if="order.status === 'completed'"
-                            @click="cancelOrder"
+                            @click="confirmCancel"
                             class="w-full flex items-center justify-center gap-2 rounded-lg bg-white border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
                         >
                             <Ban class="h-4 w-4" />
@@ -243,5 +252,18 @@ const getStatusColor = (statusText) => {
                 </div>
             </div>
         </div>
+
+        <!-- Cancel Confirmation Modal -->
+        <Modal
+            :show="showCancelDialog"
+            @update:show="showCancelDialog = $event"
+            title="Batalkan Transaksi"
+            description="Apakah Anda yakin ingin membatalkan transaksi ini? Stok produk akan otomatis dikembalikan."
+        >
+            <template #footer>
+                <Button variant="outline" @click="showCancelDialog = false">Tidak</Button>
+                <Button class="bg-red-600 text-white hover:bg-red-700" @click="executeCancel">Ya, Batalkan</Button>
+            </template>
+        </Modal>
     </AppLayout>
 </template>
