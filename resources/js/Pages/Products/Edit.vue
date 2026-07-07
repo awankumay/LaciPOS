@@ -35,10 +35,20 @@ const form = useForm({
 const photoPreview = ref(props.product.photo_url);
 const fileInput = ref(null);
 const openCategoryBox = ref(false);
+const photoError = ref('');
 
 const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const maxSize = 1024 * 1024;
+    if (file.size > maxSize) {
+        photoError.value = 'Ukuran foto maksimal 1MB.';
+        e.target.value = '';
+        return;
+    }
+
+    photoError.value = '';
     form.photo = file;
     form.remove_photo = false;
     photoPreview.value = URL.createObjectURL(file);
@@ -156,9 +166,12 @@ const submit = () => {
                                 <div @click="fileInput?.click()"
                                     class="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 transition-colors">
                                     <Upload class="h-5 w-5 text-slate-400" />
+                                    <span class="text-xs text-slate-500 mt-1">Maks 1MB</span>
                                 </div>
                                 <input ref="fileInput" type="file" accept="image/png,image/jpeg" class="hidden" @change="handlePhotoChange" />
                             </div>
+                            <p v-if="photoError" class="text-sm text-red-500">{{ photoError }}</p>
+                            <p v-if="form.errors.photo" class="text-sm text-red-500">{{ form.errors.photo }}</p>
                         </div>
                     </CardContent>
                 </Card>

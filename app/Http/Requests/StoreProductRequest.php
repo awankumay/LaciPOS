@@ -13,7 +13,7 @@ class StoreProductRequest extends FormRequest
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'discount_id' => 'nullable|exists:discounts,id',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|max:1024',
             'cogs' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',

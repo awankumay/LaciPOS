@@ -43,6 +43,9 @@ class UpdateProductRequest extends FormRequest
             'cogs.required' => 'Harga modal wajib diisi.',
             'price.required' => 'Harga jual wajib diisi.',
             'stock.required' => 'Stok wajib diisi.',
+            'photo.image' => 'File harus berupa gambar.',
+            'photo.mimes' => 'Format foto harus PNG atau JPG.',
+            'photo.max' => 'Ukuran foto maksimal 1MB.',
         ];
     }
 }

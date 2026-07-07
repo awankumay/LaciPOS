@@ -38,14 +38,30 @@ const timezones = [
 ];
 
 const logoPreviewUrl = ref(props.profile?.logo_url || null);
+const logoError = ref('');
 
 const handleLogoChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-        form.logo = file;
-        form.remove_logo = false;
-        logoPreviewUrl.value = URL.createObjectURL(file);
+    if (!file) return;
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+        logoError.value = 'Format logo harus PNG atau JPG.';
+        event.target.value = '';
+        return;
     }
+
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+        logoError.value = 'Ukuran logo maksimal 2MB.';
+        event.target.value = '';
+        return;
+    }
+
+    logoError.value = '';
+    form.logo = file;
+    form.remove_logo = false;
+    logoPreviewUrl.value = URL.createObjectURL(file);
 };
 
 const removeLogo = () => {
@@ -186,6 +202,7 @@ const submit = () => {
                                 <p class="mt-2 text-xs text-[#7c8c9a]">Format .PNG atau .JPG, maks. 2MB.</p>
                             </div>
                         </div>
+                        <p v-if="logoError" class="text-sm text-red-500">{{ logoError }}</p>
                         <p v-if="form.errors.logo" class="text-sm text-red-500">{{ form.errors.logo }}</p>
                     </div>
 

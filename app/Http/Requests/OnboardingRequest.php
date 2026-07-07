@@ -33,6 +33,7 @@ class OnboardingRequest extends FormRequest
             'logo.image' => 'File logo harus berupa gambar.',
             'logo.mimes' => 'Format logo harus PNG atau JPG.',
             'logo.max' => 'Ukuran logo maksimal 2MB.',
+            'logo.uploaded' => 'Gagal mengunggah logo. Periksa ukuran file atau coba lagi.',
         ];
     }
 }
