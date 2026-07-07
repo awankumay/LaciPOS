@@ -35,7 +35,13 @@ const form = useForm({
 const photoPreview = ref(props.product.photo_url);
 const fileInput = ref(null);
 const openCategoryBox = ref(false);
+const openDiscountBox = ref(false);
 const photoError = ref('');
+
+const selectedDiscountLabel = (id) => {
+    const d = props.discounts.find(d => d.id === id);
+    return d ? `${d.name} (${d.discount_type === 'percentage' ? d.discount_value + '%' : 'Rp ' + Number(d.discount_value).toLocaleString('id-ID')})` : 'Tidak ada diskon';
+};
 
 const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -194,12 +200,60 @@ const submit = () => {
                     <CardContent class="space-y-5">
                         <div class="space-y-2">
                             <Label class="text-sm font-medium text-slate-700">Pilih Master Diskon</Label>
-                            <select v-model="form.discount_id" class="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 shadow-sm outline-none transition-all focus:border-[#00684a] focus:ring-[2px] focus:ring-[#00684a]/10">
-                                <option value="">Tidak ada diskon</option>
-                                <option v-for="discount in discounts" :key="discount.id" :value="discount.id">
-                                    {{ discount.name }} ({{ discount.discount_type === 'percentage' ? discount.discount_value + '%' : 'Rp ' + discount.discount_value }})
-                                </option>
-                            </select>
+                            <Popover v-model:open="openDiscountBox">
+                                <PopoverTrigger as-child>
+                                    <button
+                                        type="button"
+                                        role="combobox"
+                                        :aria-expanded="openDiscountBox"
+                                        class="flex items-center justify-between h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 shadow-sm outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[2px] focus:ring-[#00684a]/10"
+                                    >
+                                        <span class="truncate">{{ selectedDiscountLabel(form.discount_id) }}</span>
+                                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-slate-500" />
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent class="w-[300px] sm:w-[400px] p-0 bg-white" align="start">
+                                    <Command>
+                                        <CommandInput class="h-10 text-sm" placeholder="Cari diskon..." />
+                                        <CommandEmpty class="py-3 text-sm text-center text-slate-500">Diskon tidak ditemukan.</CommandEmpty>
+                                        <CommandList>
+                                            <CommandGroup>
+                                                <CommandItem
+                                                    value=""
+                                                    @select="() => {
+                                                        form.discount_id = '';
+                                                        openDiscountBox = false;
+                                                    }"
+                                                    class="text-sm cursor-pointer"
+                                                >
+                                                    <span class="text-slate-500">Tidak ada diskon</span>
+                                                    <Check
+                                                        :class="['ml-auto h-4 w-4', !form.discount_id ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                    />
+                                                </CommandItem>
+                                                <CommandItem
+                                                    v-for="discount in discounts"
+                                                    :key="discount.id"
+                                                    :value="discount.name"
+                                                    @select="() => {
+                                                        form.discount_id = discount.id;
+                                                        openDiscountBox = false;
+                                                    }"
+                                                    class="text-sm cursor-pointer"
+                                                >
+                                                    <div class="flex flex-col">
+                                                        <span>{{ discount.name }}</span>
+                                                        <span class="text-xs text-slate-400">{{ discount.discount_type === 'percentage' ? discount.discount_value + '%' : 'Rp ' + Number(discount.discount_value).toLocaleString('id-ID') }}</span>
+                                                    </div>
+                                                    <Check
+                                                        :class="['ml-auto h-4 w-4', form.discount_id === discount.id ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                    />
+                                                </CommandItem>
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                             <p class="text-xs text-slate-500 mt-1">Diskon akan diterapkan pada produk ini saat checkout.</p>
                             <p v-if="form.errors.discount_id" class="text-sm text-red-500">{{ form.errors.discount_id }}</p>
                         </div>
