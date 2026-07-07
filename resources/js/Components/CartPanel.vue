@@ -158,7 +158,7 @@ const handleUpdateQuantity = (item, newQuantity) => {
                             </span>
                             <div class="flex items-center gap-1 mt-0.5">
                                 <p class="cart-item__unit-price" :class="{ 'line-through text-[#a8b3bc]': item.discountValue }">{{ formatRupiah(item.price) }}</p>
-                                <p v-if="item.discountValue" class="text-xs font-semibold text-[#001e2b]">{{ formatRupiah(item.price - (item.discountType === 'percentage' ? item.price * (item.discountValue/100) : item.discountValue)) }}</p>
+                                <p v-if="item.discountValue" class="text-xs font-semibold text-[#001e2b]">{{ formatRupiah(Math.max(0, item.price - (item.discountType === 'percentage' ? item.price * (item.discountValue/100) : item.discountValue))) }}</p>
                                 <span class="cart-item__unit-price">/ item</span>
                             </div>
                         </div>

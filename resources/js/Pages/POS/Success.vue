@@ -107,7 +107,7 @@ onMounted(() => {
                                 <p v-if="item.notes" class="text-xs text-slate-400 italic mt-0.5">Catatan: {{ item.notes }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">
                                     {{ item.quantity }} x <span :class="{ 'line-through': item.discount_amount > 0 }">{{ formatRupiah(item.price) }}</span>
-                                    <span v-if="item.discount_amount > 0" class="text-slate-700 ml-1 font-medium">{{ formatRupiah(item.price - item.discount_amount) }}</span>
+                                    <span v-if="item.discount_amount > 0" class="text-slate-700 ml-1 font-medium">{{ formatRupiah(Math.max(0, item.price - item.discount_amount)) }}</span>
                                 </p>
                             </div>
                             <p class="font-semibold text-slate-900">{{ formatRupiah(item.subtotal) }}</p>

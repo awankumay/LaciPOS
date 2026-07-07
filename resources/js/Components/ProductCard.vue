@@ -62,7 +62,7 @@ const isOverStock = computed(() => {
                         <span class="product-card__price-original truncate">{{ formatRupiah(product.price) }}</span>
                     </div>
                     <p class="product-card__price" :class="{ 'text-red-600': product.is_discount_active }">
-                        {{ product.is_discount_active ? formatRupiah(product.price - product.calculated_discount_amount) : formatRupiah(product.price) }}
+                        {{ product.is_discount_active ? formatRupiah(Math.max(0, product.price - product.calculated_discount_amount)) : formatRupiah(product.price) }}
                     </p>
                 </div>
                 <div class="product-card__add-btn mt-auto mb-auto">

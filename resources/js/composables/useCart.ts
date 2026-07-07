@@ -102,7 +102,7 @@ export function useCart() {
                 itemDiscountAmount = Number(item.discountValue);
             }
         }
-        return (item.price - itemDiscountAmount) * item.quantity;
+        return Math.max(0, (item.price - itemDiscountAmount)) * item.quantity;
     };
 
     /**

@@ -11,6 +11,7 @@ const props = defineProps({
 const page = usePage();
 const storeTimezone = computed(() => page.props.storeSettings?.timezone || 'Asia/Jakarta');
 
+
 const formatRupiah = (value) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
 };
@@ -113,7 +114,7 @@ const getStatusColor = (statusText) => {
                                     </td>
                                     <td class="px-5 py-4 text-right">
                                         <p :class="{ 'line-through text-[#a8b3bc] text-xs': item.snapshot_discount_amount > 0 }">{{ formatRupiah(item.snapshot_price) }}</p>
-                                        <p v-if="item.snapshot_discount_amount > 0" class="text-sm text-[#001e2b] font-medium">{{ formatRupiah(item.snapshot_price - item.snapshot_discount_amount) }}</p>
+                                        <p v-if="item.snapshot_discount_amount > 0" class="text-sm text-[#001e2b] font-medium">{{ formatRupiah(Math.max(0, item.snapshot_price - item.snapshot_discount_amount)) }}</p>
                                     </td>
                                     <td class="px-5 py-4 text-right font-medium">
                                         {{ item.quantity }}x

@@ -103,10 +103,10 @@ class Product extends Model
             return 0.0;
         }
 
-        if ($this->discount->discount_type === 'percentage') {
-            return (float) ($this->price * ($this->discount->discount_value / 100));
-        }
+        $amount = $this->discount->discount_type === 'percentage'
+            ? $this->price * ($this->discount->discount_value / 100)
+            : $this->discount->discount_value;
 
-        return (float) $this->discount->discount_value;
+        return (float) min($amount, $this->price);
     }
 }

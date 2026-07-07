@@ -59,7 +59,7 @@ class OrderController extends Controller
                     $itemDiscountAmount = $item['discount_value'];
                 }
             }
-            $subtotal += ($price - $itemDiscountAmount) * $item['quantity'];
+            $subtotal += max(0, ($price - $itemDiscountAmount)) * $item['quantity'];
         }
 
         // Hitung Diskon Keranjang
@@ -196,7 +196,7 @@ class OrderController extends Controller
                     'snapshot_discount_type' => $item['discount_type'] ?? null,
                     'snapshot_discount_value' => $item['discount_value'] ?? null,
                     'snapshot_discount_amount' => $itemDiscountAmount,
-                    'subtotal' => ($item['price'] - $itemDiscountAmount) * $item['quantity'],
+                    'subtotal' => max(0, ($item['price'] - $itemDiscountAmount)) * $item['quantity'],
                     'notes' => $item['notes'] ?? null,
                 ]);
             }
