@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from 'vue';
-import { Input } from '@/Components/ui/input';
 import { useCart } from '@/composables/useCart';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
 import { useToast } from '@/composables/useToast';
-import { Trash2, Plus, Minus, MessageSquare, ShoppingBag, X } from 'lucide-vue-next';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
+import { Trash2, Plus, Minus, MessageSquare, ShoppingBag, X, Check, ChevronsUpDown } from 'lucide-vue-next';
 
 const emit = defineEmits(['checkout']);
 
@@ -40,6 +41,7 @@ const toast = useToast();
 
 const showNotes = ref({});
 const showCartDiscount = ref(false);
+const openDiscountType = ref(false);
 
 const toggleCartDiscount = () => {
     showCartDiscount.value = !showCartDiscount.value;
@@ -241,13 +243,56 @@ const handleUpdateQuantity = (item, newQuantity) => {
                         <button class="cart-discount-close" @click="toggleCartDiscount"><X class="icon-xs" /></button>
                     </div>
                     <div class="cart-discount-inputs">
-                        <select v-model="cartDiscountType" class="cart-discount-select">
-                            <option value="percentage">%</option>
-                            <option value="nominal">Rp</option>
-                        </select>
+                        <Popover v-model:open="openDiscountType">
+                            <PopoverTrigger as-child>
+                                <button
+                                    type="button"
+                                    role="combobox"
+                                    :aria-expanded="openDiscountType"
+                                    class="cart-discount-type-btn"
+                                >
+                                    <span>{{ cartDiscountType === 'nominal' ? 'Rp' : '%' }}</span>
+                                    <ChevronsUpDown class="h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent class="w-[80px] p-0 bg-white" align="start">
+                                <Command>
+                                    <CommandList>
+                                        <CommandGroup>
+                                            <CommandItem
+                                                value="percentage"
+                                                @select="() => {
+                                                    cartDiscountType = 'percentage';
+                                                    openDiscountType = false;
+                                                }"
+                                                class="text-sm cursor-pointer"
+                                            >
+                                                %
+                                                <Check
+                                                    :class="['ml-auto h-4 w-4', cartDiscountType === 'percentage' ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                />
+                                            </CommandItem>
+                                            <CommandItem
+                                                value="nominal"
+                                                @select="() => {
+                                                    cartDiscountType = 'nominal';
+                                                    openDiscountType = false;
+                                                }"
+                                                class="text-sm cursor-pointer"
+                                            >
+                                                Rp
+                                                <Check
+                                                    :class="['ml-auto h-4 w-4', cartDiscountType === 'nominal' ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                                />
+                                            </CommandItem>
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                         <input v-model="cartDiscountValue" type="number" min="0" placeholder="0" class="cart-discount-input" />
                     </div>
-                    <input v-model="cartDiscountNote" type="text" placeholder="Keterangan (opsional)" class="cart-discount-note" />
+                    <textarea v-model="cartDiscountNote" placeholder="Keterangan (opsional)" class="cart-discount-note"></textarea>
                 </div>
             </div>
 
@@ -783,17 +828,31 @@ const handleUpdateQuantity = (item, newQuantity) => {
     gap: 8px;
 }
 
-.cart-discount-select {
+.cart-discount-type-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 60px;
     height: 32px;
     border: 1px solid #c1ccd6;
     border-radius: 6px;
     font-size: 13px;
+    font-weight: 600;
     outline: none;
     background: white;
+    padding: 0 8px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+.cart-discount-type-btn:hover {
+    border-color: #00684a;
+}
+.cart-discount-type-btn:focus-visible {
+    border-color: #00684a;
+    ring: 2px solid #00684a;
 }
 
-.cart-discount-input, .cart-discount-note {
+.cart-discount-input {
     flex: 1;
     height: 32px;
     border: 1px solid #c1ccd6;
@@ -803,7 +862,23 @@ const handleUpdateQuantity = (item, newQuantity) => {
     outline: none;
     width: 100%;
 }
-.cart-discount-input:focus, .cart-discount-note:focus, .cart-discount-select:focus {
+.cart-discount-input:focus {
+    border-color: #00684a;
+}
+
+.cart-discount-note {
+    width: 100%;
+    min-height: 60px;
+    border: 1px solid #c1ccd6;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    box-sizing: border-box;
+}
+.cart-discount-note:focus {
     border-color: #00684a;
 }
 </style>
