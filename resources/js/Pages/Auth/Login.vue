@@ -1,6 +1,6 @@
 <script setup>
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import { useForm, Link } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { LogIn, Loader2 } from 'lucide-vue-next';
@@ -74,13 +74,6 @@ const submit = () => {
                         {{ form.processing ? 'Memproses...' : 'Masuk' }}
                     </button>
 
-                    <!-- Link register -->
-                    <p class="text-center text-sm text-[#5c6c7a]">
-                        Belum punya akun?
-                        <Link href="/register" class="font-semibold text-[#001e2b] hover:text-[#00684a] transition-colors">
-                            Daftar di sini
-                        </Link>
-                    </p>
                 </form>
             </div>
         </div>

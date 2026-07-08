@@ -1,9 +1,13 @@
 <script setup>
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import { useForm, Link } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { UserPlus, Loader2 } from 'lucide-vue-next';
+
+const props = defineProps({
+    isFirstSetup: { type: Boolean, default: false },
+});
 
 const form = useForm({
     name: '',
@@ -25,8 +29,8 @@ const submit = () => {
             <!-- Header band -->
             <div class="rounded-t-2xl bg-[#001e2b] px-8 py-7">
                 <img src="/assets/logo/logo.png" alt="Logo" class="mb-0 h-16 w-auto object-contain" />
-                <h1 class="text-xl font-bold text-white">Buat Akun Baru</h1>
-                <p class="mt-1 text-sm text-[#a8b3bc]">Daftarkan toko Anda untuk mulai menggunakan POS Desktop.</p>
+                <h1 class="text-xl font-bold text-white">{{ isFirstSetup ? 'Setup Awal' : 'Buat Akun Baru' }}</h1>
+                <p class="mt-1 text-sm text-[#a8b3bc]">{{ isFirstSetup ? 'Buat akun pemilik untuk memulai menggunakan POS Desktop.' : 'Daftarkan toko Anda untuk mulai menggunakan POS Desktop.' }}</p>
             </div>
 
             <!-- Form -->
@@ -113,13 +117,6 @@ const submit = () => {
                         {{ form.processing ? 'Mendaftar...' : 'Buat Akun' }}
                     </button>
 
-                    <!-- Link login -->
-                    <p class="text-center text-sm text-[#5c6c7a]">
-                        Sudah punya akun?
-                        <Link href="/login" class="font-semibold text-[#001e2b] hover:text-[#00684a] transition-colors">
-                            Masuk di sini
-                        </Link>
-                    </p>
                 </form>
             </div>
         </div>
