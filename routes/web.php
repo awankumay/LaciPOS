@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\Settings\AccountSecurityController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,6 +19,15 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'store']);
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);
+
+    // Forgot Password
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'index'])->name('forgot-password');
+    Route::post('/forgot-password/verify-email', [ForgotPasswordController::class, 'verifyEmail'])
+        ->middleware('throttle:5,30')
+        ->name('forgot-password.verify');
+    Route::get('/forgot-password/reset', [ForgotPasswordController::class, 'showResetForm'])->name('forgot-password.reset');
+    Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'reset'])
+        ->middleware('throttle:10,30');
 });
 
 // Auth-only routes (tanpa onboarding guard — bisa diakses sebelum onboarding selesai)
@@ -26,6 +37,7 @@ Route::middleware('auth')->group(function () {
     // Route onboarding TIDAK pakai middleware 'onboarding' (mencegah infinite redirect loop)
     Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding');
     Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
+    Route::get('/onboarding/recovery-codes', [OnboardingController::class, 'recoveryCodes'])->name('onboarding.recovery-codes');
 });
 
 // Protected routes (auth + onboarding harus selesai)
@@ -73,6 +85,12 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         // Inventory Settings
         Route::get('/settings/inventory', [App\Http\Controllers\SettingsController::class, 'inventory'])->name('settings.inventory');
         Route::post('/settings/inventory', [App\Http\Controllers\SettingsController::class, 'updateInventory'])->name('settings.inventory.update');
+
+        // Account Security Settings
+        Route::get('/settings/account', [AccountSecurityController::class, 'index'])->name('settings.account');
+        Route::put('/settings/account/security', [AccountSecurityController::class, 'updateSecurity'])->name('settings.account.security');
+        Route::put('/settings/account/password', [AccountSecurityController::class, 'changePassword'])->name('settings.account.password');
+        Route::post('/settings/account/recovery-codes', [AccountSecurityController::class, 'generateCodes'])->name('settings.account.recovery-codes');
 
         // Backup Settings
         Route::get('/settings/backup', [App\Http\Controllers\BackupController::class, 'index'])->name('settings.backup');

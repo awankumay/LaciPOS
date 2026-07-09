@@ -3,7 +3,7 @@ import { Check } from 'lucide-vue-next';
 
 const props = defineProps({
     currentStep: { type: Number, required: true },
-    totalSteps: { type: Number, default: 5 },
+    totalSteps: { type: Number, default: 6 },
 });
 
 const steps = [
@@ -11,7 +11,8 @@ const steps = [
     { number: 2, label: 'Alamat' },
     { number: 3, label: 'Logo' },
     { number: 4, label: 'Kontak' },
-    { number: 5, label: 'Preview' },
+    { number: 5, label: 'Keamanan' },
+    { number: 6, label: 'Konfirmasi' },
 ];
 </script>
 

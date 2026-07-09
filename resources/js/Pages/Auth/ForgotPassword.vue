@@ -3,7 +3,7 @@ import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { useForm, Link } from '@inertiajs/vue3';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { LogIn, Loader2 } from 'lucide-vue-next';
+import { Lock, Loader2, ArrowLeft } from 'lucide-vue-next';
 import { useToast } from '@/composables/useToast';
 import { watch } from 'vue';
 
@@ -11,12 +11,11 @@ const toast = useToast();
 
 const form = useForm({
     email: '',
-    password: '',
 });
 
 const submit = () => {
-    form.post('/login', {
-        onFinish: () => form.reset('password'),
+    form.post('/forgot-password/verify-email', {
+        preserveState: true,
     });
 };
 
@@ -27,21 +26,22 @@ watch(() => form.errors, (errors) => {
 </script>
 
 <template>
-    <GuestLayout title="Masuk">
+    <GuestLayout title="Lupa Password">
         <div class="rounded-2xl border border-[#e1e5e8] bg-white shadow-[0_4px_12px_rgba(0,30,43,0.08)]">
-            <!-- Header band -->
-            <div class="rounded-t-2xl bg-[#001e2b] px-8 py-7 text-start">
-                <img src="/assets/logo/logo.png" alt="Logo" class=" mb-0 h-16 w-auto object-contain" />
-                <h1 class="text-xl font-bold text-white">Masuk ke Akun Anda</h1>
-                <p class="mt-1 text-sm text-[#a8b3bc]">Masukkan email dan password untuk melanjutkan.</p>
+            <div class="rounded-t-2xl bg-[#001e2b] px-8 py-7">
+                <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#00ed64]/20">
+                    <Lock class="h-7 w-7 text-[#00ed64]" />
+                </div>
+                <h1 class="text-center text-xl font-bold text-white">Lupa Password</h1>
+                <p class="mt-1 text-center text-sm text-[#a8b3bc]">
+                    Masukkan email pemilik toko untuk memulihkan akun.
+                </p>
             </div>
 
-            <!-- Form -->
             <div class="px-8 py-8">
-                <form @submit.prevent="submit" class="space-y-6">
-                    <!-- Email -->
+                <form @submit.prevent="submit" class="space-y-5">
                     <div class="space-y-2">
-                        <Label for="email" class="text-sm font-medium text-[#1c2d38]">Email</Label>
+                        <Label for="email" class="text-sm font-medium text-[#1c2d38]">Email Pemilik Toko</Label>
                         <Input
                             id="email"
                             v-model="form.email"
@@ -54,31 +54,6 @@ watch(() => form.errors, (errors) => {
                         <p v-if="form.errors.email" class="text-xs text-red-500">{{ form.errors.email }}</p>
                     </div>
 
-                    <!-- Password -->
-                    <div class="space-y-2">
-                        <Label for="password" class="text-sm font-medium text-[#1c2d38]">Password</Label>
-                        <Input
-                            id="password"
-                            v-model="form.password"
-                            type="password"
-                            placeholder="Masukkan password"
-                            required
-                            :class="['h-11', form.errors.password ? 'border-red-500 focus-visible:ring-red-400' : '']"
-                        />
-                        <p v-if="form.errors.password" class="text-xs text-red-500">{{ form.errors.password }}</p>
-                    </div>
-
-                    <!-- Lupa Password -->
-                    <div class="text-right">
-                        <Link
-                            href="/forgot-password"
-                            class="text-xs font-medium text-[#5c6c7a] hover:text-[#001e2b] transition-colors"
-                        >
-                            Lupa Password?
-                        </Link>
-                    </div>
-
-                    <!-- Submit -->
                     <button
                         type="submit"
                         :disabled="form.processing"
@@ -90,9 +65,16 @@ watch(() => form.errors, (errors) => {
                         ]"
                     >
                         <Loader2 v-if="form.processing" class="h-4 w-4 animate-spin" />
-                        {{ form.processing ? 'Memproses...' : 'Masuk' }}
+                        {{ form.processing ? 'Memverifikasi...' : 'Verifikasi Email' }}
                     </button>
 
+                    <Link
+                        href="/login"
+                        class="flex items-center justify-center gap-2 text-sm text-[#5c6c7a] hover:text-[#001e2b] transition-colors"
+                    >
+                        <ArrowLeft class="h-4 w-4" />
+                        Kembali ke Login
+                    </Link>
                 </form>
             </div>
         </div>

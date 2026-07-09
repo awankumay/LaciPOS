@@ -23,6 +23,8 @@ class OnboardingRequest extends FormRequest
             'enable_customer_name' => ['boolean'],
             'enable_table_number' => ['boolean'],
             'enable_order_notes' => ['boolean'],
+            'security_question' => ['nullable', 'string', 'max:255'],
+            'security_answer' => ['nullable', 'string', 'max:255'],
         ];
     }
 

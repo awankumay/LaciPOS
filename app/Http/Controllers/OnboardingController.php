@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OnboardingRequest;
 use App\Models\StoreProfile;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class OnboardingController extends Controller
@@ -49,11 +51,58 @@ class OnboardingController extends Controller
 
         // Update or create (hanya 1 record)
         StoreProfile::updateOrCreate(
-            [], // Tidak ada where condition, selalu row pertama
+            [],
             $data
         );
 
+        // Simpan security question & answer
+        $user = Auth::user();
+        if ($request->filled('security_question') && $request->filled('security_answer')) {
+            $recoveryCodes = $this->generateRecoveryCodes();
+
+            $user->update([
+                'security_question' => $request->security_question,
+                'security_answer' => strtolower($request->security_answer),
+                'recovery_codes' => $recoveryCodes['hashed'],
+            ]);
+
+            return redirect()->route('onboarding.recovery-codes')
+                ->with('recovery_codes', $recoveryCodes['raw']);
+        }
+
         return redirect('/dashboard')
             ->with('success', 'Setup toko berhasil! Selamat berjualan.');
+    }
+
+    /**
+     * Tampilkan halaman recovery codes setelah onboarding.
+     */
+    public function recoveryCodes()
+    {
+        if (!session('recovery_codes')) {
+            return redirect('/dashboard');
+        }
+
+        return Inertia::render('Onboarding/RecoveryCodes', [
+            'codes' => session('recovery_codes'),
+        ]);
+    }
+
+    /**
+     * Generate 10 recovery codes.
+     */
+    private function generateRecoveryCodes(): array
+    {
+        $raw = [];
+        $hashed = [];
+
+        for ($i = 0; $i < 10; $i++) {
+            $code = strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
+            $formatted = substr($code, 0, 4) . '-' . substr($code, 4, 4);
+            $raw[] = $formatted;
+            $hashed[] = bcrypt($formatted);
+        }
+
+        return ['raw' => $raw, 'hashed' => $hashed];
     }
 }

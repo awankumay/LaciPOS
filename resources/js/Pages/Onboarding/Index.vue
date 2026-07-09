@@ -6,7 +6,8 @@ import OnboardingStep2 from '@/Components/OnboardingStep2.vue';
 import OnboardingStep3 from '@/Components/OnboardingStep3.vue';
 import OnboardingStep4 from '@/Components/OnboardingStep4.vue';
 import OnboardingStep5 from '@/Components/OnboardingStep5.vue';
-import { ref, reactive, computed } from 'vue';
+import OnboardingStep6 from '@/Components/OnboardingStep6.vue';
+import { ref, reactive, watch, onUnmounted } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -23,18 +24,34 @@ const formData = reactive({
     logo: null,
     receipt_footer: props.existingProfile?.receipt_footer || 'Terima kasih sudah berbelanja di toko kami!',
     timezone: props.existingProfile?.timezone || 'Asia/Jakarta',
+    security_question: '',
+    security_answer: '',
 });
 
 // Preview URL untuk logo
-const logoPreviewUrl = computed(() => {
-    if (formData.logo) {
-        return URL.createObjectURL(formData.logo);
+const logoPreviewUrl = ref(props.existingProfile?.logo_url || null);
+
+watch(() => formData.logo, (newLogo, oldLogo) => {
+    const currentUrl = logoPreviewUrl.value;
+    if (oldLogo && currentUrl && currentUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(currentUrl);
     }
-    return props.existingProfile?.logo_url || null;
+    if (newLogo) {
+        logoPreviewUrl.value = URL.createObjectURL(newLogo);
+    } else {
+        logoPreviewUrl.value = props.existingProfile?.logo_url || null;
+    }
+});
+
+onUnmounted(() => {
+    const currentUrl = logoPreviewUrl.value;
+    if (currentUrl && currentUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(currentUrl);
+    }
 });
 
 const nextStep = () => {
-    if (currentStep.value < 5) currentStep.value++;
+    if (currentStep.value < 6) currentStep.value++;
 };
 
 const prevStep = () => {
@@ -51,9 +68,17 @@ const submitOnboarding = () => {
     if (formData.logo) data.append('logo', formData.logo);
     if (formData.receipt_footer) data.append('receipt_footer', formData.receipt_footer);
     if (formData.timezone) data.append('timezone', formData.timezone);
+    if (formData.security_question) data.append('security_question', formData.security_question);
+    if (formData.security_answer) data.append('security_answer', formData.security_answer);
 
     router.post('/onboarding', data, {
         forceFormData: true,
+        onSuccess: () => {
+            isSubmitting.value = false;
+        },
+        onError: () => {
+            isSubmitting.value = false;
+        },
         onFinish: () => {
             isSubmitting.value = false;
         },
@@ -72,7 +97,7 @@ const submitOnboarding = () => {
                     Ayo setup toko Anda 🚀
                 </h1>
                 <p class="mt-1 text-sm text-[#a8b3bc]">
-                    Selesaikan {{ 5 }} langkah berikut untuk mulai berjualan.
+                    Selesaikan {{ 6 }} langkah berikut untuk mulai berjualan.
                 </p>
             </div>
 
@@ -123,6 +148,15 @@ const submitOnboarding = () => {
                     <OnboardingStep5
                         v-else-if="currentStep === 5"
                         key="step5"
+                        v-model="formData.security_question"
+                        v-model:security-answer="formData.security_answer"
+                        @next="nextStep"
+                        @back="prevStep"
+                    />
+
+                    <OnboardingStep6
+                        v-else-if="currentStep === 6"
+                        key="step6"
                         :store-name="formData.store_name"
                         :address="formData.address"
                         :phone="formData.phone"

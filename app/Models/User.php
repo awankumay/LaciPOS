@@ -20,6 +20,9 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'security_question',
+        'security_answer',
+        'recovery_codes',
     ];
 
     /**
@@ -28,6 +31,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'security_answer',
+        'recovery_codes',
     ];
 
     /**
@@ -37,8 +42,15 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'security_answer' => 'hashed',
+            'recovery_codes' => 'array',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function hasSecuritySetup(): bool
+    {
+        return !is_null($this->security_question) && !is_null($this->security_answer);
     }
 
     /**

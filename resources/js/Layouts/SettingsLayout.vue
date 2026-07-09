@@ -10,6 +10,7 @@ const page = usePage();
 
 const navItems = [
     { name: 'Informasi Umum', url: '/settings/store' },
+    { name: 'Keamanan Akun', url: '/settings/account' },
     { name: 'Printer', url: '/settings/printer' },
     { name: 'Manajemen Kasir', url: '/settings/cashiers' },
     { name: 'Pajak & Layanan', url: '/settings/taxes' },

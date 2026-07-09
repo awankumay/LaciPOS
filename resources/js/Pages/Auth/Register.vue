@@ -4,6 +4,10 @@ import { useForm } from '@inertiajs/vue3';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { UserPlus, Loader2 } from 'lucide-vue-next';
+import { useToast } from '@/composables/useToast';
+import { watch } from 'vue';
+
+const toast = useToast();
 
 const props = defineProps({
     isFirstSetup: { type: Boolean, default: false },
@@ -21,6 +25,11 @@ const submit = () => {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
+
+watch(() => form.errors, (errors) => {
+    const firstError = Object.values(errors).find(Boolean);
+    if (firstError) toast.error(firstError);
+}, { deep: true });
 </script>
 
 <template>
@@ -46,7 +55,7 @@ const submit = () => {
                             placeholder="Masukkan nama lengkap"
                             autofocus
                             required
-                            class="h-11"
+                            :class="['h-11', form.errors.name ? 'border-red-500 focus-visible:ring-red-400' : '']"
                         />
                         <p v-if="form.errors.name" class="text-xs text-red-500">{{ form.errors.name }}</p>
                     </div>
@@ -60,7 +69,7 @@ const submit = () => {
                             type="email"
                             placeholder="contoh@email.com"
                             required
-                            class="h-11"
+                            :class="['h-11', form.errors.email ? 'border-red-500 focus-visible:ring-red-400' : '']"
                         />
                         <p v-if="form.errors.email" class="text-xs text-red-500">{{ form.errors.email }}</p>
                     </div>
@@ -84,7 +93,7 @@ const submit = () => {
                             type="password"
                             placeholder="Minimal 8 karakter"
                             required
-                            class="h-11"
+                            :class="['h-11', form.errors.password ? 'border-red-500 focus-visible:ring-red-400' : '']"
                         />
                         <p v-if="form.errors.password" class="text-xs text-red-500">{{ form.errors.password }}</p>
                     </div>

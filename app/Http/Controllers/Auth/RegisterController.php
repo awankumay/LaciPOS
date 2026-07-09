@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class RegisterController extends Controller
@@ -31,19 +32,21 @@ class RegisterController extends Controller
      */
     public function store(RegisterRequest $request)
     {
-        if (User::where('role', 'owner')->exists()) {
-            return redirect()->route('login')->with('error', 'Registrasi hanya untuk pemilik pertama.');
-        }
+        return DB::transaction(function () use ($request) {
+            if (User::where('role', 'owner')->lockForUpdate()->exists()) {
+                return redirect()->route('login')->with('error', 'Registrasi hanya untuk pemilik pertama.');
+            }
 
-        $user = User::create([
-            'name' => $request->validated('name'),
-            'email' => $request->validated('email'),
-            'password' => $request->validated('password'),
-            'role' => 'owner',
-        ]);
+            $user = User::create([
+                'name' => $request->validated('name'),
+                'email' => $request->validated('email'),
+                'password' => $request->validated('password'),
+                'role' => 'owner',
+            ]);
 
-        Auth::login($user);
+            Auth::login($user);
 
-        return redirect()->intended('/onboarding');
+            return redirect()->intended('/onboarding');
+        });
     }
 }
