@@ -100,7 +100,7 @@ onMounted(() => {
                 <div class="space-y-4 mb-6">
                     <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wider">Rincian Pesanan</h3>
                     <div class="max-h-60 overflow-y-auto pr-2 space-y-3">
-                        <div v-for="(item, index) in order.items" :key="index" class="flex justify-between items-start text-sm">
+                        <div v-for="(item) in order.items" :key="item.id" class="flex justify-between items-start text-sm">
                             <div class="flex-1">
                                 <p class="font-medium text-slate-800">{{ item.product_name }}</p>
                                 <p v-if="item.variant_label" class="text-xs text-slate-500">{{ item.variant_label }}</p>

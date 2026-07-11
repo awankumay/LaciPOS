@@ -37,12 +37,13 @@ class RegisterController extends Controller
                 return redirect()->route('login')->with('error', 'Registrasi hanya untuk pemilik pertama.');
             }
 
-            $user = User::create([
+            $user = new User([
                 'name' => $request->validated('name'),
                 'email' => $request->validated('email'),
                 'password' => $request->validated('password'),
-                'role' => 'owner',
             ]);
+            $user->role = 'owner';
+            $user->save();
 
             Auth::login($user);
 

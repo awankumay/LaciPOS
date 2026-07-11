@@ -17,13 +17,15 @@ class StockService
 
                 $product->decrement('stock', $item->quantity);
 
-                StockLog::create([
+                $log = new StockLog();
+                $log->change = -$item->quantity;
+                $log->fill([
                     'product_id' => $product->id,
-                    'change' => -$item->quantity,
                     'reason' => 'sale',
                     'reference_id' => $order->id,
                     'notes' => "Order #{$order->order_number}",
                 ]);
+                $log->save();
             }
         });
     }
@@ -45,13 +47,15 @@ class StockService
                     }
                 }
 
-                StockLog::create([
+                $log = new StockLog();
+                $log->change = $item->quantity;
+                $log->fill([
                     'product_id' => $product->id,
-                    'change' => $item->quantity,
                     'reason' => 'cancellation',
                     'reference_id' => $order->id,
                     'notes' => "Pembatalan Order #{$order->order_number}",
                 ]);
+                $log->save();
             }
         });
     }

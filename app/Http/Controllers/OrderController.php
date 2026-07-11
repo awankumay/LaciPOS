@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -137,27 +138,30 @@ class OrderController extends Controller
 
         $order = DB::transaction(function () use ($validated, $items, $subtotal, $cartDiscountAmount, $taxRate, $taxType, $taxAmount, $serviceChargeRate, $serviceChargeType, $serviceChargeAmount, $totalAmount, $paymentMethodId, $paymentMethodName, $paymentAccountDetails, $paymentAdminFeeType, $paymentAdminFee, $paymentAdminFeeAmount, $request) {
             // Buat order
-            $order = Order::create([
-                'order_number' => Order::generateOrderNumber(),
-                'user_id' => $request->user()->id,
-                'status' => 'pending', // Akan diubah ke completed setelah items dibuat
+            $order = new Order();
+            $order->order_number = Order::generateOrderNumber();
+            $order->user_id = $request->user()->id;
+            $order->status = 'pending';
+            $order->subtotal = $subtotal;
+            $order->discount_amount = $cartDiscountAmount;
+            $order->tax_amount = $taxAmount;
+            $order->service_charge_amount = $serviceChargeAmount;
+            $order->total_amount = $totalAmount;
+            $order->change_amount = $validated['payment_method'] === 'cash'
+                ? ($validated['cash_received'] - $totalAmount) : null;
+            $order->payment_admin_fee = $paymentAdminFee;
+            $order->payment_admin_fee_amount = $paymentAdminFeeAmount;
+            $order->fill([
                 'payment_method' => $validated['payment_method'],
                 'payment_provider' => $validated['payment_provider'] ?? null,
-                'subtotal' => $subtotal,
                 'discount_type' => $validated['discount_type'] ?? null,
                 'discount_value' => $validated['discount_value'] ?? null,
-                'discount_amount' => $cartDiscountAmount,
                 'discount_note' => $validated['discount_note'] ?? null,
                 'tax_rate' => $taxRate,
                 'tax_type' => $taxType,
-                'tax_amount' => $taxAmount,
                 'service_charge_rate' => $serviceChargeRate,
                 'service_charge_type' => $serviceChargeType,
-                'service_charge_amount' => $serviceChargeAmount,
-                'total_amount' => $totalAmount,
                 'cash_received' => $validated['cash_received'] ?? null,
-                'change_amount' => $validated['payment_method'] === 'cash'
-                    ? ($validated['cash_received'] - $totalAmount) : null,
                 'customer_name' => $validated['customer_name'] ?? null,
                 'table_number' => $validated['table_number'] ?? null,
                 'notes' => $validated['notes'] ?? null,
@@ -165,44 +169,63 @@ class OrderController extends Controller
                 'payment_method_name' => $paymentMethodName,
                 'payment_account_details' => $paymentAccountDetails,
                 'payment_admin_fee_type' => $paymentAdminFeeType,
-                'payment_admin_fee' => $paymentAdminFee,
-                'payment_admin_fee_amount' => $paymentAdminFeeAmount,
             ]);
+            $order->save();
 
             // Buat order items dengan PRICE SNAPSHOT dan potong kuota diskon
             foreach ($items as $item) {
                 $itemDiscountAmount = 0;
+
+                $product = \App\Models\Product::with('discount')->find($item['productId']);
+                $snapshotCogs = $product ? $product->cogs : ($item['cogs'] ?? 0);
+                $snapshotPrice = $product ? $product->price : ($item['price'] ?? 0);
+                $productNameSnapshot = $product ? $product->name : ($item['productName'] ?? '');
+
+                // Include variant modifier dalam snapshot
+                if (!empty($item['variantLabel']) && $product) {
+                    $option = \App\Models\VariantOption::whereHas('variant', fn ($q) => $q->where('product_id', $product->id))
+                        ->where('label', $item['variantLabel'])
+                        ->first();
+                    if ($option) {
+                        $snapshotPrice += $option->price_modifier;
+                        $snapshotCogs += $option->cogs_modifier;
+                    }
+                }
+
                 if (!empty($item['discount_type']) && !empty($item['discount_value'])) {
                     if ($item['discount_type'] === 'percentage') {
-                        $itemDiscountAmount = $item['price'] * ($item['discount_value'] / 100);
+                        $itemDiscountAmount = $snapshotPrice * ($item['discount_value'] / 100);
                     } else {
                         $itemDiscountAmount = $item['discount_value'];
                     }
-                    
+
                     // Potong kuota diskon pada master diskon
-                    $product = \App\Models\Product::with('discount')->find($item['productId']);
                     if ($product && $product->discount && $product->discount->quota !== null) {
                         $product->discount->increment('quota_used', $item['quantity']);
                     }
                 }
 
-                $order->items()->create([
+                $orderItem = new OrderItem();
+                $orderItem->order_id = $order->id;
+                $orderItem->snapshot_cogs = $snapshotCogs;
+                $orderItem->snapshot_price = $snapshotPrice;
+                $orderItem->subtotal = max(0, ($snapshotPrice - $itemDiscountAmount)) * $item['quantity'];
+                $orderItem->snapshot_discount_amount = $itemDiscountAmount;
+                $orderItem->fill([
                     'product_id' => $item['productId'],
-                    'product_name_snapshot' => $item['productName'],
-                    'snapshot_cogs' => $item['cogs'],
-                    'snapshot_price' => $item['price'],
+                    'product_name_snapshot' => $productNameSnapshot,
                     'variant_label' => $item['variantLabel'] ?? null,
                     'quantity' => $item['quantity'],
                     'snapshot_discount_type' => $item['discount_type'] ?? null,
                     'snapshot_discount_value' => $item['discount_value'] ?? null,
-                    'snapshot_discount_amount' => $itemDiscountAmount,
-                    'subtotal' => max(0, ($item['price'] - $itemDiscountAmount)) * $item['quantity'],
                     'notes' => $item['notes'] ?? null,
                 ]);
+                $orderItem->save();
             }
 
             // Update status ke completed (trigger observer untuk kurangi stok)
-            $order->update(['status' => 'completed']);
+            $order->status = 'completed';
+            $order->save();
 
             return $order;
         });
@@ -317,7 +340,8 @@ class OrderController extends Controller
             return back()->with('error', 'Hanya transaksi completed yang bisa dibatalkan.');
         }
 
-        $order->update(['status' => 'cancelled']);
+        $order->status = 'cancelled';
+        $order->save();
 
         return back()->with('success', 'Transaksi berhasil dibatalkan. Stok telah dikembalikan.');
     }

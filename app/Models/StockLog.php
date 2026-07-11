@@ -10,7 +10,7 @@ class StockLog extends Model
     use HasUlids;
 
     public $timestamps = false; // Hanya created_at, no updated_at
-    protected $fillable = ['product_id', 'change', 'reason', 'reference_id', 'notes', 'created_at'];
+    protected $fillable = ['product_id', 'reason', 'reference_id', 'notes'];
 
     protected static function booted(): void
     {

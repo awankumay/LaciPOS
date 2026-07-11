@@ -9,7 +9,7 @@ import Modal from '@/Components/Modal.vue';
 import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/Components/ui/command';
 import { Plus, Search, Package, Trash2, ArrowRightLeft, Check, ChevronsUpDown } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
 import { useFormatCurrency } from '@/composables/useFormatCurrency';
 
 const props = defineProps({
@@ -31,6 +31,7 @@ watch(search, (val) => {
         applyFilters();
     }, 300);
 });
+onUnmounted(() => clearTimeout(searchTimeout));
 
 watch(selectedCategory, () => applyFilters());
 

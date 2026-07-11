@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/Components/ui/command';
 import { ArrowLeft, Upload, X, Check, ChevronsUpDown } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import VariantEditor from '@/Components/VariantEditor.vue';
 
 const props = defineProps({
@@ -57,8 +57,17 @@ const handlePhotoChange = (e) => {
     photoError.value = '';
     form.photo = file;
     form.remove_photo = false;
+    if (photoPreview.value?.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview.value);
+    }
     photoPreview.value = URL.createObjectURL(file);
 };
+
+onUnmounted(() => {
+    if (photoPreview.value?.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview.value);
+    }
+});
 
 const removePhoto = () => {
     form.photo = null;

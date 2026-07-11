@@ -40,7 +40,7 @@ const navItems = [
                     :href="item.url"
                     class="block px-3 py-2 text-sm font-medium rounded-md transition-colors"
                     :class="[
-                        page.url.startsWith(item.url)
+                        page.url === item.url || page.url.startsWith(item.url + '/')
                             ? 'bg-[#001e2b] text-[#00ed64]' // brand-teal-deep bg and brand-green text
                             : 'text-[#5c6c7a] hover:bg-[#eceff1] hover:text-[#1c2d38]' // steel text, hairline-soft bg, charcoal text
                     ]"

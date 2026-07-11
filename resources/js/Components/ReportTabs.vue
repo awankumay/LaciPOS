@@ -9,6 +9,7 @@ const tabs = [
     { name: 'Pendapatan', href: '/reports/revenue' },
     { name: 'Laba / Rugi (Kotor)', href: '/reports/profit-loss' },
     { name: 'Produk Terlaris', href: '/reports/best-sellers' },
+    { name: 'Pajak & SC', href: '/reports/tax-summary' },
 ];
 </script>
 

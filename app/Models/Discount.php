@@ -13,7 +13,7 @@ class Discount extends Model
     protected $fillable = [
         'name', 'discount_type', 'discount_value',
         'start_date', 'end_date', 'start_time', 'end_time',
-        'quota', 'quota_used', 'is_active',
+        'quota', 'is_active',
     ];
 
     protected $appends = ['is_discount_active'];

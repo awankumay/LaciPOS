@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('store_profiles', function (Blueprint $table) {
-            //
+            $table->dropColumn(['enable_customer_name', 'enable_table_number', 'enable_order_notes']);
         });
     }
 };

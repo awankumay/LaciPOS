@@ -1,6 +1,6 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
@@ -61,8 +61,17 @@ const handleLogoChange = (event) => {
     logoError.value = '';
     form.logo = file;
     form.remove_logo = false;
+    if (logoPreviewUrl.value?.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreviewUrl.value);
+    }
     logoPreviewUrl.value = URL.createObjectURL(file);
 };
+
+onUnmounted(() => {
+    if (logoPreviewUrl.value?.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreviewUrl.value);
+    }
+});
 
 const removeLogo = () => {
     form.logo = null;

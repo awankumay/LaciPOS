@@ -24,30 +24,29 @@ class CashierController extends Controller
 
     public function store(StoreCashierRequest $request)
     {
-        User::create([
+        $user = new User([
             'name' => $request->validated('name'),
             'email' => $request->validated('email'),
             'password' => Hash::make($request->validated('password')),
-            'role' => 'cashier',
-            'is_active' => true,
         ]);
+        $user->role = 'cashier';
+        $user->is_active = true;
+        $user->save();
 
         return back()->with('success', 'Akun kasir berhasil ditambahkan.');
     }
 
     public function update(UpdateCashierRequest $request, User $cashier)
     {
-        $data = [
-            'name' => $request->validated('name'),
-            'email' => $request->validated('email'),
-            'is_active' => $request->boolean('is_active'),
-        ];
+        $cashier->name = $request->validated('name');
+        $cashier->email = $request->validated('email');
+        $cashier->is_active = $request->boolean('is_active');
 
         if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->validated('password'));
+            $cashier->password = Hash::make($request->validated('password'));
         }
 
-        $cashier->update($data);
+        $cashier->save();
         return back()->with('success', 'Akun kasir berhasil diperbarui.');
     }
 }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import { ImagePlus, ArrowRight, ArrowLeft, X, Upload } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -33,9 +33,18 @@ const handleFileSelect = (event) => {
         return;
     }
 
+    if (previewUrl.value?.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl.value);
+    }
     previewUrl.value = URL.createObjectURL(file);
     emit('update:modelValue', file);
 };
+
+onUnmounted(() => {
+    if (previewUrl.value?.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl.value);
+    }
+});
 
 const removeLogo = () => {
     previewUrl.value = null;

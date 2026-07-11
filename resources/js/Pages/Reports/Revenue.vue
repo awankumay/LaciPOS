@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ReportTabs from '@/Components/ReportTabs.vue';
@@ -7,7 +7,7 @@ import { Download, FileText, Calendar, Filter } from 'lucide-vue-next';
 
 const props = defineProps({
     dailyRevenue: Array,
-    grandTotal: [String, Number],
+    totals: Object,
     filters: Object,
 });
 
@@ -24,6 +24,9 @@ const applyFilter = () => {
         { preserveState: true, replace: true }
     );
 };
+
+const sanitizeDate = (val) => /^\d{4}-\d{2}-\d{2}$/.test(val) ? val : '';
+const exportUrl = computed(() => `start_date=${sanitizeDate(startDate.value)}&end_date=${sanitizeDate(endDate.value)}`);
 
 const formatRupiah = (value) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
@@ -44,11 +47,11 @@ const formatDate = (dateString) => {
                     <p class="text-xs text-[#7c8c9a]">Pantau omzet harian bisnis Anda</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <a :href="`/reports/revenue/export-pdf?start_date=${startDate}&end_date=${endDate}`" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] hover:bg-slate-50 transition-colors">
+                    <a :href="`/reports/revenue/export-pdf?${exportUrl}`" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] hover:bg-slate-50 transition-colors">
                         <Download class="h-3.5 w-3.5" />
                         Export PDF
                     </a>
-                    <a :href="`/reports/revenue/export-csv?start_date=${startDate}&end_date=${endDate}`" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] hover:bg-slate-50 transition-colors">
+                    <a :href="`/reports/revenue/export-csv?${exportUrl}`" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-[#e1e5e8] bg-white px-3 py-1.5 text-xs font-semibold text-[#3d4f5b] hover:bg-slate-50 transition-colors">
                         <FileText class="h-3.5 w-3.5" />
                         Export CSV
                     </a>
@@ -96,20 +99,34 @@ const formatDate = (dateString) => {
                 </div>
             </div>
 
+            <!-- Notes -->
+            <div class="rounded-xl border border-[#e1e5e8] bg-gray-50 px-5 py-4 text-xs text-[#5c6c7a] space-y-1.5">
+                <p><span class="font-semibold text-[#001e2b]">Omzet Kotor</span> — Seluruh uang yang masuk sebelum dipotong pajak dan service charge.</p>
+                <p><span class="font-semibold text-[#001e2b]">Pajak Dipungut</span> — Uang titipan negara yang dikumpulkan dari pelanggan, bukan hak milik toko.</p>
+                <p><span class="font-semibold text-[#001e2b]">Service Charge</span> — Biaya jasa yang dikumpulkan untuk karyawan, bukan hak milik toko.</p>
+                <p><span class="font-semibold text-[#001e2b]">Pendapatan Bersih</span> — Omzet Kotor dikurangi Pajak dan Service Charge. Murni hak milik toko.</p>
+                <p><span class="font-semibold text-[#001e2b]">Potongan MDR</span> — Biaya admin payment gateway (QRIS/transfer) yang dipotong oleh penyedia jasa pembayaran.</p>
+                <p><span class="font-semibold text-[#001e2b]">Total Dana Cair</span> — Omzet Kotor dikurangi Potongan MDR. Untuk kebutuhan rekonsiliasi bank.</p>
+            </div>
+
             <!-- Table -->
             <div class="rounded-2xl border border-[#e1e5e8] bg-white shadow-[0_1px_2px_rgba(0,30,43,0.04)] overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-[#3d4f5b]">
                         <thead class="bg-[#f4f7f6] text-xs uppercase text-[#7c8c9a] border-b border-[#e1e5e8]">
                             <tr>
-                                <th scope="col" class="px-6 py-4 font-semibold">Tanggal</th>
-                                <th scope="col" class="px-6 py-4 font-semibold text-right">Jumlah Transaksi</th>
-                                <th scope="col" class="px-6 py-4 font-semibold text-right">Total Pendapatan</th>
+                                <th scope="col" class="px-4 py-4 font-semibold whitespace-nowrap">Tanggal</th>
+                                <th scope="col" class="px-4 py-4 font-semibold text-right whitespace-nowrap">Omzet Kotor</th>
+                                <th scope="col" class="px-4 py-4 font-semibold text-right whitespace-nowrap">Pajak Dipungut</th>
+                                <th scope="col" class="px-4 py-4 font-semibold text-right whitespace-nowrap">Service Charge</th>
+                                <th scope="col" class="px-4 py-4 font-semibold text-right whitespace-nowrap">Pendapatan Bersih</th>
+                                <th scope="col" class="px-4 py-4 font-semibold text-right whitespace-nowrap">Potongan MDR</th>
+                                <th scope="col" class="px-4 py-4 font-semibold text-right whitespace-nowrap">Total Dana Cair</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e1e5e8]">
                             <tr v-if="dailyRevenue.length === 0">
-                                <td colspan="3" class="px-6 py-8 text-center text-[#7c8c9a]">
+                                <td colspan="7" class="px-6 py-8 text-center text-[#7c8c9a]">
                                     <div class="flex flex-col items-center justify-center">
                                         <FileText class="mb-2 h-8 w-8 text-[#c1ccd6]" />
                                         <p>Tidak ada data transaksi pada rentang tanggal ini.</p>
@@ -117,25 +134,38 @@ const formatDate = (dateString) => {
                                 </td>
                             </tr>
                             <tr v-for="row in dailyRevenue" :key="row.date" class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-4 font-medium text-[#001e2b]">
+                                <td class="px-4 py-4 font-medium text-[#001e2b] whitespace-nowrap">
                                     {{ formatDate(row.date) }}
                                 </td>
-                                <td class="px-6 py-4 text-right">
-                                    {{ row.total_transactions }}
+                                <td class="px-4 py-4 text-right font-medium">
+                                    {{ formatRupiah(row.gross_revenue) }}
                                 </td>
-                                <td class="px-6 py-4 text-right font-semibold text-[#00684a]">
-                                    {{ formatRupiah(row.total_revenue) }}
+                                <td class="px-4 py-4 text-right text-orange-600">
+                                    {{ formatRupiah(row.total_tax) }}
+                                </td>
+                                <td class="px-4 py-4 text-right text-orange-600">
+                                    {{ formatRupiah(row.total_sc) }}
+                                </td>
+                                <td class="px-4 py-4 text-right font-semibold text-[#00684a]">
+                                    {{ formatRupiah(row.net_revenue) }}
+                                </td>
+                                <td class="px-4 py-4 text-right text-red-500">
+                                    -{{ formatRupiah(row.total_mdr) }}
+                                </td>
+                                <td class="px-4 py-4 text-right font-bold text-[#001e2b]">
+                                    {{ formatRupiah(row.total_settlement) }}
                                 </td>
                             </tr>
                         </tbody>
                         <tfoot class="bg-[#001e2b] text-white">
                             <tr>
-                                <td colspan="2" class="px-6 py-4 text-right font-bold uppercase text-xs tracking-wider">
-                                    Grand Total
-                                </td>
-                                <td class="px-6 py-4 text-right text-lg font-bold text-[#00ed64]">
-                                    {{ formatRupiah(grandTotal) }}
-                                </td>
+                                <td class="px-4 py-4 text-left font-bold uppercase text-xs tracking-wider">Grand Total</td>
+                                <td class="px-4 py-4 text-right font-bold">{{ formatRupiah(totals.gross_revenue) }}</td>
+                                <td class="px-4 py-4 text-right font-bold">{{ formatRupiah(totals.total_tax) }}</td>
+                                <td class="px-4 py-4 text-right font-bold">{{ formatRupiah(totals.total_sc) }}</td>
+                                <td class="px-4 py-4 text-right font-bold text-[#00ed64]">{{ formatRupiah(totals.net_revenue) }}</td>
+                                <td class="px-4 py-4 text-right font-bold">{{ formatRupiah(totals.total_mdr) }}</td>
+                                <td class="px-4 py-4 text-right font-bold text-[#00ed64]">{{ formatRupiah(totals.total_settlement) }}</td>
                             </tr>
                         </tfoot>
                     </table>

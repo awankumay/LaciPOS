@@ -11,10 +11,9 @@ class OrderItem extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'order_id', 'product_id', 'product_name_snapshot',
-        'snapshot_cogs', 'snapshot_price', 'variant_label',
-        'quantity', 'subtotal', 'notes',
-        'snapshot_discount_type', 'snapshot_discount_value', 'snapshot_discount_amount',
+        'product_id', 'product_name_snapshot', 'variant_label',
+        'quantity', 'notes',
+        'snapshot_discount_type', 'snapshot_discount_value',
     ];
 
     protected function casts(): array

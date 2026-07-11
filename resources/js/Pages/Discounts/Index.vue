@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
@@ -34,6 +34,7 @@ watch(search, (val) => {
         applyFilters();
     }, 300);
 });
+onUnmounted(() => clearTimeout(searchTimeout));
 
 const applyFilters = () => {
     router.get('/discounts', {

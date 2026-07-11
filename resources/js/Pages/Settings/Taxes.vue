@@ -29,28 +29,14 @@ const openServiceChargeTypeBox = ref(false);
 
 const changeTaxType = (newType) => {
     if (form.tax_type === newType) return;
-    
-    // Auto convert suggestion
-    if (form.tax_type === 'nominal' && newType === 'percentage') {
-        form.tax_value = form.tax_value > 0 ? form.tax_value / 1000 : form.tax_value;
-    } else if (form.tax_type === 'percentage' && newType === 'nominal') {
-        form.tax_value = form.tax_value > 0 ? form.tax_value * 1000 : form.tax_value;
-    }
-    
+    form.tax_value = 0;
     form.tax_type = newType;
     openTaxTypeBox.value = false;
 };
 
 const changeServiceChargeType = (newType) => {
     if (form.service_charge_type === newType) return;
-    
-    // Auto convert suggestion
-    if (form.service_charge_type === 'nominal' && newType === 'percentage') {
-        form.service_charge_value = form.service_charge_value > 0 ? form.service_charge_value / 1000 : form.service_charge_value;
-    } else if (form.service_charge_type === 'percentage' && newType === 'nominal') {
-        form.service_charge_value = form.service_charge_value > 0 ? form.service_charge_value * 1000 : form.service_charge_value;
-    }
-    
+    form.service_charge_value = 0;
     form.service_charge_type = newType;
     openServiceChargeTypeBox.value = false;
 };

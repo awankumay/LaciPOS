@@ -34,20 +34,28 @@ class StockController extends Controller
         $change = $validated['type'] === 'add' ? $validated['quantity'] : -$validated['quantity'];
         $reason = $validated['type'] === 'add' ? 'manual_add' : 'manual_reduce';
 
-        // Cek stok tidak boleh negatif
-        if ($product->stock + $change < 0) {
-            return back()->with('error', 'Stok tidak bisa kurang dari 0.');
-        }
+        try {
+            DB::transaction(function () use ($product, $change, $reason, $validated) {
+                $freshProduct = Product::lockForUpdate()->findOrFail($product->id);
 
-        DB::transaction(function () use ($product, $change, $reason, $validated) {
-            $product->increment('stock', $change);
-            StockLog::create([
-                'product_id' => $product->id,
-                'change' => $change,
-                'reason' => $reason,
-                'notes' => $validated['notes'],
-            ]);
-        });
+                if ($freshProduct->stock + $change < 0) {
+                    throw new \DomainException('Stok tidak bisa kurang dari 0.');
+                }
+
+                $freshProduct->increment('stock', $change);
+
+                $log = new StockLog();
+                $log->change = $change;
+                $log->fill([
+                    'product_id' => $freshProduct->id,
+                    'reason' => $reason,
+                    'notes' => $validated['notes'],
+                ]);
+                $log->save();
+            });
+        } catch (\DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return back()->with('success', 'Stok berhasil disesuaikan.');
     }

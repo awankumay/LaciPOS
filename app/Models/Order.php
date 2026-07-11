@@ -10,14 +10,14 @@ class Order extends Model
     use HasUlids;
 
     protected $fillable = [
-        'order_number', 'user_id', 'status', 'payment_method',
-        'payment_provider', 'subtotal', 'tax_rate', 'tax_type', 'tax_amount',
-        'service_charge_rate', 'service_charge_type', 'service_charge_amount',
-        'discount_type', 'discount_value', 'discount_amount', 'discount_note',
-        'total_amount', 'cash_received', 'change_amount', 'notes',
+        'payment_method', 'payment_provider',
+        'tax_rate', 'tax_type',
+        'service_charge_rate', 'service_charge_type',
+        'discount_type', 'discount_value', 'discount_note',
+        'cash_received', 'notes',
         'customer_name', 'table_number',
         'payment_method_id', 'payment_method_name', 'payment_account_details',
-        'payment_admin_fee_type', 'payment_admin_fee', 'payment_admin_fee_amount',
+        'payment_admin_fee_type',
     ];
 
     protected function casts(): array

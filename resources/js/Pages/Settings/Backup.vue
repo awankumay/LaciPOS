@@ -1,6 +1,6 @@
 <script setup>
 import SettingsLayout from '@/Layouts/SettingsLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -63,7 +63,7 @@ const processRestore = () => {
         onSuccess: () => {
             isRestoreModalOpen.value = false;
             restoreForm.reset();
-            window.location.reload();
+            router.visit('/dashboard');
         },
     });
 };

@@ -18,8 +18,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
-        'is_active',
         'security_question',
         'security_answer',
         'recovery_codes',

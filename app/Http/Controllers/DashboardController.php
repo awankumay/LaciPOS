@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -11,19 +15,24 @@ class DashboardController extends Controller
     {
         $today = now()->startOfDay();
 
-        $todayOrders = Order::where('status', 'completed')
+        $baseQuery = Order::where('status', 'completed')
             ->where('created_at', '>=', $today);
 
-        $totalRevenue = (clone $todayOrders)->sum('total_amount');
-        $totalTransactions = (clone $todayOrders)->count();
+        $totalRevenue = (clone $baseQuery)->sum('total_amount');
+        $totalTax = (clone $baseQuery)->sum('tax_amount');
+        $totalServiceCharge = (clone $baseQuery)->sum('service_charge_amount');
+        $netRevenue = $totalRevenue - $totalTax - $totalServiceCharge;
+        $totalTransactions = (clone $baseQuery)->count();
 
-        $activeCashiers = \App\Models\User::where('role', 'cashier')->where('is_active', true)->count();
+        $activeCashiers = User::where('role', 'cashier')->where('is_active', true)->count();
 
-        $grossProfit = \App\Models\OrderItem::whereHas('order', function ($q) use ($today) {
-            $q->where('status', 'completed')->where('created_at', '>=', $today);
-        })->sum(\Illuminate\Support\Facades\DB::raw('(snapshot_price - snapshot_cogs) * quantity'));
+        $totalCogs = OrderItem::whereHas('order', fn ($q) =>
+            $q->where('status', 'completed')->where('created_at', '>=', $today)
+        )->sum(DB::raw('snapshot_cogs * quantity'));
 
-        $restockProducts = \App\Models\Product::active()
+        $grossProfit = $netRevenue - $totalCogs;
+
+        $restockProducts = Product::active()
             ->lowStock()
             ->with('category')
             ->orderBy('stock')
@@ -37,20 +46,21 @@ class DashboardController extends Controller
 
         $salesData = collect(range(6, 0))->map(function ($daysAgo) {
             $date = now()->subDays($daysAgo)->startOfDay();
-            $revenue = Order::where('status', 'completed')
-                ->whereDate('created_at', $date)
-                ->sum('total_amount');
+            $dayOrders = Order::where('status', 'completed')->whereDate('created_at', $date);
+            $dayTotal = (float) $dayOrders->sum('total_amount');
+            $dayTax = (float) $dayOrders->sum('tax_amount');
+            $daySc = (float) $dayOrders->sum('service_charge_amount');
             return [
                 'date' => $date->format('d/m'),
                 'full_date' => $date->toDateString(),
                 'day' => $date->translatedFormat('D'),
-                'revenue' => (float) $revenue,
+                'revenue' => $dayTotal - $dayTax - $daySc,
             ];
         });
 
         return Inertia::render('Dashboard/Index', [
             'stats' => [
-                'totalRevenue' => $totalRevenue,
+                'totalRevenue' => $netRevenue,
                 'totalTransactions' => $totalTransactions,
                 'grossProfit' => $grossProfit,
                 'activeCashiers' => $activeCashiers,

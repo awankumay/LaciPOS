@@ -64,6 +64,9 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::get('/reports/profit-loss/export-csv', [\App\Http\Controllers\ExportController::class, 'exportProfitLossCsv'])->name('reports.profit-loss.export-csv');
         Route::get('/reports/best-sellers', [\App\Http\Controllers\ReportController::class, 'bestSellers'])->name('reports.best-sellers');
         Route::get('/reports/best-sellers/export-csv', [\App\Http\Controllers\ExportController::class, 'exportBestSellersCsv'])->name('reports.best-sellers.export-csv');
+        Route::get('/reports/tax-summary', [\App\Http\Controllers\ReportController::class, 'taxSummary'])->name('reports.tax-summary');
+        Route::get('/reports/tax-summary/export-pdf', [\App\Http\Controllers\ExportController::class, 'exportTaxSummary'])->name('reports.tax-summary.export-pdf');
+        Route::get('/reports/tax-summary/export-csv', [\App\Http\Controllers\ExportController::class, 'exportTaxSummaryCsv'])->name('reports.tax-summary.export-csv');
         Route::get('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'index'])->name('settings.printer.index');
         Route::post('/settings/printer', [App\Http\Controllers\PrinterSettingController::class, 'store'])->name('settings.printer.store');
         Route::post('/settings/printer/test', [App\Http\Controllers\PrinterSettingController::class, 'testPrint'])->name('settings.printer.test');
