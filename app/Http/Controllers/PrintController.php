@@ -7,6 +7,7 @@ use App\Models\StoreProfile;
 use App\Services\PrintService;
 use App\Services\ReceiptService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class PrintController extends Controller
 {
@@ -25,17 +26,30 @@ class PrintController extends Controller
         $data = $receiptService->generateReceiptData($order);
         $data['paperSize'] = $paperSize;
 
+        // Konversi logo ke base64 agar bisa dirender dompdf
+        if (!empty($data['store']['logo_url']) && $store?->logo_path) {
+            $fullPath = Storage::disk('public')->path($store->logo_path);
+            if (file_exists($fullPath)) {
+                $mime = mime_content_type($fullPath);
+                $base64 = base64_encode(file_get_contents($fullPath));
+                $data['store']['logo_url'] = "data:{$mime};base64,{$base64}";
+            }
+        }
+
         $widthMm  = $paperSize === '58mm' ? 58 : 80;
-        // dompdf setPaper array menggunakan satuan point (1mm = 2.835pt)
         $widthPt  = $widthMm * 2.835;
-        $heightPt = 1000; // ~353mm — cukup untuk struk panjang apapun
+
+        $itemCount = count($data['items']);
+        $heightPt = $paperSize === '58mm'
+            ? max(350, 280 + ($itemCount * 22))
+            : max(400, 320 + ($itemCount * 26));
 
         $pdf = Pdf::loadView('receipts.thermal', $data)
             ->setPaper([0, 0, $widthPt, $heightPt], 'portrait');
 
         $pdf->getDomPDF()->set_option('isHtml5ParserEnabled', true);
         $pdf->getDomPDF()->set_option('isPhpEnabled', false);
-        $pdf->getDomPDF()->set_option('dpi', 203); // standard thermal DPI
+        $pdf->getDomPDF()->set_option('dpi', 203);
 
         $filename = 'struk-' . $order->order_number . '.pdf';
 
