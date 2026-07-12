@@ -16,25 +16,25 @@
             font-weight: 700;
             -webkit-font-smoothing: none;
             text-rendering: optimizeSpeed;
-            line-height: 1.5;
+            line-height: 1.15;
             color: #000;
-            padding: 3mm 4mm;
+            padding: 2mm 3mm;
             background: #fff;
         }
         .text-center { text-align: center; }
         .fw-bold { font-weight: 700; }
         .text-muted { color: #777; }
         .logo {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
-            margin: 8px auto 4px;
+            margin: 3px auto 2px;
             display: block;
         }
         .hr {
             border: none;
             border-top: 1px dashed #999;
-            margin: 6px 0;
+            margin: 3px 0;
         }
         table {
             width: 100%;
@@ -48,18 +48,17 @@
             white-space: nowrap;
         }
         .item td {
-            padding: 1px 0;
+            padding: 0;
         }
         .total td {
-            padding: 2px 0;
+            padding: 1px 0;
         }
-        .spacer { height: 4px; }
+        .spacer { height: 2px; }
     </style>
 </head>
 <body>
 
-    <div style="height: 8px;"></div>
-    <div class="hr"></div>
+    <div style="height: 3px;"></div>
 
     @if(!empty($store['logo_url']))
         <div class="text-center">
@@ -147,8 +146,8 @@
         </tr>
         @endif
         <tr>
-            <td class="fw-bold" style="padding-top: 4px;">Total:</td>
-            <td class="amount fw-bold" style="padding-top: 4px;">Rp {{ number_format($order['total'], 0, ',', '.') }}</td>
+            <td class="fw-bold" style="padding-top: 2px;">Total:</td>
+            <td class="amount fw-bold" style="padding-top: 2px;">Rp {{ number_format($order['total'], 0, ',', '.') }}</td>
         </tr>
         @if(strtolower($order['payment_method']) === 'cash' || strtolower($order['payment_method']) === 'tunai')
         <tr>
@@ -169,13 +168,9 @@
 
     <div class="hr"></div>
 
-    <div class="text-center">
-        @if(!empty($store['receipt_footer']))
-            <div class="text-muted">{!! nl2br(e($store['receipt_footer'])) !!}</div>
-            <div class="spacer"></div>
-        @endif
-        <div class="fw-bold">Terima Kasih</div>
-    </div>
+    @if(!empty($store['receipt_footer']))
+        <div class="text-center text-muted">{!! nl2br(e($store['receipt_footer'])) !!}</div>
+    @endif
 
     <div class="hr"></div>
 
