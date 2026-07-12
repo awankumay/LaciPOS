@@ -16,9 +16,9 @@
             font-weight: 700;
             -webkit-font-smoothing: none;
             text-rendering: optimizeSpeed;
-            line-height: 1.15;
+            line-height: 1.05;
             color: #000;
-            padding: 2mm 3mm;
+            padding: 1mm 1.5mm;
             background: #fff;
         }
         .text-center { text-align: center; }
@@ -34,7 +34,7 @@
         .hr {
             border: none;
             border-top: 1px dashed #999;
-            margin: 3px 0;
+            margin: 1px 0;
         }
         table {
             width: 100%;
@@ -51,14 +51,14 @@
             padding: 0;
         }
         .total td {
-            padding: 1px 0;
+            padding: 0;
         }
-        .spacer { height: 2px; }
+        .spacer { height: 1px; }
     </style>
 </head>
 <body>
 
-    <div style="height: 3px;"></div>
+    <div style="height: 1px;"></div>
 
     @if(!empty($store['logo_url']))
         <div class="text-center">
