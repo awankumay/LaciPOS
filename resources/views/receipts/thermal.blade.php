@@ -16,9 +16,9 @@
             font-weight: 700;
             -webkit-font-smoothing: none;
             text-rendering: optimizeSpeed;
-            line-height: 1.05;
+            line-height: 1.15;
             color: #000;
-            padding: 1mm 1.5mm;
+            padding: 0.5mm 1mm;
             background: #fff;
         }
         .text-center { text-align: center; }
@@ -34,7 +34,7 @@
         .hr {
             border: none;
             border-top: 1px dashed #999;
-            margin: 1px 0;
+            margin: 2px 0;
         }
         table {
             width: 100%;
@@ -57,8 +57,6 @@
     </style>
 </head>
 <body>
-
-    <div style="height: 1px;"></div>
 
     @if(!empty($store['logo_url']))
         <div class="text-center">
