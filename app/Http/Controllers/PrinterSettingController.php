@@ -54,27 +54,44 @@ class PrinterSettingController extends Controller
 
     public function testPrint(\App\Services\PrintService $printService)
     {
-        $dummyOrder = new \App\Models\Order([
-            'order_number' => 'TEST-' . date('Ymd-His'),
-            'payment_method' => 'cash',
-            'payment_provider' => null,
-            'total_amount' => 150000,
-            'cash_received' => 150000,
-            'change_amount' => 0,
+        $dummyUser = new \App\Models\User(['name' => 'Kasir Test']);
+        $dummyUser->id = 'test-user-id';
+
+        $makeItem = function (string $name, ?string $variant, int $qty, int $price, int $discountPerUnit, int $subtotal) {
+            $item = new \App\Models\OrderItem();
+            $item->product_name_snapshot = $name;
+            $item->variant_label = $variant;
+            $item->quantity = $qty;
+            $item->snapshot_price = $price;
+            $item->snapshot_discount_amount = $discountPerUnit;
+            $item->subtotal = $subtotal;
+            return $item;
+        };
+
+        $items = collect([
+            $makeItem('Kopi Susu', null, 2, 12000, 2000, 20000),
+            $makeItem('Es Teh Manis', null, 2, 7000, 0, 14000),
+            $makeItem('Nasi Goreng', 'Spesial', 1, 25000, 0, 25000),
         ]);
+
+        $subtotal = 20000 + 14000 + 25000; // 59.000
+        $taxAmount = 5900;
+        $total = $subtotal + $taxAmount; // 64.900
+
+        $dummyOrder = new \App\Models\Order();
+        $dummyOrder->order_number = 'TEST-' . date('Ymd-His');
+        $dummyOrder->subtotal = $subtotal;
+        $dummyOrder->payment_method = 'cash';
+        $dummyOrder->payment_provider = null;
+        $dummyOrder->total_amount = $total;
+        $dummyOrder->cash_received = 100000;
+        $dummyOrder->change_amount = 100000 - $total;
+        $dummyOrder->tax_type = 'percentage';
+        $dummyOrder->tax_rate = 10;
+        $dummyOrder->tax_amount = $taxAmount;
         $dummyOrder->created_at = now();
-
-        $dummyUser = new \App\Models\User(['name' => 'Test Cashier']);
         $dummyOrder->setRelation('user', $dummyUser);
-
-        $dummyItem = new \App\Models\OrderItem([
-            'product_name_snapshot' => 'Produk Test Printer',
-            'variant_label' => 'Variant 1',
-            'quantity' => 1,
-            'snapshot_price' => 150000,
-            'subtotal' => 150000,
-        ]);
-        $dummyOrder->setRelation('items', collect([$dummyItem]));
+        $dummyOrder->setRelation('items', $items);
 
         $result = $printService->printReceipt($dummyOrder);
 

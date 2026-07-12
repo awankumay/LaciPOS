@@ -26,16 +26,19 @@ class PrintController extends Controller
         $data['paperSize'] = $paperSize;
 
         $widthMm  = $paperSize === '58mm' ? 58 : 80;
-        // dompdf setPaper array menggunakan satuan point (1mm = 2.835pt)
         $widthPt  = $widthMm * 2.835;
-        $heightPt = 1000; // ~353mm — cukup untuk struk panjang apapun
+
+        $itemCount = count($data['items']);
+        $heightPt = $paperSize === '58mm'
+            ? max(350, 280 + ($itemCount * 22))
+            : max(400, 320 + ($itemCount * 26));
 
         $pdf = Pdf::loadView('receipts.thermal', $data)
             ->setPaper([0, 0, $widthPt, $heightPt], 'portrait');
 
         $pdf->getDomPDF()->set_option('isHtml5ParserEnabled', true);
         $pdf->getDomPDF()->set_option('isPhpEnabled', false);
-        $pdf->getDomPDF()->set_option('dpi', 203); // standard thermal DPI
+        $pdf->getDomPDF()->set_option('dpi', 203);
 
         $filename = 'struk-' . $order->order_number . '.pdf';
 

@@ -125,7 +125,7 @@ const handleNext = () => {
                         : 'bg-[#e1e5e8] text-[#a8b3bc] cursor-not-allowed',
                 ]"
             >
-                Lanjutkan
+                Lihat Preview
                 <ArrowRight class="h-4 w-4" />
             </button>
         </div>

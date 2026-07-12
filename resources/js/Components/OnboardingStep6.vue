@@ -1,5 +1,4 @@
 <script setup>
-import { Separator } from '@/Components/ui/separator';
 import { ArrowLeft, Check, Printer, Loader2 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -29,52 +28,77 @@ const emit = defineEmits(['back', 'submit']);
         </div>
 
         <div class="mx-auto w-64 rounded-2xl border border-[#e1e5e8] bg-white p-5 shadow-[0_4px_12px_rgba(0,30,43,0.08)]">
-            <div class="text-center font-mono text-xs leading-relaxed">
-                <div class="text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
-                <img
-                    v-if="logoPreviewUrl"
-                    :src="logoPreviewUrl"
-                    alt="Logo"
-                    class="mx-auto my-2 h-12 w-12 object-contain"
-                />
-                <div class="mt-1 text-sm font-bold text-[#001e2b]">{{ storeName || 'Nama Toko' }}</div>
-                <div v-if="address" class="text-[#5c6c7a]">{{ address }}</div>
-                <div v-if="phone" class="text-[#5c6c7a]">Telp: {{ phone }}</div>
-                <div class="mt-1 text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
-            </div>
-
-            <div class="mt-3 font-mono text-xs space-y-1 text-[#3d4f5b]">
-                <div>No: TRX-20260610-001</div>
-                <div>Kasir: Sari</div>
-                <div>Tgl: 10 Jun 2026, 14:32</div>
-                <Separator class="my-2" />
-                <div class="flex justify-between">
-                    <span>Kopi Susu x1</span>
-                    <span>28.000</span>
+            <div class="font-mono text-xs leading-relaxed">
+                <div class="border-t border-dashed border-[#999]"></div>
+                <div class="text-center">
+                    <img
+                        v-if="logoPreviewUrl"
+                        :src="logoPreviewUrl"
+                        alt="Logo"
+                        class="mx-auto my-2 h-12 w-12 object-contain"
+                    />
+                    <div class="font-bold text-[#001e2b]" style="font-size: 1.1em;">{{ storeName || 'Nama Toko' }}</div>
+                    <div v-if="address" class="text-[#777]">{{ address }}</div>
+                    <div v-if="phone" class="text-[#777]">Telp: {{ phone }}</div>
                 </div>
-                <div class="flex justify-between">
-                    <span>Es Teh x2</span>
-                    <span>14.000</span>
+                <div class="border-t border-dashed border-[#999] my-1.5"></div>
+                <table class="w-full">
+                    <tr><td>No: TRX-20260610-001</td></tr>
+                    <tr><td>Kasir: Sari</td></tr>
+                    <tr><td>Tgl: 10 Jun 2026, 14:32</td></tr>
+                </table>
+                <div class="border-t border-dashed border-[#999] my-1.5"></div>
+                <table class="w-full">
+                    <tr class="align-top">
+                        <td>
+                            Kopi Susu
+                            <br>
+                            <span class="text-[#777]">1 x <span class="line-through">Rp 10.000</span> Rp 8.000</span>
+                        </td>
+                        <td class="text-right whitespace-nowrap">Rp 8.000</td>
+                    </tr>
+                    <tr class="align-top">
+                        <td>
+                            Es Teh
+                            <br>
+                            <span class="text-[#777]">2 x Rp 7.000</span>
+                        </td>
+                        <td class="text-right whitespace-nowrap">Rp 14.000</td>
+                    </tr>
+                </table>
+                <div class="border-t border-dashed border-[#999] my-1.5"></div>
+                <table class="w-full">
+                    <tr>
+                        <td>Subtotal</td>
+                        <td class="text-right whitespace-nowrap">Rp 24.000</td>
+                    </tr>
+                    <tr>
+                        <td>Diskon Trx</td>
+                        <td class="text-right whitespace-nowrap">- Rp 2.000</td>
+                    </tr>
+                    <tr>
+                        <td>Pajak (10%)</td>
+                        <td class="text-right whitespace-nowrap">Rp 2.200</td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold" style="padding-top: 4px;">Total:</td>
+                        <td class="text-right whitespace-nowrap font-bold" style="padding-top: 4px;">Rp 24.200</td>
+                    </tr>
+                    <tr>
+                        <td class="text-[#777]">Bayar (Tunai)</td>
+                        <td class="text-right whitespace-nowrap text-[#777]">Rp 50.000</td>
+                    </tr>
+                    <tr>
+                        <td class="text-[#777]">Kembali</td>
+                        <td class="text-right whitespace-nowrap text-[#777]">Rp 25.800</td>
+                    </tr>
+                </table>
+                <div class="border-t border-dashed border-[#999] my-1.5"></div>
+                <div class="text-center">
+                    <div v-if="receiptFooter" class="text-[#777]">{{ receiptFooter }}</div>
+                    <div class="font-bold mt-0.5">Terima Kasih</div>
                 </div>
-                <Separator class="my-2" />
-                <div class="flex justify-between font-bold text-[#001e2b]">
-                    <span>Total:</span>
-                    <span>Rp 42.000</span>
-                </div>
-                <div class="flex justify-between text-[#5c6c7a]">
-                    <span>Bayar:</span>
-                    <span>50.000</span>
-                </div>
-                <div class="flex justify-between text-[#5c6c7a]">
-                    <span>Kembali:</span>
-                    <span>8.000</span>
-                </div>
-            </div>
-
-            <div class="mt-3 text-center font-mono text-xs">
-                <div class="text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
-                <div v-if="receiptFooter" class="mt-1 text-[#5c6c7a]">{{ receiptFooter }}</div>
-                <div class="mt-0.5 text-[#a8b3bc]">― ― ― ― ― ― ― ― ― ―</div>
+                <div class="border-t border-dashed border-[#999] mt-1.5"></div>
             </div>
         </div>
 

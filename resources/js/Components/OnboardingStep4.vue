@@ -74,7 +74,7 @@ const emit = defineEmits(['update:phone', 'update:receiptFooter', 'next', 'back'
                 @click="$emit('next')"
                 class="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#00ed64] py-3 text-sm font-semibold text-[#001e2b] transition-colors hover:bg-[#00b545] active:bg-[#008c34]"
             >
-                Lihat Preview
+                Lanjutkan
                 <ArrowRight class="h-4 w-4" />
             </button>
         </div>
