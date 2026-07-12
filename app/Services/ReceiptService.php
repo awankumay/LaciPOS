@@ -10,7 +10,7 @@ class ReceiptService
     public function generateReceiptData(Order $order): array
     {
         $store = StoreProfile::getProfile();
-        $order->load(['items', 'user']);
+        $order->loadMissing(['items', 'user']);
 
         $logoUrl = null;
         if ($store?->logo_path) {
