@@ -102,7 +102,7 @@ const submitOnboarding = () => {
             </div>
 
             <!-- Progress Bar -->
-            <div class="border-b border-[#e1e5e8] px-8 py-5">
+            <div class="border-b border-[#e1e5e8] px-8 pt-5 pb-9">
                 <OnboardingProgress :current-step="currentStep" />
             </div>
 

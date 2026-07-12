@@ -1,7 +1,10 @@
 <script setup>
+import { ref } from 'vue';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Shield, ArrowLeft, ArrowRight } from 'lucide-vue-next';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
+import { Shield, ArrowLeft, ArrowRight, ChevronsUpDown, Check } from 'lucide-vue-next';
 
 const props = defineProps({
     modelValue: { type: String, default: '' },
@@ -9,6 +12,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue', 'update:securityAnswer', 'next', 'back']);
+
+const openQuestion = ref(false);
 
 const securityQuestions = [
     'Apa nama hewan peliharaan pertama Anda?',
@@ -46,16 +51,43 @@ const handleNext = () => {
         <div class="space-y-5">
             <div class="space-y-2">
                 <Label for="security_question" class="text-sm font-medium text-[#1c2d38]">Pertanyaan Keamanan</Label>
-                <select
-                    id="security_question"
-                    :value="modelValue"
-                    @change="$emit('update:modelValue', $event.target.value)"
-                    class="flex h-11 w-full rounded-xl border border-[#d0d7dd] bg-white px-3 py-2 text-sm text-[#1c2d38] shadow-sm focus:border-[#00b545] focus:outline-none focus:ring-2 focus:ring-[#00ed64]/20"
-                    required
-                >
-                    <option value="" disabled>Pilih pertanyaan keamanan</option>
-                    <option v-for="q in securityQuestions" :key="q" :value="q">{{ q }}</option>
-                </select>
+                <Popover v-model:open="openQuestion">
+                    <PopoverTrigger as-child>
+                        <button
+                            id="security_question"
+                            type="button"
+                            role="combobox"
+                            :aria-expanded="openQuestion"
+                            class="flex items-center justify-between h-11 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                        >
+                            <span class="truncate">{{ modelValue || 'Pilih pertanyaan keamanan' }}</span>
+                            <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent class="w-full sm:w-[500px] p-0 bg-white" align="start">
+                        <Command>
+                            <CommandList>
+                                <CommandGroup>
+                                    <CommandItem
+                                        v-for="q in securityQuestions"
+                                        :key="q"
+                                        :value="q"
+                                        @select="() => {
+                                            emit('update:modelValue', q);
+                                            openQuestion = false;
+                                        }"
+                                        class="text-sm cursor-pointer"
+                                    >
+                                        {{ q }}
+                                        <Check
+                                            :class="['ml-auto h-4 w-4 shrink-0', modelValue === q ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                        />
+                                    </CommandItem>
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
             </div>
 
             <div class="space-y-2">
@@ -67,7 +99,7 @@ const handleNext = () => {
                     type="text"
                     placeholder="Masukkan jawaban Anda"
                     autocomplete="off"
-                    class="h-11 text-base"
+                    class="h-11 text-base rounded-xl border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10"
                 />
                 <p class="text-xs text-[#7c8c9a]">
                     Gunakan jawaban yang mudah diingat. Jawaban ini digunakan untuk memulihkan akun Anda.

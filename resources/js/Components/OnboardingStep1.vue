@@ -41,7 +41,7 @@ const handleNext = () => {
                 type="text"
                 placeholder="Contoh: Warung Kopi Budi"
                 autofocus
-                class="h-11 text-base"
+                class="h-11 text-base rounded-xl border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10"
             />
         </div>
 

@@ -1,7 +1,10 @@
 <script setup>
+import { ref } from 'vue';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { MapPin, ArrowRight, ArrowLeft } from 'lucide-vue-next';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/Components/ui/command';
+import { MapPin, ArrowRight, ArrowLeft, ChevronsUpDown, Check } from 'lucide-vue-next';
 
 const props = defineProps({
     address: { type: String, default: '' },
@@ -9,6 +12,13 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:address', 'update:timezone', 'next', 'back']);
+
+const openTimezone = ref(false);
+const timezones = [
+    { value: 'Asia/Jakarta', label: 'Asia/Jakarta (WIB)' },
+    { value: 'Asia/Makassar', label: 'Asia/Makassar (WITA)' },
+    { value: 'Asia/Jayapura', label: 'Asia/Jayapura (WIT)' },
+];
 </script>
 
 <template>
@@ -39,7 +49,7 @@ const emit = defineEmits(['update:address', 'update:timezone', 'next', 'back']);
                 type="text"
                 placeholder="Contoh: Jl. Merdeka No. 123, Jakarta"
                 autofocus
-                class="h-11"
+                class="h-11 rounded-xl border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10"
             />
         </div>
 
@@ -48,17 +58,43 @@ const emit = defineEmits(['update:address', 'update:timezone', 'next', 'back']);
             <Label for="timezone" class="text-sm font-medium text-[#1c2d38]">
                 Zona Waktu <span class="text-red-500">*</span>
             </Label>
-            <select
-                id="timezone"
-                :value="timezone"
-                @change="$emit('update:timezone', $event.target.value)"
-                required
-                class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white focus:border-[#00684a] focus:ring-4 focus:ring-[#00684a]/10 transition-all text-sm font-medium text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none"
-            >
-                <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
-                <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
-                <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
-            </select>
+            <Popover v-model:open="openTimezone">
+                <PopoverTrigger as-child>
+                    <button
+                        id="timezone"
+                        type="button"
+                        role="combobox"
+                        :aria-expanded="openTimezone"
+                        class="flex items-center justify-between h-11 w-full rounded-xl border-[1.5px] border-[#c1ccd6] bg-white pl-4 pr-3 text-sm font-normal text-[#001e2b] shadow-[0_1px_2px_rgba(0,30,43,0.04)] outline-none transition-all hover:bg-slate-50 focus:border-[#00684a] focus:ring-[3px] focus:ring-[#00684a]/10"
+                    >
+                        <span class="truncate">{{ timezone ? timezones.find(tz => tz.value === timezone)?.label : 'Pilih Zona Waktu' }}</span>
+                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50 text-[#7c8c9a]" />
+                    </button>
+                </PopoverTrigger>
+                <PopoverContent class="w-full sm:w-[400px] p-0 bg-white" align="start">
+                    <Command>
+                        <CommandList>
+                            <CommandGroup>
+                                <CommandItem
+                                    v-for="tz in timezones"
+                                    :key="tz.value"
+                                    :value="tz.label"
+                                    @select="() => {
+                                        emit('update:timezone', tz.value);
+                                        openTimezone = false;
+                                    }"
+                                    class="text-sm cursor-pointer"
+                                >
+                                    {{ tz.label }}
+                                    <Check
+                                        :class="['ml-auto h-4 w-4', timezone === tz.value ? 'opacity-100 text-[#00684a]' : 'opacity-0']"
+                                    />
+                                </CommandItem>
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
             <p class="text-xs text-[#5c6c7a] mt-1">Zona waktu yang digunakan untuk seluruh fitur sistem.</p>
         </div>
 

@@ -40,7 +40,7 @@ const emit = defineEmits(['update:phone', 'update:receiptFooter', 'next', 'back'
                     type="tel"
                     placeholder="Contoh: 0812-3456-7890"
                     autofocus
-                    class="h-11"
+                    class="h-11 rounded-xl border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10"
                 />
             </div>
 
@@ -55,7 +55,7 @@ const emit = defineEmits(['update:phone', 'update:receiptFooter', 'next', 'back'
                     @update:model-value="$emit('update:receiptFooter', $event)"
                     type="text"
                     placeholder="Contoh: Terima kasih sudah berkunjung!"
-                    class="h-11"
+                    class="h-11 rounded-xl border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10"
                 />
                 <p class="text-xs text-[#7c8c9a]">Teks ini akan muncul di bagian bawah struk.</p>
             </div>
