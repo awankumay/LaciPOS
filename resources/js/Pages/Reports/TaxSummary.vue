@@ -112,21 +112,21 @@ const formatDate = (dateString) => {
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="rounded-2xl border border-[#e1e5e8] bg-white p-6 shadow-[0_1px_2px_rgba(0,30,43,0.04)] flex items-center gap-4">
-                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50">
-                        <FileText class="h-7 w-7 text-blue-600" />
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#e3fcef]">
+                        <FileText class="h-7 w-7 text-[#00684a]" />
                     </div>
                     <div>
                         <p class="text-sm font-medium text-[#7c8c9a]">Total Pajak Dipungut</p>
-                        <p class="text-2xl font-bold text-blue-700">{{ formatRupiah(totalTax) }}</p>
+                        <p class="text-2xl font-bold text-[#00684a]">{{ formatRupiah(totalTax) }}</p>
                     </div>
                 </div>
                 <div class="rounded-2xl border border-[#e1e5e8] bg-white p-6 shadow-[0_1px_2px_rgba(0,30,43,0.04)] flex items-center gap-4">
-                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-purple-50">
-                        <FileText class="h-7 w-7 text-purple-600" />
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#f4f7f6]">
+                        <FileText class="h-7 w-7 text-[#003d4f]" />
                     </div>
                     <div>
                         <p class="text-sm font-medium text-[#7c8c9a]">Total Service Charge Terkumpul</p>
-                        <p class="text-2xl font-bold text-purple-700">{{ formatRupiah(totalSc) }}</p>
+                        <p class="text-2xl font-bold text-[#001e2b]">{{ formatRupiah(totalSc) }}</p>
                     </div>
                 </div>
             </div>
@@ -160,8 +160,8 @@ const formatDate = (dateString) => {
                                 <td class="px-6 py-4 font-medium text-[#001e2b] whitespace-nowrap">{{ row.order_number }}</td>
                                 <td class="px-6 py-4 text-right">{{ formatRupiah(row.subtotal) }}</td>
                                 <td class="px-6 py-4 text-right">{{ row.tax_rate }}</td>
-                                <td class="px-6 py-4 text-right font-medium text-blue-600">{{ formatRupiah(row.tax_amount) }}</td>
-                                <td class="px-6 py-4 text-right font-medium text-purple-600">{{ formatRupiah(row.service_charge_amount) }}</td>
+                                <td class="px-6 py-4 text-right font-medium text-[#00684a]">{{ formatRupiah(row.tax_amount) }}</td>
+                                <td class="px-6 py-4 text-right font-medium text-[#003d4f]">{{ formatRupiah(row.service_charge_amount) }}</td>
                                 <td class="px-6 py-4 text-right font-bold text-[#001e2b]">{{ formatRupiah(row.grand_total) }}</td>
                             </tr>
                         </tbody>

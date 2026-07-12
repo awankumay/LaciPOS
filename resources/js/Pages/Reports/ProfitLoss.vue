@@ -179,22 +179,22 @@ const formatRupiah = (value) => {
 
             <!-- Additional Info: Total Pajak & Service Charge -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 flex items-center gap-3">
-                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100">
-                        <Info class="h-4 w-4 text-blue-600" />
+                <div class="rounded-2xl border border-[#e1e5e8] bg-white p-5 shadow-[0_1px_2px_rgba(0,30,43,0.04)] flex items-center gap-3">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e3fcef]">
+                        <FileText class="h-6 w-6 text-[#00684a]" />
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-blue-700">Total Pajak Terkumpul</p>
-                        <p class="text-sm font-bold text-blue-900">{{ formatRupiah(totalTax) }}</p>
+                        <p class="text-xs font-medium text-[#7c8c9a]">Total Pajak Terkumpul</p>
+                        <p class="text-lg font-bold text-[#00684a]">{{ formatRupiah(totalTax) }}</p>
                     </div>
                 </div>
-                <div class="rounded-xl border border-purple-100 bg-purple-50 px-4 py-3 flex items-center gap-3">
-                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-100">
-                        <Info class="h-4 w-4 text-purple-600" />
+                <div class="rounded-2xl border border-[#e1e5e8] bg-white p-5 shadow-[0_1px_2px_rgba(0,30,43,0.04)] flex items-center gap-3">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f4f7f6]">
+                        <FileText class="h-6 w-6 text-[#003d4f]" />
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-purple-700">Total Service Charge Terkumpul</p>
-                        <p class="text-sm font-bold text-purple-900">{{ formatRupiah(totalSc) }}</p>
+                        <p class="text-xs font-medium text-[#7c8c9a]">Total Service Charge Terkumpul</p>
+                        <p class="text-lg font-bold text-[#001e2b]">{{ formatRupiah(totalSc) }}</p>
                     </div>
                 </div>
             </div>
