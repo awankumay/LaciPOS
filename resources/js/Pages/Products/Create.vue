@@ -108,7 +108,7 @@ const submit = () => {
                     <CardContent class="space-y-5">
                         <div class="space-y-2">
                             <Label for="name" class="text-sm font-medium text-slate-700">Nama Produk <span class="text-red-500">*</span></Label>
-                            <Input id="name" v-model="form.name" placeholder="Contoh: Kopi Susu Aren" class="h-10 rounded-lg" />
+                            <Input id="name" v-model="form.name" placeholder="Contoh: Kopi Susu Aren" class="h-10 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                             <p v-if="form.errors.name" class="text-sm text-red-500">{{ form.errors.name }}</p>
                         </div>
 
@@ -268,12 +268,12 @@ const submit = () => {
                     <CardContent class="space-y-4">
                         <div class="space-y-2">
                             <Label for="cogs" class="text-sm font-medium text-slate-700">Harga Modal (COGS) <span class="text-red-500">*</span></Label>
-                            <Input id="cogs" v-model="form.cogs" type="number" step="100" min="0" placeholder="0" class="h-10 rounded-lg" />
+                            <Input id="cogs" v-model="form.cogs" type="number" step="100" min="0" placeholder="0" class="h-10 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                             <p v-if="form.errors.cogs" class="text-sm text-red-500">{{ form.errors.cogs }}</p>
                         </div>
                         <div class="space-y-2">
                             <Label for="price" class="text-sm font-medium text-slate-700">Harga Jual <span class="text-red-500">*</span></Label>
-                            <Input id="price" v-model="form.price" type="number" step="100" min="0" placeholder="0" class="h-10 rounded-lg" />
+                            <Input id="price" v-model="form.price" type="number" step="100" min="0" placeholder="0" class="h-10 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                             <p v-if="form.errors.price" class="text-sm text-red-500">{{ form.errors.price }}</p>
                         </div>
                         <div v-if="form.cogs && form.price && Number(form.price) > Number(form.cogs)"
@@ -296,12 +296,12 @@ const submit = () => {
                     <CardContent class="space-y-4">
                         <div class="space-y-2">
                             <Label for="stock" class="text-sm font-medium text-slate-700">Stok Awal <span class="text-red-500">*</span></Label>
-                            <Input id="stock" v-model="form.stock" type="number" min="0" placeholder="0" class="h-10 rounded-lg" />
+                            <Input id="stock" v-model="form.stock" type="number" min="0" placeholder="0" class="h-10 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                             <p v-if="form.errors.stock" class="text-sm text-red-500">{{ form.errors.stock }}</p>
                         </div>
                         <div class="space-y-2">
                             <Label for="min_stock_alert" class="text-sm font-medium text-slate-700">Minimum Stok Alert</Label>
-                            <Input id="min_stock_alert" v-model="form.min_stock_alert" type="number" min="0" placeholder="5" class="h-10 rounded-lg" />
+                            <Input id="min_stock_alert" v-model="form.min_stock_alert" type="number" min="0" placeholder="5" class="h-10 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                             <p class="text-xs text-slate-500 mt-1">Sistem akan memberi tahu jika stok kurang dari ini.</p>
                         </div>
                     </CardContent>

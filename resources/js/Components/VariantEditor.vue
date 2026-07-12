@@ -52,7 +52,7 @@ const removeOption = (variantIndex, optionIndex) => {
             <div class="flex items-center justify-between">
                 <div class="flex-1 mr-3">
                     <Label class="text-xs text-slate-500">Nama Varian {{ vIdx + 1 }}</Label>
-                    <Input v-model="variant.name" placeholder='Contoh: Ukuran, Level Gula, Suhu' class="mt-1" />
+                    <Input v-model="variant.name" placeholder='Contoh: Ukuran, Level Gula, Suhu' class="mt-1 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                 </div>
                 <Button type="button" variant="ghost" size="sm" @click="removeVariant(vIdx)" class="text-red-500">
                     <Trash2 class="h-4 w-4" />
@@ -64,15 +64,15 @@ const removeOption = (variantIndex, optionIndex) => {
                 <div v-for="(option, oIdx) in variant.options" :key="oIdx" class="flex items-start gap-2">
                     <div class="flex-1">
                         <Label class="text-xs text-slate-500">Label Opsi</Label>
-                        <Input v-model="option.label" placeholder="Contoh: Small, Medium, Large" class="mt-1" />
+                        <Input v-model="option.label" placeholder="Contoh: Small, Medium, Large" class="mt-1 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                     </div>
                     <div class="w-28">
                         <Label class="text-xs text-slate-500">+ Harga</Label>
-                        <Input v-model="option.price_modifier" type="number" step="500" placeholder="0" class="mt-1" />
+                        <Input v-model="option.price_modifier" type="number" step="500" placeholder="0" class="mt-1 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                     </div>
                     <div class="w-28">
                         <Label class="text-xs text-slate-500">+ Modal</Label>
-                        <Input v-model="option.cogs_modifier" type="number" step="500" placeholder="0" class="mt-1" />
+                        <Input v-model="option.cogs_modifier" type="number" step="500" placeholder="0" class="mt-1 rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                     </div>
                     <Button type="button" v-if="variant.options.length > 1" variant="ghost" size="sm" class="mt-6"
                         @click="removeOption(vIdx, oIdx)">

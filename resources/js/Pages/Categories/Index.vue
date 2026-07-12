@@ -90,7 +90,7 @@ const executeDelete = () => {
             <form @submit.prevent="submitAdd" class="flex items-end gap-3">
                 <div class="flex-1">
                     <label class="text-sm font-medium text-slate-700 mb-1 block">Nama Kategori</label>
-                    <Input v-model="addForm.name" placeholder="Contoh: Minuman" autofocus />
+                    <Input v-model="addForm.name" placeholder="Contoh: Minuman" autofocus class="rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" />
                     <p v-if="addForm.errors.name" class="text-sm text-red-500 mt-1">{{ addForm.errors.name }}</p>
                 </div>
                 <Button type="submit" :disabled="addForm.processing" size="sm">
@@ -117,7 +117,7 @@ const executeDelete = () => {
                         <TableCell>
                             <!-- Edit mode -->
                             <form v-if="editingId === category.id" @submit.prevent="submitEdit(category.id)" class="flex items-center gap-2">
-                                <Input v-model="editForm.name" class="max-w-xs" autofocus />
+                                <Input v-model="editForm.name" class="max-w-xs rounded-lg border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10" autofocus />
                                 <Button type="submit" size="sm" variant="ghost" :disabled="editForm.processing">
                                     <Check class="h-4 w-4 text-green-600" />
                                 </Button>

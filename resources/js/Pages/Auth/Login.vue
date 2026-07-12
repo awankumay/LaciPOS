@@ -49,7 +49,7 @@ watch(() => form.errors, (errors) => {
                             placeholder="contoh@email.com"
                             autofocus
                             required
-                            :class="['h-11', form.errors.email ? 'border-red-500 focus-visible:ring-red-400' : '']"
+                            :class="['h-11 rounded-xl border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10', form.errors.email ? 'border-red-500 focus-visible:ring-red-400' : '']"
                         />
                         <p v-if="form.errors.email" class="text-xs text-red-500">{{ form.errors.email }}</p>
                     </div>
@@ -63,7 +63,7 @@ watch(() => form.errors, (errors) => {
                             type="password"
                             placeholder="Masukkan password"
                             required
-                            :class="['h-11', form.errors.password ? 'border-red-500 focus-visible:ring-red-400' : '']"
+                            :class="['h-11 rounded-xl border-[1.5px] border-[#c1ccd6] px-4 shadow-[0_1px_2px_rgba(0,30,43,0.04)] focus-visible:border-[#00684a] focus-visible:ring-[3px] focus-visible:ring-[#00684a]/10', form.errors.password ? 'border-red-500 focus-visible:ring-red-400' : '']"
                         />
                         <p v-if="form.errors.password" class="text-xs text-red-500">{{ form.errors.password }}</p>
                     </div>
