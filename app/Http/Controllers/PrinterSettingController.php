@@ -57,43 +57,38 @@ class PrinterSettingController extends Controller
         $dummyUser = new \App\Models\User(['name' => 'Kasir Test']);
         $dummyUser->id = 'test-user-id';
 
-        $dummyItem1 = new \App\Models\OrderItem([
-            'product_name_snapshot' => 'Kopi Susu',
-            'variant_label' => null,
-            'quantity' => 2,
-            'snapshot_price' => 12000,
-            'snapshot_discount_amount' => 2000,
-            'subtotal' => 20000,
+        $makeItem = function (string $name, ?string $variant, int $qty, int $price, int $discountPerUnit, int $subtotal) {
+            $item = new \App\Models\OrderItem();
+            $item->product_name_snapshot = $name;
+            $item->variant_label = $variant;
+            $item->quantity = $qty;
+            $item->snapshot_price = $price;
+            $item->snapshot_discount_amount = $discountPerUnit;
+            $item->subtotal = $subtotal;
+            return $item;
+        };
+
+        $items = collect([
+            $makeItem('Kopi Susu', null, 2, 12000, 2000, 20000),
+            $makeItem('Es Teh Manis', null, 2, 7000, 0, 14000),
+            $makeItem('Nasi Goreng', 'Spesial', 1, 25000, 0, 25000),
         ]);
 
-        $dummyItem2 = new \App\Models\OrderItem([
-            'product_name_snapshot' => 'Es Teh Manis',
-            'variant_label' => null,
-            'quantity' => 1,
-            'snapshot_price' => 7000,
-            'snapshot_discount_amount' => 0,
-            'subtotal' => 7000,
-        ]);
-
-        $dummyItem3 = new \App\Models\OrderItem([
-            'product_name_snapshot' => 'Nasi Goreng',
-            'variant_label' => 'Spesial',
-            'quantity' => 1,
-            'snapshot_price' => 25000,
-            'snapshot_discount_amount' => 0,
-            'subtotal' => 25000,
-        ]);
-
-        $items = collect([$dummyItem1, $dummyItem2, $dummyItem3]);
+        $subtotal = 20000 + 14000 + 25000; // 59.000
+        $taxAmount = 5900;
+        $total = $subtotal + $taxAmount; // 64.900
 
         $dummyOrder = new \App\Models\Order();
         $dummyOrder->order_number = 'TEST-' . date('Ymd-His');
-        $dummyOrder->subtotal = 52000;
+        $dummyOrder->subtotal = $subtotal;
         $dummyOrder->payment_method = 'cash';
         $dummyOrder->payment_provider = null;
-        $dummyOrder->total_amount = 55000;
+        $dummyOrder->total_amount = $total;
         $dummyOrder->cash_received = 100000;
-        $dummyOrder->change_amount = 45000;
+        $dummyOrder->change_amount = 100000 - $total;
+        $dummyOrder->tax_type = 'percentage';
+        $dummyOrder->tax_rate = 10;
+        $dummyOrder->tax_amount = $taxAmount;
         $dummyOrder->created_at = now();
         $dummyOrder->setRelation('user', $dummyUser);
         $dummyOrder->setRelation('items', $items);
