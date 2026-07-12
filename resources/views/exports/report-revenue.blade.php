@@ -57,7 +57,7 @@
             @forelse($dailyRevenue as $index => $row)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ \Carbon\Carbon::parse($row['date'])->translatedFormat('l, d M Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($row['date'])->locale('id')->translatedFormat('l, d M Y') }}</td>
                 <td class="text-right">{{ $row['total_transactions'] }}</td>
                 <td class="text-right">{{ number_format($row['gross_revenue'], 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($row['total_tax'], 0, ',', '.') }}</td>

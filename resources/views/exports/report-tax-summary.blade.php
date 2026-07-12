@@ -65,7 +65,7 @@
             @forelse($details as $index => $row)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ \Carbon\Carbon::parse($row['date'])->translatedFormat('l, d M Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($row['date'])->locale('id')->translatedFormat('l, d M Y') }}</td>
                 <td>{{ $row['order_number'] }}</td>
                 <td class="text-right">Rp {{ number_format($row['subtotal'], 0, ',', '.') }}</td>
                 <td class="text-center">{{ $row['tax_rate'] }}</td>

@@ -53,7 +53,7 @@ class DashboardController extends Controller
             return [
                 'date' => $date->format('d/m'),
                 'full_date' => $date->toDateString(),
-                'day' => $date->translatedFormat('D'),
+                'day' => $date->locale('id')->translatedFormat('D'),
                 'revenue' => $dayTotal - $dayTax - $daySc,
             ];
         });
