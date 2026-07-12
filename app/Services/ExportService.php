@@ -3,26 +3,35 @@
 namespace App\Services;
 
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class ExportService
 {
+    private function formatDateFile(string $date): string
+    {
+        return Carbon::parse($date)->locale('id')->translatedFormat('d-M-Y');
+    }
+
     public function exportRevenuePdf(array $data)
     {
         $pdf = Pdf::loadView('exports.report-revenue', $data);
         $pdf->setPaper('a4', 'portrait');
-        return $pdf->download('laporan-pendapatan.pdf');
+        $fileDate = $this->formatDateFile($data['start_date']) . '-' . $this->formatDateFile($data['end_date']);
+        return $pdf->download("laporan-pendapatan-{$fileDate}.pdf");
     }
 
     public function exportProfitLossPdf(array $data)
     {
         $pdf = Pdf::loadView('exports.report-profit', $data);
         $pdf->setPaper('a4', 'portrait');
-        return $pdf->download('laporan-laba-rugi.pdf');
+        $fileDate = $this->formatDateFile($data['start_date']) . '-' . $this->formatDateFile($data['end_date']);
+        return $pdf->download("laporan-laba-rugi-{$fileDate}.pdf");
     }
 
     public function exportRevenueCsv($dailyRevenue, array $totals, string $startDate, string $endDate): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $filename = "laporan-pendapatan-{$startDate}-{$endDate}.csv";
+        $fileDate = $this->formatDateFile($startDate) . '-' . $this->formatDateFile($endDate);
+        $filename = "laporan-pendapatan-{$fileDate}.csv";
 
         return response()->streamDownload(function () use ($dailyRevenue, $totals) {
             $handle = fopen('php://output', 'w');
@@ -53,7 +62,8 @@ class ExportService
 
     public function exportProfitLossCsv(array $data, string $startDate, string $endDate): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $filename = "laporan-laba-rugi-{$startDate}-{$endDate}.csv";
+        $fileDate = $this->formatDateFile($startDate) . '-' . $this->formatDateFile($endDate);
+        $filename = "laporan-laba-rugi-{$fileDate}.csv";
 
         return response()->streamDownload(function () use ($data) {
             $handle = fopen('php://output', 'w');
@@ -77,12 +87,14 @@ class ExportService
     {
         $pdf = Pdf::loadView('exports.report-tax-summary', $data);
         $pdf->setPaper('a4', 'portrait');
-        return $pdf->download('laporan-pajak-service-charge.pdf');
+        $fileDate = $this->formatDateFile($data['start_date']) . '-' . $this->formatDateFile($data['end_date']);
+        return $pdf->download("laporan-pajak-service-charge-{$fileDate}.pdf");
     }
 
     public function exportTaxSummaryCsv($details, string $startDate, string $endDate, float $totalTax, float $totalSc): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $filename = "laporan-pajak-service-charge-{$startDate}-{$endDate}.csv";
+        $fileDate = $this->formatDateFile($startDate) . '-' . $this->formatDateFile($endDate);
+        $filename = "laporan-pajak-service-charge-{$fileDate}.csv";
 
         return response()->streamDownload(function () use ($details, $totalTax, $totalSc) {
             $handle = fopen('php://output', 'w');
@@ -115,7 +127,8 @@ class ExportService
 
     public function exportBestSellersCsv($products, string $startDate, string $endDate): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $filename = "laporan-produk-terlaris-{$startDate}-{$endDate}.csv";
+        $fileDate = $this->formatDateFile($startDate) . '-' . $this->formatDateFile($endDate);
+        $filename = "laporan-produk-terlaris-{$fileDate}.csv";
 
         return response()->streamDownload(function () use ($products) {
             $handle = fopen('php://output', 'w');

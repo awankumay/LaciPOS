@@ -32,7 +32,7 @@
 
     <table class="meta-table">
         <tr>
-            <td><strong>Periode:</strong> {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}</td>
+            <td><strong>Periode:</strong> {{ \Carbon\Carbon::parse($start_date)->locale('id')->translatedFormat('l, d M Y') }} - {{ \Carbon\Carbon::parse($end_date)->locale('id')->translatedFormat('l, d M Y') }}</td>
             <td style="text-align: right;"><strong>Tanggal Cetak:</strong> {{ $print_date }}</td>
         </tr>
     </table>
