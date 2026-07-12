@@ -68,16 +68,6 @@ watch(() => form.errors, (errors) => {
                         <p v-if="form.errors.password" class="text-xs text-red-500">{{ form.errors.password }}</p>
                     </div>
 
-                    <!-- Lupa Password -->
-                    <div class="text-right">
-                        <Link
-                            href="/forgot-password"
-                            class="text-xs font-medium text-[#5c6c7a] hover:text-[#001e2b] transition-colors"
-                        >
-                            Lupa Password?
-                        </Link>
-                    </div>
-
                     <!-- Submit -->
                     <button
                         type="submit"
@@ -92,6 +82,17 @@ watch(() => form.errors, (errors) => {
                         <Loader2 v-if="form.processing" class="h-4 w-4 animate-spin" />
                         {{ form.processing ? 'Memproses...' : 'Masuk' }}
                     </button>
+
+                    <!-- Lupa Password -->
+                    <div class="rounded-xl border border-[#e1e5e8] bg-[#f9fbfa] px-4 py-3 text-center space-y-1">
+                        <Link
+                            href="/forgot-password"
+                            class="text-xs font-semibold text-[#00684a] hover:text-[#00a35c] transition-colors"
+                        >
+                            Lupa Password?
+                        </Link>
+                        <p class="text-[10px] text-[#7c8c9a]">Khusus akun owner — Reset dengan Beberapa Metode</p>
+                    </div>
 
                 </form>
             </div>
