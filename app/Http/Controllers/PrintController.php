@@ -7,7 +7,6 @@ use App\Models\StoreProfile;
 use App\Services\PrintService;
 use App\Services\ReceiptService;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
 
 class PrintController extends Controller
 {
@@ -25,16 +24,6 @@ class PrintController extends Controller
 
         $data = $receiptService->generateReceiptData($order);
         $data['paperSize'] = $paperSize;
-
-        // Konversi logo ke base64 agar bisa dirender dompdf
-        if (!empty($data['store']['logo_url']) && $store?->logo_path) {
-            $fullPath = Storage::disk('public')->path($store->logo_path);
-            if (file_exists($fullPath)) {
-                $mime = mime_content_type($fullPath);
-                $base64 = base64_encode(file_get_contents($fullPath));
-                $data['store']['logo_url'] = "data:{$mime};base64,{$base64}";
-            }
-        }
 
         $widthMm  = $paperSize === '58mm' ? 58 : 80;
         $widthPt  = $widthMm * 2.835;

@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\StoreProfile;
+use Illuminate\Support\Facades\Storage;
 
 class ReceiptService
 {
@@ -11,12 +12,22 @@ class ReceiptService
         $store = StoreProfile::getProfile();
         $order->load(['items', 'user']);
 
+        $logoUrl = null;
+        if ($store?->logo_path) {
+            $fullPath = Storage::disk('public')->path($store->logo_path);
+            if (file_exists($fullPath)) {
+                $mime = mime_content_type($fullPath);
+                $base64 = base64_encode(file_get_contents($fullPath));
+                $logoUrl = "data:{$mime};base64,{$base64}";
+            }
+        }
+
         return [
             'store' => [
                 'name' => $store?->store_name ?? 'Toko',
                 'address' => $store?->address,
                 'phone' => $store?->phone,
-                'logo_url' => $store?->logo_url,
+                'logo_url' => $logoUrl,
                 'receipt_footer' => $store?->receipt_footer,
             ],
             'order' => [
