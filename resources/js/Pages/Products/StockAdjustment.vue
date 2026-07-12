@@ -1,6 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { useForm, Link } from '@inertiajs/vue3';
+import { useForm, Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -13,6 +14,8 @@ const props = defineProps({
     product: Object,
     logs: Array,
 });
+
+const storeTimezone = computed(() => usePage().props.storeSettings?.timezone || 'Asia/Jakarta');
 
 const form = useForm({
     type: 'add',
@@ -30,6 +33,7 @@ const submit = () => {
 const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('id-ID', {
+        timeZone: storeTimezone.value,
         dateStyle: 'medium',
         timeStyle: 'short'
     }).format(date);

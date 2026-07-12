@@ -35,6 +35,7 @@ const props = defineProps({
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
+const storeTimezone = computed(() => page.props.storeSettings?.timezone || 'Asia/Jakarta');
 const greeting = computed(() => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Selamat pagi';
@@ -210,7 +211,7 @@ const quickActions = [
                                     <tr v-for="trx in recentTransactions" :key="trx.id" class="hover:bg-slate-50 transition-colors">
                                         <td class="px-6 py-4 font-medium text-[#001e2b] whitespace-nowrap">{{ trx.order_number }}</td>
                                         <td class="px-6 py-4 text-[#5c6c7a] whitespace-nowrap">
-                                            {{ new Date(trx.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }}
+                                            {{ new Date(trx.created_at).toLocaleTimeString('id-ID', { timeZone: storeTimezone, hour: '2-digit', minute: '2-digit' }) }}
                                         </td>
                                         <td class="px-6 py-4 text-[#001e2b] whitespace-nowrap">{{ trx.user?.name || 'Unknown' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
