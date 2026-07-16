@@ -11,7 +11,6 @@ import {
     Clock,
     Sparkles,
     Wallet,
-    AlertTriangle,
 } from 'lucide-vue-next';
 
 import StatCard from '@/Components/StatCard.vue';
@@ -259,21 +258,6 @@ const quickActions = [
                 <div class="rounded-2xl border border-[#e1e5e8] bg-white px-6 pb-6 shadow-[0_1px_2px_rgba(0,30,43,0.04)] overflow-x-auto">
                     <div class="min-w-[500px]">
                         <SalesChart :data="salesData" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Coming Soon notice -->
-            <div class="rounded-2xl border border-dashed border-[#c1ccd6] bg-transparent px-6 py-5">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#e3fcef]">
-                        <Sparkles class="h-4 w-4 text-[#00684a]" />
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-[#001e2b]">Dashboard sedang dalam pengembangan</p>
-                        <p class="mt-0.5 text-xs text-[#7c8c9a]">
-                            Statistik penjualan, grafik pendapatan, dan laporan lengkap akan tersedia di task selanjutnya.
-                        </p>
                     </div>
                 </div>
             </div>

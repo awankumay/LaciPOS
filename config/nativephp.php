@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'app_name' => env('APP_NAME', 'Laci POS Desktop'),
+    'app_name' => env('APP_NAME', 'LaciPOS'),
 
     /**
      * The version of your app.
@@ -156,7 +156,7 @@ return [
      * Define your own scripts to run before and after the build process.
      */
     'prebuild' => [
-        // 'npm run build',
+        'npm run build',
     ],
 
     'postbuild' => [

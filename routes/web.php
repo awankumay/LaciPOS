@@ -101,6 +101,9 @@ Route::middleware(['auth', 'onboarding'])->group(function () {
         Route::post('/settings/restore', [App\Http\Controllers\BackupController::class, 'restore'])->name('settings.backup.restore');
         Route::get('/settings/backup/{filename}/download', [App\Http\Controllers\BackupController::class, 'download'])->name('settings.backup.download');
 
+        // App Info
+        Route::get('/settings/app-info', [App\Http\Controllers\SettingsController::class, 'appInfo'])->name('settings.app-info');
+
         // Payment Methods
         Route::resource('/settings/payment-methods', PaymentMethodController::class)->except(['create', 'show', 'edit']);
     });

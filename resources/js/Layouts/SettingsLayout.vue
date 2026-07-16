@@ -17,6 +17,7 @@ const navItems = [
     { name: 'Metode Pembayaran', url: '/settings/payment-methods' },
     { name: 'Stok', url: '/settings/inventory' },
     { name: 'Backup & Restore', url: '/settings/backup' },
+    { name: 'Info Aplikasi', url: '/settings/app-info' },
 ];
 </script>
 

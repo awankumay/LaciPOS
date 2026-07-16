@@ -6,6 +6,7 @@ use App\Http\Requests\OnboardingRequest;
 use App\Models\StoreProfile;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\App;
 
 class SettingsController extends Controller
 {
@@ -80,6 +81,27 @@ class SettingsController extends Controller
         }
 
         return back()->with('success', 'Pengaturan stok berhasil disimpan.');
+    }
+
+    public function appInfo()
+    {
+        $composerJson = json_decode(file_get_contents(base_path('composer.json')), true);
+
+        $info = [
+            'app_name' => config('app.name'),
+            'app_version' => config('nativephp.version', '1.0.0'),
+            'app_env' => App::environment(),
+            'php_version' => PHP_VERSION,
+            'laravel_version' => App::version(),
+            'database' => config('database.default'),
+            'developer_name' => env('APP_DEVELOPER', 'Yoga Ardiana'),
+            'developer_email' => env('APP_DEVELOPER_EMAIL', 'yogaardiana1805@gmail.com'),
+            'github_url' => env('APP_GITHUB_URL', 'https://github.com/yogaardiana'),
+            'website_url' => env('APP_WEBSITE_URL', 'https://lacipos.my.id'),
+            'license' => 'MIT',
+        ];
+
+        return Inertia::render('Settings/AppInfo', $info);
     }
 
     public function taxes()
