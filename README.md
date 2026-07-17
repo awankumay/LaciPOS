@@ -3,6 +3,31 @@
   <img src="public/assets/logo/laci-banner-logo.png" alt="LaciPOS Logo" width="full" height="auto">
 </p>
 
+<p align="center">
+  <a href="https://github.com/yogaarrd/LaciPOS/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+  </a>
+  <a href="https://laravel.com">
+    <img src="https://img.shields.io/badge/Laravel-11-red?logo=laravel" alt="Laravel">
+  </a>
+  <a href="https://vuejs.org">
+    <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3">
+  </a>
+  <a href="https://inertiajs.com">
+    <img src="https://img.shields.io/badge/Inertia.js-9553E9?logo=inertia&logoColor=white" alt="Inertia.js">
+  </a>
+  <a href="https://tailwindcss.com">
+    <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+  </a>
+  <a href="https://nativephp.com">
+    <img src="https://img.shields.io/badge/NativePHP-1.3-0055FF?logo=electron&logoColor=white" alt="NativePHP">
+  </a>
+  <img src="https://img.shields.io/badge/PHP_8.2-777BB4?logo=php&logoColor=white" alt="PHP">
+  <img src="https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white" alt="SQLite">
+  <a href="https://github.com/yogaarrd/LaciPOS/releases">
+    <img src="https://img.shields.io/github/v/release/yogaarrd/LaciPOS?color=00ed64&label=version" alt="Latest Release">
+  </a>
+</p>
 
 <p align="center">
   Aplikasi POS (Point of Sale) desktop modern, cepat, ringan, dan siap digunakan untuk bisnis retail, kuliner, dan UKM.
@@ -101,6 +126,15 @@ php artisan native:dev
 | Cetak | DomPDF, NativePHP Print API |
 | Chart | Unovis |
 | UI Icons | Lucide |
+
+## Sponsor
+
+Dukung pengembangan LaciPOS agar terus berkembang untuk semua orang.
+
+<a href="https://ko-fi.com/yogaardiana" target="_blank"><img src="https://img.shields.io/badge/Ko--fi-F16061?logo=ko-fi&logoColor=white" alt="Ko-fi" height="30"></a>
+<a href="https://trakteer.id/yogaardiana" target="_blank"><img src="https://img.shields.io/badge/Trakteer.id-FF5E00?logo=buymeacoffee&logoColor=white" alt="Trakteer" height="30"></a>
+
+Terima kasih atas dukungannya!
 
 ## Kontribusi
 
