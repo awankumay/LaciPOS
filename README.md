@@ -1,6 +1,6 @@
 <h1 align="center">Laci Point Of Sales - Laci POS</h1>
 <p align="center">
-  <img src="public/assets/logo/laci-banner-logo.png" alt="LaciPOS Logo" width="full" height="auto">
+  <img src="public/assets/logo/laci-banner-logo.png" alt="LaciPOS Logo" width="100%">
 </p>
 
 <p align="center">
@@ -43,6 +43,16 @@
   ·
   <a href="#kontribusi">Kontribusi</a>
 </p>
+
+---
+
+## Demo
+
+<a href="https://youtu.be/smipcU3-IMw?si=KDgEeGNe68JX0r6o" target="_blank">
+  <img src="https://img.youtube.com/vi/smipcU3-IMw/maxresdefault.jpg" alt="LaciPOS Demo" width="100%">
+</a>
+
+Klik gambar di atas untuk menonton video demo fitur utama LaciPOS.
 
 ---
 
