@@ -95,8 +95,8 @@ class SettingsController extends Controller
             'laravel_version' => App::version(),
             'database' => config('database.default'),
             'developer_name' => env('APP_DEVELOPER', 'Yoga Ardiana'),
-            'developer_email' => env('APP_DEVELOPER_EMAIL', 'yogaardiana1805@gmail.com'),
-            'github_url' => env('APP_GITHUB_URL', 'https://github.com/yogaardiana'),
+            'developer_email' => env('APP_DEVELOPER_EMAIL', 'yogaardiana05@gmail.com'),
+            'github_url' => env('APP_GITHUB_URL', 'https://github.com/yogaarrd/LaciPOS'),
             'website_url' => env('APP_WEBSITE_URL', 'https://lacipos.my.id'),
             'license' => 'MIT',
         ];
