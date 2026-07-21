@@ -74,9 +74,8 @@ Klik gambar di atas untuk menonton video demo fitur utama LaciPOS.
 ### Untuk Pengguna Umum (Non-Teknis)
 
 1. Buka halaman [Releases](https://github.com/yogaarrd/LaciPOS/releases) di repositori ini.
-2. Download file installer sesuai sistem operasi Anda:
+2. Download file installer :
    - **Windows** — `LaciPOS-Setup-x.x.x.exe`
-   - **macOS** — `LaciPOS-x.x.x.dmg`
 3. Jalankan file installer dan ikuti petunjuk instalasi.
 4. Buka aplikasi LaciPOS yang sudah terinstal.
 5. Aplikasi akan memandu Anda melalui proses setup awal (onboarding).
