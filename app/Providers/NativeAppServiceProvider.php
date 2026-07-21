@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Native\Laravel\Facades\Window;
-use Native\Laravel\Facades\Menu;
 use Native\Laravel\Contracts\ProvidesPhpIni;
 
 class NativeAppServiceProvider implements ProvidesPhpIni
@@ -11,6 +10,7 @@ class NativeAppServiceProvider implements ProvidesPhpIni
     public function boot(): void
     {
         Window::open()
+            ->hideMenu()
             ->width(1280)
             ->height(800)
             ->minWidth(1024)
@@ -20,15 +20,9 @@ class NativeAppServiceProvider implements ProvidesPhpIni
             ->title('LaciPOS');
 
         Menu::new()
-            ->appMenu()
-            ->submenu('File', Menu::new()
-                ->submenu('Keluar', 'quit')
-            )
-            ->submenu('Jendela', Menu::new()
-                ->minimize()
-                ->zoom()
-                ->separator()
-                ->close()
+            ->with(
+                Menu::app(),  
+                Menu::file()  
             )
             ->register();
     }
