@@ -8,10 +8,6 @@ use Native\Laravel\Contracts\ProvidesPhpIni;
 
 class NativeAppServiceProvider implements ProvidesPhpIni
 {
-    /**
-     * Executed once the native application has been booted.
-     * Use this method to open windows, register global shortcuts, etc.
-     */
     public function boot(): void
     {
         Window::open()
@@ -21,13 +17,12 @@ class NativeAppServiceProvider implements ProvidesPhpIni
             ->minHeight(768)
             ->center()
             ->showDevTools(false)
-            ->title('Sistem POS App');
+            ->title('LaciPOS');
 
         Menu::new()
-            ->appMenu() 
-            ->editMenu() 
-            ->submenu('Tampilan', Menu::new()
-                ->toggleFullscreen() 
+            ->appMenu()
+            ->submenu('File', Menu::new()
+                ->submenu('Keluar', 'quit')
             )
             ->submenu('Jendela', Menu::new()
                 ->minimize()
