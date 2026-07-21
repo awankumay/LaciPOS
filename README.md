@@ -80,7 +80,7 @@ Klik gambar di atas untuk menonton video demo fitur utama LaciPOS.
 4. Buka aplikasi LaciPOS yang sudah terinstal.
 5. Aplikasi akan memandu Anda melalui proses setup awal (onboarding).
 
-> **Persyaratan:** macOS 12+ atau Windows 10+, printer thermal opsional.
+> **Persyaratan:** Windows 10+, printer thermal opsional.
 
 ### Untuk Pengembang (Developer)
 
