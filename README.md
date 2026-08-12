@@ -119,7 +119,7 @@ php artisan serve
 Untuk menjalankan sebagai aplikasi desktop (NativePHP):
 
 ```bash
-php artisan native:dev
+php artisan native:serve
 ```
 
 > **Persyaratan Developer:** PHP 8.2+, Composer, Node.js 18+, npm, SQLite.
