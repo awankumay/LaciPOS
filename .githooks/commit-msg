@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Ensures every commit has exactly one canonical Co-Authored-By trailer.
+# Existing trailers from Claude Code, Opencode, Command Code, or any other
+# tool are normalized to the canonical identity; messages without one get
+# the trailer appended.
+#
+# This file is the tracked source of truth. Git does not read hooks from
+# here automatically — install it into .git/hooks/commit-msg (see
+# .githooks/README.md).
+set -euo pipefail
+
+msg_file="$1"
+trailer="Co-Authored-By: SupportAgent <support@mitracoretech.id>"
+
+awk -v trailer="$trailer" '
+  tolower($0) ~ /^[[:space:]]*co-authored-by[[:space:]]*:/ { next }
+  { sub(/\r$/, ""); lines[++count] = $0 }
+  END {
+    while ((count > 0) && (lines[count] ~ /^[[:space:]]*$/)) { count-- }
+    for (line = 1; line <= count; line++) { print lines[line] }
+    if (count > 0) { print "" }
+    print trailer
+  }
+' "$msg_file" > "$msg_file.tmp"
+
+mv "$msg_file.tmp" "$msg_file"

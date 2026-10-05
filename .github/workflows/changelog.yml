@@ -1,0 +1,189 @@
+name: Update Changelog
+
+on:
+  push:
+    branches:
+      - main
+
+    paths-ignore:
+      - CHANGELOG.md
+
+  workflow_dispatch:
+
+concurrency:
+  group: changelog-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  changelog:
+    name: Generate Changelog & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------------------------------------------
+      # Checkout
+      # ---------------------------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      # ---------------------------------------------------------------
+      # PHP
+      # ---------------------------------------------------------------
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer:v2
+
+      # ---------------------------------------------------------------
+      # Validate Composer
+      # ---------------------------------------------------------------
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
+      # ---------------------------------------------------------------
+      # git-cliff
+      # ---------------------------------------------------------------
+      - name: Install git-cliff
+        uses: taiki-e/install-action@git-cliff
+
+      # ---------------------------------------------------------------
+      # Compute version
+      # ---------------------------------------------------------------
+      - name: Compute next version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          current="$(git tag --list 'v*' --sort=-v:refname | head -n1 || true)"
+          next="$(git-cliff --bumped-version || true)"
+
+          echo "Current version: ${current:-none}"
+          echo "Next version: ${next:-none}"
+
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+
+      # ---------------------------------------------------------------
+      # Generate CHANGELOG
+      # ---------------------------------------------------------------
+      - name: Generate changelog
+        if: steps.version.outputs.next != ''
+        run: |
+          git-cliff \
+            --tag "${{ steps.version.outputs.next }}" \
+            --output CHANGELOG.md
+
+      # ---------------------------------------------------------------
+      # Update composer.json version
+      # ---------------------------------------------------------------
+      - name: Update composer.json version
+        if: steps.version.outputs.next != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          next="${{ steps.version.outputs.next }}"
+          next="${next#v}"
+
+          php -r '
+            $path = "composer.json";
+
+            $data = json_decode(
+                file_get_contents($path),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+
+            $data["version"] = $argv[1];
+
+            file_put_contents(
+                $path,
+                json_encode(
+                    $data,
+                    JSON_PRETTY_PRINT |
+                    JSON_UNESCAPED_SLASHES |
+                    JSON_UNESCAPED_UNICODE
+                ) . PHP_EOL
+            );
+          ' "$next"
+
+      # ---------------------------------------------------------------
+      # Refresh composer.lock
+      # ---------------------------------------------------------------
+      - name: Refresh composer.lock hash
+        if: steps.version.outputs.next != ''
+        run: |
+          composer update \
+            --lock \
+            --no-install \
+            --no-scripts
+
+      # ---------------------------------------------------------------
+      # Check changes
+      # ---------------------------------------------------------------
+      - name: Check release changes
+        if: steps.version.outputs.next != ''
+        run: |
+          git status --short
+
+      # ---------------------------------------------------------------
+      # Commit CHANGELOG + Version
+      # ---------------------------------------------------------------
+      - name: Commit changelog and version
+        if: steps.version.outputs.next != ''
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: >-
+            docs(changelog): update CHANGELOG.md and composer.json
+            version for ${{ steps.version.outputs.next }} [skip ci]
+          file_pattern: "CHANGELOG.md composer.json composer.lock"
+
+      # ---------------------------------------------------------------
+      # Create Git Tag
+      # ---------------------------------------------------------------
+      - name: Create Git tag
+        if: >-
+          steps.version.outputs.next != '' &&
+          steps.version.outputs.next != steps.version.outputs.current
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.version.outputs.next }}"
+
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists."
+            exit 0
+          fi
+
+          git tag "$tag"
+          git push origin "$tag"
+
+      # ---------------------------------------------------------------
+      # Trigger production release build
+      # ---------------------------------------------------------------
+      - name: Trigger release build
+        if: >-
+          steps.version.outputs.next != '' &&
+          steps.version.outputs.next != steps.version.outputs.current
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.version.outputs.next }}"
+
+          gh workflow run release.yml \
+            --ref "$tag" \
+            -f tag="$tag"

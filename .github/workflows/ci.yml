@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test & Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------------------------------------------
+      # Checkout
+      # ---------------------------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # PHP
+      # ---------------------------------------------------------------
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, intl, gd, zip
+          coverage: none
+          tools: composer:v2
+
+      # ---------------------------------------------------------------
+      # Composer
+      # ---------------------------------------------------------------
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      # ---------------------------------------------------------------
+      # Node.js
+      # ---------------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      # ---------------------------------------------------------------
+      # Frontend
+      # ---------------------------------------------------------------
+      - name: Build frontend assets
+        run: npm run build
+
+      # ---------------------------------------------------------------
+      # Laravel
+      # ---------------------------------------------------------------
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Create SQLite database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Run database migrations
+        run: php artisan migrate --force
+
+      # ---------------------------------------------------------------
+      # Code Quality
+      # ---------------------------------------------------------------
+      - name: Check code style (Pint)
+        run: vendor/bin/pint --test
+
+      # ---------------------------------------------------------------
+      # Tests
+      # ---------------------------------------------------------------
+      - name: Run tests (Pest)
+        run: php artisan test --parallel --compact
+
+      # ---------------------------------------------------------------
+      # Static Analysis
+      # ---------------------------------------------------------------
+      - name: Static analysis (PHPStan)
+        run: vendor/bin/phpstan analyse --memory-limit=2G

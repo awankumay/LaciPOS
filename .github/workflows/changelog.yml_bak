@@ -1,0 +1,68 @@
+name: Update Changelog
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - CHANGELOG.md
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install git-cliff
+        uses: taiki-e/install-action@git-cliff
+
+      - name: Compute next version
+        id: version
+        run: |
+          current="$(git tag --list 'v*' --sort=-v:refname | head -n1)"
+          next="$(git-cliff --bumped-version)"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog
+        run: git-cliff --tag "${{ steps.version.outputs.next }}" --output CHANGELOG.md
+
+      - name: Update composer.json version
+        if: ${{ steps.version.outputs.next != '' }}
+        run: |
+          next="${{ steps.version.outputs.next }}"
+          next="${next#v}"
+          php -r '
+            $path = "composer.json";
+            $data = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+            $data["version"] = $argv[1];
+            file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
+          ' "$next"
+
+      - name: Refresh composer.lock hash
+        if: ${{ steps.version.outputs.next != '' }}
+        run: composer update --lock --no-install --no-scripts
+
+      - name: Commit changelog
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs(changelog): update CHANGELOG.md and composer.json version for ${{ steps.version.outputs.next }} [skip ci]"
+          file_pattern: CHANGELOG.md composer.json composer.lock
+
+      - name: Tag release
+        if: ${{ steps.version.outputs.next != '' && steps.version.outputs.next != steps.version.outputs.current }}
+        run: |
+          git tag "${{ steps.version.outputs.next }}"
+          git push origin "${{ steps.version.outputs.next }}"

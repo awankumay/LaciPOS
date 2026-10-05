@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  echo "Error: .githooks/install must be run inside a Git repository." >&2
+  exit 1
+}
+
+source_hook="$repo_root/.githooks/commit-msg"
+hooks_dir=$(git rev-parse --path-format=absolute --git-path hooks)
+installed_hook="$hooks_dir/commit-msg"
+
+if [[ ! -f "$source_hook" ]]; then
+  echo "Error: tracked hook not found at $source_hook." >&2
+  exit 1
+fi
+
+mkdir -p "$hooks_dir"
+cp "$source_hook" "$installed_hook"
+chmod +x "$installed_hook"
+
+if ! cmp -s "$source_hook" "$installed_hook"; then
+  echo "Error: installed hook does not match $source_hook." >&2
+  exit 1
+fi
+
+printf 'Installed and verified %s\n' "$installed_hook"

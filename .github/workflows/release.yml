@@ -1,0 +1,319 @@
+name: Build Production Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Git tag to build"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Production Artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------------------------------------------
+      # Normalize release ref
+      # ---------------------------------------------------------------
+      - name: Normalize release ref
+        id: ref
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            tag="${{ inputs.tag }}"
+            tag="${tag#v}"
+            ref="v${tag}"
+          else
+            ref="${GITHUB_REF_NAME}"
+          fi
+
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      # ---------------------------------------------------------------
+      # Checkout release
+      # ---------------------------------------------------------------
+      - name: Checkout release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+          fetch-depth: 0
+
+      # ---------------------------------------------------------------
+      # Determine version
+      # ---------------------------------------------------------------
+      - name: Determine release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="${{ steps.ref.outputs.ref }}"
+          version="${version#v}"
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # ---------------------------------------------------------------
+      # PHP
+      # ---------------------------------------------------------------
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, pdo_mysql, bcmath, intl, gd, zip
+          coverage: none
+          tools: composer:v2
+
+      # ---------------------------------------------------------------
+      # Validate Composer
+      # ---------------------------------------------------------------
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
+      # ---------------------------------------------------------------
+      # Install production Composer dependencies
+      # ---------------------------------------------------------------
+      - name: Install production Composer dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: "--no-dev --optimize-autoloader --no-interaction"
+
+      # ---------------------------------------------------------------
+      # Node.js
+      # ---------------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # ---------------------------------------------------------------
+      # Install frontend dependencies
+      # ---------------------------------------------------------------
+      - name: Install npm dependencies
+        run: npm ci
+
+      # ---------------------------------------------------------------
+      # Build frontend assets
+      # ---------------------------------------------------------------
+      - name: Build frontend assets
+        run: npm run build
+
+      # ---------------------------------------------------------------
+      # Remove Node development files
+      # ---------------------------------------------------------------
+      - name: Remove Node development files
+        run: |
+          rm -rf node_modules
+          rm -f package-lock.json
+
+      # ---------------------------------------------------------------
+      # Remove Composer development files
+      # ---------------------------------------------------------------
+      - name: Remove Composer development files
+        run: |
+          rm -rf vendor
+
+      # ---------------------------------------------------------------
+      # Remove AI Agent files
+      # ---------------------------------------------------------------
+      - name: Remove AI Agent files
+        run: |
+          rm -rf .agents
+          rm -rf .ai
+          rm -rf .claude
+          rm -rf .cursor
+          rm -rf .github/ai
+
+          rm -f .mcp.json
+          rm -f CLAUDE.md
+          rm -f AGENTS.md
+          rm -f GEMINI.md
+          rm -f COPILOT.md
+
+      # ---------------------------------------------------------------
+      # Remove development documentation
+      # ---------------------------------------------------------------
+      - name: Remove development documentation
+        run: |
+          rm -f PRD.md
+          rm -f TODO.md
+          rm -f ARCHITECTURE.md
+          rm -f ARCHITECTURE.MD
+          rm -f ERD.md
+          rm -f DESIGN.md
+          rm -f TECHNICAL.md
+          rm -f DEVELOPMENT.md
+          rm -f CONTRIBUTING.md
+
+          rm -rf docs
+
+      # ---------------------------------------------------------------
+      # Remove development configuration
+      # ---------------------------------------------------------------
+      - name: Remove development configuration
+        run: |
+          rm -rf .phpunit.cache
+          rm -rf .php-cs-fixer.cache
+
+          rm -f phpstan.neon
+          rm -f phpstan.neon.dist
+
+      # ---------------------------------------------------------------
+      # Remove tests
+      # ---------------------------------------------------------------
+      - name: Remove test files
+        run: |
+          rm -rf tests
+
+      # ---------------------------------------------------------------
+      # Remove Git metadata
+      # ---------------------------------------------------------------
+      - name: Remove Git metadata
+        run: |
+          rm -rf .git
+          rm -rf .github
+
+      # ---------------------------------------------------------------
+      # Remove CI / development files
+      # ---------------------------------------------------------------
+      - name: Remove development files
+        run: |
+          rm -f .editorconfig
+          rm -f .gitattributes
+          rm -f .gitignore
+          rm -f .php-cs-fixer.dist.php
+
+          rm -f pint.json
+          rm -f phpunit.xml
+          rm -f phpunit.xml.dist
+
+      # ---------------------------------------------------------------
+      # Verify production artifact
+      # ---------------------------------------------------------------
+      - name: Verify production artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Checking forbidden files..."
+
+          forbidden=(
+            ".agents"
+            ".ai"
+            ".claude"
+            ".cursor"
+            ".mcp.json"
+            "CLAUDE.md"
+            "AGENTS.md"
+            "GEMINI.md"
+            "COPILOT.md"
+            "PRD.md"
+            "TODO.md"
+            "ARCHITECTURE.md"
+            "ERD.md"
+            "DESIGN.md"
+            "TECHNICAL.md"
+            "DEVELOPMENT.md"
+            "CONTRIBUTING.md"
+            "docs"
+            "tests"
+            ".github"
+            ".git"
+            "node_modules"
+            "vendor"
+          )
+
+          for path in "${forbidden[@]}"; do
+            if [[ -e "$path" ]]; then
+              echo "::error::Forbidden production file exists: $path"
+              exit 1
+            fi
+          done
+
+          echo "Production artifact validation passed."
+
+      # ---------------------------------------------------------------
+      # Create archive
+      # ---------------------------------------------------------------
+      - name: Create production archive
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="${{ steps.version.outputs.version }}"
+          archive="v${version}.tar.gz"
+
+          # Write outside the tree being archived — writing "$archive" inside "."
+          # makes tar observe its own output growing mid-scan ("file changed as
+          # we read it"), even with the file excluded by name.
+          tar \
+            --exclude="storage/logs/*" \
+            --exclude="storage/framework/cache/*" \
+            --exclude="storage/framework/sessions/*" \
+            --exclude="storage/framework/views/*" \
+            --exclude="storage/app/*" \
+            -czf "/tmp/$archive" .
+
+          mv "/tmp/$archive" .
+
+      # ---------------------------------------------------------------
+      # Generate checksum
+      # ---------------------------------------------------------------
+      - name: Generate SHA256 checksum
+        run: |
+          sha256sum \
+            "v${{ steps.version.outputs.version }}.tar.gz" \
+            > "v${{ steps.version.outputs.version }}.sha256"
+
+      # ---------------------------------------------------------------
+      # Upload artifact
+      # ---------------------------------------------------------------
+      - name: Upload production artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: v${{ steps.version.outputs.version }}
+          path: |
+            v${{ steps.version.outputs.version }}.tar.gz
+            v${{ steps.version.outputs.version }}.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      # ---------------------------------------------------------------
+      # Publish GitHub Release
+      # ---------------------------------------------------------------
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.ref.outputs.ref }}"
+          version="${{ steps.version.outputs.version }}"
+
+          asset_tar="v${version}.tar.gz"
+          asset_sha="v${version}.sha256"
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists — uploading assets only."
+            gh release upload "$tag" "$asset_tar" "$asset_sha" --clobber
+          else
+            gh release create "$tag" "$asset_tar" "$asset_sha" \
+              --title "$tag" \
+              --generate-notes
+          fi
